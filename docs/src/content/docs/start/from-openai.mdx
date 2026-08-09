@@ -1,0 +1,187 @@
+---
+title: Coming from OpenAI
+description: The three-line diff that moves working OpenAI code onto Rovie, what carries over unchanged, and the handful of things that don't.
+sidebar:
+  order: 4
+---
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+If you already have working OpenAI code, you are three lines from running it on
+Rovie.
+
+## The diff
+
+<Tabs syncKey="lang">
+<TabItem label="Python">
+
+```diff lang="python"
+  from openai import OpenAI
+
+  client = OpenAI(
+-     base_url="https://api.openai.com/v1",
+-     api_key=os.environ["OPENAI_API_KEY"],
++     base_url="https://api.getrovie.com/v1",
++     api_key=os.environ["ROVIE_API_KEY"],
+  )
+
+  response = client.chat.completions.create(
+-     model="gpt-4o",
++     model="openai/gpt-4o",
+      messages=[{"role": "user", "content": "Hello"}],
+  )
+```
+
+</TabItem>
+<TabItem label="TypeScript">
+
+```diff lang="ts"
+  import OpenAI from 'openai';
+
+  const client = new OpenAI({
+-   baseURL: 'https://api.openai.com/v1',
+-   apiKey: process.env.OPENAI_API_KEY,
++   baseURL: 'https://api.getrovie.com/v1',
++   apiKey: process.env.ROVIE_API_KEY,
+  });
+
+  const response = await client.chat.completions.create({
+-   model: 'gpt-4o',
++   model: 'openai/gpt-4o',
+    messages: [{ role: 'user', content: 'Hello' }],
+  });
+```
+
+</TabItem>
+<TabItem label="LangChain">
+
+```diff lang="python"
+  from langchain_openai import ChatOpenAI
+
+  llm = ChatOpenAI(
+-     model="gpt-4o",
++     model="openai/gpt-4o",
+-     base_url="https://api.openai.com/v1",
++     base_url="https://api.getrovie.com/v1",
+-     api_key=os.environ["OPENAI_API_KEY"],
++     api_key=os.environ["ROVIE_API_KEY"],
+  )
+```
+
+</TabItem>
+<TabItem label="Vercel AI SDK">
+
+```diff lang="ts"
+  import { createOpenAI } from '@ai-sdk/openai';
+
+  const rovie = createOpenAI({
+-   baseURL: 'https://api.openai.com/v1',
+-   apiKey: process.env.OPENAI_API_KEY,
++   baseURL: 'https://api.getrovie.com/v1',
++   apiKey: process.env.ROVIE_API_KEY,
+  });
+
+- const model = rovie('gpt-4o');
++ const model = rovie('openai/gpt-4o');
+```
+
+</TabItem>
+</Tabs>
+
+That is the migration. If your code did anything else with the OpenAI client,
+it keeps doing it.
+
+<Aside type="note" title="Why the model name changes">
+`gpt-4o` becomes `openai/gpt-4o`. One key here reaches nine providers, and
+without a prefix their names would collide — several of them ship something
+called `llama-3.3-70b`. The prefix is what makes one namespace out of nine.
+[`GET /models`](/api/operations/listcatalog/) lists every id.
+</Aside>
+
+## What carries over unchanged
+
+Everything in the chat completions surface, because Rovie serves the same
+request and response shapes:
+
+- Streaming — `stream: true`, SSE chunks, `data: [DONE]`. See
+  [Streaming](/guides/streaming/).
+- Tool calling — `tools`, `tool_choice`, `tool_calls`, tool-role messages. See
+  [Tool calling](/guides/tool-calling/).
+- Structured output — `response_format` with `json_object` or `json_schema`.
+- Sampling — `temperature`, `top_p`, `max_tokens`, `stop`, `n`, `seed`, the
+  penalties.
+- Vision — image parts in `content`, on models that accept them.
+- The error envelope — `{"error": {"message", "type", "param", "code"}}`, so
+  your existing `except APIError` / `catch` blocks keep working.
+- `usage` accounting, including `prompt_tokens_details.cached_tokens`.
+
+## What is different
+
+Five things, and only the first is likely to affect you.
+
+### 1. Model ids are prefixed
+
+Covered above. If you build model names dynamically, that string concatenation
+is the one place to look.
+
+### 2. Some parameters depend on the model
+
+OpenAI's API is one company's models. Rovie's is everyone's, and they don't all
+accept the same fields. `temperature` on a reasoning model that fixes it is a
+`400`, not a silent ignore.
+
+The catalog tells you before you call. Each model carries boolean flags —
+`temperature`, `tool_call`, `reasoning`, `structured_output`, `attachment` —
+and [Capabilities](/models/capabilities/) explains how to read them.
+
+### 3. `402` is a real status code here
+
+You spend against a balance rather than a card, so "out of credit" is an
+ordinary, recoverable response rather than a billing incident. Handle it: alert
+somebody, don't retry. See [Errors and retries](/guides/errors/).
+
+### 4. Rate limits are per key, not per organisation tier
+
+There is no usage tier to climb. Limits are whatever your key is configured
+with, and they are visible on the key itself. See
+[Rate limits and budgets](/guides/limits/).
+
+### 5. Endpoints beyond chat completions
+
+Rovie's documented surface is [chat completions](/api/operations/createchatcompletion/),
+[the model list](/api/operations/listgatewaymodels/) and
+[a health probe](/api/operations/getreadiness/). If your code calls Assistants,
+the Responses API, files, batches or fine-tuning, those are not part of what is
+documented here — check before you migrate, or keep two clients.
+
+## Running both at once
+
+You don't have to cut over. Two clients, one process, is a perfectly good way to
+compare cost and quality on real traffic before committing:
+
+```python
+openai_client = OpenAI(
+    base_url="https://api.openai.com/v1",
+    api_key=os.environ["OPENAI_API_KEY"],
+)
+
+rovie_client = OpenAI(
+    base_url="https://api.getrovie.com/v1",
+    api_key=os.environ["ROVIE_API_KEY"],
+)
+
+# Same call, same shape, two bills.
+```
+
+Give the Rovie key a small [budget cap](/start/authentication/#narrowing-a-key)
+while you evaluate. Then the experiment cannot cost more than the number you
+chose.
+
+## A checklist
+
+- [ ] `base_url` points at `https://api.getrovie.com/v1`
+- [ ] Key comes from `ROVIE_API_KEY`, out of a secret store
+- [ ] Every model name is provider-prefixed
+- [ ] Anything reading `OPENAI_API_KEY` elsewhere in the process is accounted for
+- [ ] `402` is handled distinctly from `429`
+- [ ] There is a balance on the account

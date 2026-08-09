@@ -1,0 +1,17 @@
+# https://docs.rovie.africa
+#
+# Everything here is meant to be found. Nothing on this host is private, gated
+# or session-scoped, so there is nothing to exclude.
+
+User-agent: *
+Allow: /
+
+# The generated plain-text mirrors of this site, for models rather than for
+# people. Explicitly allowed rather than left to inference - a crawler that
+# skips them falls back to parsing HTML for the same content, which is worse
+# for everyone.
+Allow: /llms.txt
+Allow: /llms-small.txt
+Allow: /llms-full.txt
+
+Sitemap: https://docs.rovie.africa/sitemap-index.xml

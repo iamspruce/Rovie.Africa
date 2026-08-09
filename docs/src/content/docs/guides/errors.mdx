@@ -1,0 +1,189 @@
+---
+title: Errors and retries
+description: Every status code the gateway returns, which are worth retrying, and the backoff schedule to use when they are.
+sidebar:
+  order: 4
+---
+
+import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+Errors come back in OpenAI's envelope, so existing handling keeps working:
+
+```json
+{
+  "error": {
+    "message": "Insufficient balance. Top up at https://rovie.africa/dashboard/billing",
+    "type": "insufficient_quota",
+    "param": null,
+    "code": "insufficient_quota"
+  }
+}
+```
+
+Branch on `code`. `message` is written for a human and its wording can change.
+
+## The table
+
+| Status | Meaning | Retry? |
+| --- | --- | --- |
+| `400` | Malformed body, or a parameter this model rejects | **No** — fix the request |
+| `401` | Key missing, malformed, revoked or expired | **No** |
+| `402` | Out of balance, or past this key's budget cap | **No** — top up |
+| `404` | No such model, or the key is scoped away from it | **No** |
+| `429` | Over a rate limit | **Yes**, with backoff |
+| `500` | Rovie failed | **Yes**, a couple of times |
+| `503` | Upstream provider unavailable | **Yes**, or switch model |
+| Timeout | No response in time | **Yes**, carefully — see below |
+
+The distinction that matters: **`4xx` except `429` will fail identically
+forever.** Retrying them burns latency and, in the `402` case, hides the actual
+problem from whoever could fix it.
+
+## The ones with a Rovie-specific meaning
+
+### `402` — out of balance
+
+You spend against a balance, not a card, so this is an ordinary operational
+state rather than a billing incident. Nothing was charged and nothing reached
+the provider.
+
+Do not retry. Alert someone. Better still, don't get here: set a
+[low-balance email](https://rovie.africa/dashboard/account) so you hear about
+it before your users do.
+
+If it fires while you know the account has credit, the cause is the key's own
+`maxBudgetUsd` cap rather than the account — see
+[Rate limits and budgets](/guides/limits/).
+
+### `404` on a model you know exists
+
+Two causes, and the second is easy to miss:
+
+1. The id is wrong — usually a missing provider prefix (`gpt-4o` rather than
+   `openai/gpt-4o`).
+2. The key is [scoped to a model list](/start/authentication/#narrowing-a-key)
+   that excludes it.
+
+`GET /v1/models` answers both: it returns what *this key* can reach.
+
+### `503` — the provider is down
+
+Rovie does not silently reroute to a different model. A request for Claude that
+came back answered by GPT would be worse than a failure — different quality,
+different price, and no way for you to know it happened.
+
+So a `503` is yours to decide about. Retry, or fall back to a model you have
+chosen in advance:
+
+```python
+PREFERRED = "anthropic/claude-sonnet-5"
+FALLBACK = "openai/gpt-4o"
+
+try:
+    response = complete(PREFERRED, messages)
+except ServiceUnavailable:
+    logger.warning("falling back", extra={"from": PREFERRED, "to": FALLBACK})
+    response = complete(FALLBACK, messages)
+```
+
+Log the substitution. A silent fallback is the thing being avoided in the first
+place.
+
+## Retrying well
+
+Exponential backoff with jitter. The jitter is not optional: without it, every
+client that failed at the same moment retries at the same moment, and the
+retries are the outage.
+
+<Tabs syncKey="lang">
+<TabItem label="Python">
+
+```python
+import random, time
+from openai import APIStatusError, APITimeoutError
+
+RETRYABLE = {429, 500, 502, 503, 504}
+
+def with_retries(call, attempts=4):
+    for attempt in range(attempts):
+        try:
+            return call()
+        except APIStatusError as error:
+            if error.status_code not in RETRYABLE or attempt == attempts - 1:
+                raise
+            # Honour Retry-After when the server sent one; it knows better
+            # than the schedule does.
+            after = error.response.headers.get("retry-after")
+            delay = float(after) if after else (2 ** attempt) + random.random()
+        except APITimeoutError:
+            if attempt == attempts - 1:
+                raise
+            delay = (2 ** attempt) + random.random()
+
+        time.sleep(delay)
+```
+
+</TabItem>
+<TabItem label="TypeScript">
+
+```ts
+const RETRYABLE = new Set([429, 500, 502, 503, 504]);
+
+async function withRetries<T>(call: () => Promise<T>, attempts = 4): Promise<T> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await call();
+    } catch (error) {
+      const status = (error as { status?: number }).status;
+      const retryable = status === undefined || RETRYABLE.has(status);
+
+      if (!retryable || attempt === attempts - 1) throw error;
+
+      const after = (error as { headers?: Headers }).headers?.get('retry-after');
+      const delay = after ? Number(after) * 1000 : 2 ** attempt * 1000 + Math.random() * 1000;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+}
+```
+
+</TabItem>
+</Tabs>
+
+<Aside type="tip" title="The SDKs already do some of this">
+The official OpenAI clients retry a few status codes on their own. Check
+`max_retries` before wrapping them in a second layer — two independent retry
+loops multiply into far more attempts than either intended.
+</Aside>
+
+### Timeouts are the dangerous one
+
+A timeout does not mean the request failed. It means you stopped waiting. The
+provider may well have generated a full response, which you are billed for and
+never saw.
+
+So:
+
+- **Set the timeout to fit the work.** A long generation on a reasoning model
+  legitimately takes a minute. A default of ten seconds turns success into a
+  retry, and pays twice.
+- **Prefer [streaming](/guides/streaming/) for anything long.** First-token
+  latency is a much better signal of a stuck request than total duration.
+- **Retry timeouts less eagerly than `429`s** — once, not three times.
+
+## What is not charged
+
+Nothing is charged for a request that never reached a provider: `400`, `401`,
+`402`, `404`, `429` and Rovie's own `500`s are free.
+
+You *are* charged when a provider generated tokens, even if you never used
+them — a timeout you abandoned, a stream you cancelled mid-flight, a `503`
+returned after partial generation. These show up in your
+[usage breakdown](/guides/usage/) as failed requests with a non-zero spend,
+which is the honest accounting rather than a comfortable one.
+
+## Logging worth having
+
+When a call fails, record the status, `error.code`, the model, and the request
+id from the response headers if present. With those four fields a support
+conversation takes one message instead of five.

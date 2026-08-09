@@ -1,0 +1,168 @@
+/* -----------------------------------------------------------------------
+ * Rovie's palette and typefaces, expressed in Starlight's token names.
+ *
+ * The values are NOT invented here. Every colour below is copied from
+ * ../../../src/styles/base/_theme.scss, which is the app's source of truth and
+ * carries the measured contrast ratio for each one in a comment. This file is
+ * a translation layer, not a second palette: if a colour needs to change it
+ * changes there first and is copied here, so docs.rovie.africa and
+ * rovie.africa can never drift into two slightly different blues.
+ *
+ * Starlight's scheme is inverted from the app's. It ships dark-first, with
+ * :root carrying dark and [data-theme='light'] overriding - so the blocks
+ * below read in the opposite order from _theme.scss. The values are the same
+ * ones, on the same side.
+ * --------------------------------------------------------------------- */
+
+@import '@fontsource-variable/bricolage-grotesque';
+@import '@fontsource/atkinson-hyperlegible/400.css';
+@import '@fontsource/atkinson-hyperlegible/700.css';
+
+:root {
+  /* ------------------------------------------------------------ typefaces
+   * The same three roles the app uses, for the same reasons:
+   *
+   * Display - Bricolage Grotesque, a grotesque assembled from parts that
+   * don't quite agree, which is the shape of what Rovie does.
+   *
+   * Body - Atkinson Hyperlegible, drawn so characters cannot be mistaken for
+   * one another. On a docs site full of API keys, base URLs and per-million
+   * prices, "cannot misread a digit or an l/1/I" is a functional requirement.
+   *
+   * Code - the reader's own system mono, deliberately. A code block should
+   * look like the terminal it is about to be pasted into. */
+  --sl-font: 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --sl-font-mono: ui-monospace, 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  --rv-font-display: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+
+  /* Starlight's default 1.75 is set for short pages. Docs are read in long
+   * passes and the measure below is wide, so the lines need more air. */
+  --sl-line-height: 1.75;
+
+  /* Wider than the 45rem default. Every API reference page here carries a
+   * parameter table, and a table that has to scroll sideways inside the prose
+   * column is a table nobody reads. */
+  --sl-content-width: 50rem;
+}
+
+/* ------------------------------------------------------------------ dark
+ * Starlight's default. Matches the @media (prefers-color-scheme: dark) half
+ * of the app's _theme.scss - a true black page, not a charcoal one. */
+:root {
+  --sl-color-white: #ffffff;
+  --sl-color-gray-1: #e9edf1;
+  --sl-color-gray-2: #c3c9d0;
+  --sl-color-gray-3: #8b949d; /* --rv-text-muted, 8.0:1 on black */
+  --sl-color-gray-4: #4a525a;
+  --sl-color-gray-5: #272d34; /* --rv-border */
+  --sl-color-gray-6: #16191d; /* --rv-surface */
+  --sl-color-black: #000000; /* --rv-bg */
+
+  /* --rv-primary / --rv-line. The brand blue is 2.6:1 on black - too dark to
+   * be a link there - so dark gets the lifted version. */
+  --sl-color-accent-low: #062b46;
+  --sl-color-accent: #3d9ae0;
+  --sl-color-accent-high: #a9d2f0;
+
+  --sl-color-text-accent: #5ea0cc; /* --rv-line */
+  --sl-color-bg-nav: #000000;
+  --sl-color-bg-sidebar: #000000;
+  --sl-color-hairline-shade: #272d34;
+
+  /* Asides. Note (blue) and tip (green) carry the theme's own hues rather
+   * than Starlight's defaults, so a callout reads as part of this site. */
+  --sl-color-blue: #3d9ae0;
+  --sl-color-blue-low: #062b46;
+  --sl-color-blue-high: #a9d2f0;
+  --sl-color-green: #2f9e6a; /* --rv-success */
+  --sl-color-green-low: #06301e;
+  --sl-color-green-high: #63c79b; /* --rv-success-text */
+  --sl-color-orange: #e08c1f; /* --rv-accent */
+  --sl-color-orange-low: #3a2404;
+  --sl-color-orange-high: #f0c07a;
+  --sl-color-red: #d9503f; /* --rv-danger */
+  --sl-color-red-low: #3d100b;
+  --sl-color-red-high: #f08b7d; /* --rv-danger-text */
+}
+
+/* ----------------------------------------------------------------- light
+ * The :root half of the app's _theme.scss: a white page with a warm
+ * off-white for raised surfaces, and the brand blue at full strength. */
+:root[data-theme='light'] {
+  --sl-color-white: #000000; /* --rv-text */
+  --sl-color-gray-1: #1a1a1a;
+  --sl-color-gray-2: #3d3a34;
+  --sl-color-gray-3: #6b675e; /* --rv-text-muted, 5.6:1 on white */
+  --sl-color-gray-4: #8c887e;
+  --sl-color-gray-5: #e2ded6; /* --rv-border */
+  --sl-color-gray-6: #f5f3ee; /* --rv-surface */
+  --sl-color-gray-7: #faf9f6;
+  --sl-color-black: #ffffff; /* --rv-bg */
+
+  --sl-color-accent-low: #dbeaf6;
+  --sl-color-accent: #076db0; /* --rv-primary, 5.0:1 */
+  --sl-color-accent-high: #05578d; /* --rv-line, 7.4:1 */
+
+  --sl-color-text-accent: #05578d;
+  --sl-color-bg-nav: #ffffff;
+  --sl-color-bg-sidebar: #ffffff;
+  --sl-color-hairline-shade: #e2ded6;
+
+  --sl-color-blue: #076db0;
+  --sl-color-blue-low: #dbeaf6;
+  --sl-color-blue-high: #05578d;
+  --sl-color-green: #0c6b42; /* --rv-success */
+  --sl-color-green-low: #d6efe3;
+  --sl-color-green-high: #0a5a38; /* --rv-success-text */
+  --sl-color-orange: #b45309; /* --rv-accent, 4.7:1 - the map's amber */
+  --sl-color-orange-low: #fbe8d5;
+  --sl-color-orange-high: #8a3f07;
+  --sl-color-red: #b32d1f; /* --rv-danger */
+  --sl-color-red-low: #f8dcd9;
+  --sl-color-red-high: #96271b; /* --rv-danger-text */
+}
+
+/* --------------------------------------------------------------- headings
+ * Bricolage sets tighter than a system grotesque, so tracking is pulled back
+ * here rather than per-page - the same figures as the app's _typography.scss. */
+.sl-markdown-content h1,
+.sl-markdown-content h2,
+.sl-markdown-content h3,
+.sl-markdown-content h4,
+.content-panel h1,
+.site-title {
+  font-family: var(--rv-font-display);
+  font-optical-sizing: auto;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.content-panel h1,
+.sl-markdown-content h1 {
+  letter-spacing: -0.035em;
+}
+
+/* ----------------------------------------------------------------- digits
+ * Every figure on this site is money, a token count or a context window, and
+ * all three are read by comparison down a column. Lining tabular digits are
+ * the point of the body face. */
+.sl-markdown-content table,
+.sl-markdown-content td,
+.sl-markdown-content th,
+code {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Tables in an API reference are wide by nature. Let each one scroll inside
+ * its own box rather than letting the page scroll sideways. */
+.sl-markdown-content table {
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* ------------------------------------------------------------- site title
+ * Sits next to the mark in the header, the same pairing as the app's. */
+.site-title {
+  letter-spacing: -0.03em;
+}

@@ -1,0 +1,213 @@
+---
+/**
+ * The live catalog, on a docs page.
+ *
+ * The only dynamic thing on this site, and a deliberate exception: a
+ * hand-written price table would be wrong within a week, and a docs page whose
+ * numbers are stale is worse than one that has no numbers on it.
+ *
+ * It reads the same two public endpoints the models page on rovie.africa uses
+ * - GET /models and GET /fx/rates, neither of which needs a key - so these are
+ * the figures the product shows rather than a copy of them.
+ *
+ * Plain Astro plus a <script>, not a React island. Shipping a UI runtime for
+ * one table on one page is a bad trade at any size, and it is worse here:
+ * starlight-llms-txt renders every page to text without a framework renderer
+ * registered, so a framework component in a page breaks the /llms-*.txt build
+ * outright. This is ~2 KB of JavaScript and no dependency.
+ *
+ * The empty table below is what ships in the HTML - it is also what a reader
+ * with JavaScript off, or a failed fetch, sees replaced by a link to the same
+ * data. The page never depends on the request succeeding.
+ */
+---
+
+<div class="model-table" data-model-table>
+  <div class="model-table__controls">
+    <label>
+      <span class="sr-only">Filter models</span>
+      <input type="search" placeholder="Filter by name or provider…" data-filter disabled />
+    </label>
+
+    <label>
+      <span class="sr-only">Currency</span>
+      <select data-currency disabled>
+        <option value="USD">USD</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="model-table__scroll">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Model</th>
+          <th scope="col">Model id</th>
+          <th scope="col">Context</th>
+          <th scope="col">Input</th>
+          <th scope="col">Output</th>
+        </tr>
+      </thead>
+      <tbody data-rows></tbody>
+    </table>
+  </div>
+
+  <p class="model-table__note" data-note>Loading the live catalog…</p>
+</div>
+
+<script>
+  const API = 'https://api.getrovie.com';
+
+  interface CatalogModel {
+    litellmModelName: string;
+    provider: string;
+    name: string;
+    limit?: { context?: number; output?: number };
+    /** USD per ONE MILLION tokens. Not per token. */
+    cost?: { input: number; output: number; cache_read?: number };
+  }
+
+  interface FxRates {
+    currencies: Record<string, { ratePerUsd: number }>;
+    supported: string[];
+    fetchedAt: number;
+  }
+
+  /** Midpoint of the two rates. Only ever a sort key - never shown as a price. */
+  function blended(model: CatalogModel): number | null {
+    return model.cost ? (model.cost.input + model.cost.output) / 2 : null;
+  }
+
+  function formatContext(tokens: number | undefined): string {
+    if (!tokens) return '—';
+    if (tokens >= 1_000_000) return `${(tokens / 1_000_000).toFixed(1).replace(/\.0$/, '')}M`;
+    return `${Math.round(tokens / 1000)}K`;
+  }
+
+  const root = document.querySelector<HTMLElement>('[data-model-table]');
+  if (root) {
+    const filter = root.querySelector<HTMLInputElement>('[data-filter]')!;
+    const currencySelect = root.querySelector<HTMLSelectElement>('[data-currency]')!;
+    const body = root.querySelector<HTMLElement>('[data-rows]')!;
+    const note = root.querySelector<HTMLElement>('[data-note]')!;
+
+    let models: CatalogModel[] = [];
+    let rates: FxRates | null = null;
+
+    function currentRate(): number | null {
+      const code = currencySelect.value;
+      if (code === 'USD') return 1;
+      return rates?.currencies[code]?.ratePerUsd ?? null;
+    }
+
+    function price(usdPerMillion: number | undefined): string {
+      if (usdPerMillion === undefined) return '—';
+      const rate = currentRate();
+      if (rate === null) return `$${usdPerMillion.toFixed(2)}`;
+      const value = usdPerMillion * rate;
+      // Local figures run to thousands; dollars run to fractions of one.
+      return currencySelect.value === 'USD'
+        ? `$${value.toFixed(2)}`
+        : value.toLocaleString(undefined, { maximumFractionDigits: 0 });
+    }
+
+    function render() {
+      const needle = filter.value.trim().toLowerCase();
+
+      const rows = models
+        .filter(
+          (model) =>
+            !needle ||
+            model.name.toLowerCase().includes(needle) ||
+            model.litellmModelName.toLowerCase().includes(needle) ||
+            model.provider.toLowerCase().includes(needle)
+        )
+        .sort((a, b) => {
+          const left = blended(a);
+          const right = blended(b);
+          // A model with no published price sorts last, never as if it were free.
+          if (left === null) return right === null ? 0 : 1;
+          if (right === null) return -1;
+          return left - right;
+        });
+
+      body.replaceChildren(
+        ...rows.map((model) => {
+          const tr = document.createElement('tr');
+
+          const name = document.createElement('td');
+          name.append(model.name);
+          const provider = document.createElement('span');
+          provider.className = 'model-table__provider';
+          provider.textContent = model.provider;
+          name.append(provider);
+
+          const id = document.createElement('td');
+          const code = document.createElement('code');
+          code.textContent = model.litellmModelName;
+          id.append(code);
+
+          const context = document.createElement('td');
+          context.className = 'model-table__number';
+          context.textContent = formatContext(model.limit?.context);
+
+          const input = document.createElement('td');
+          input.className = 'model-table__number';
+          input.textContent = price(model.cost?.input);
+
+          const output = document.createElement('td');
+          output.className = 'model-table__number';
+          output.textContent = price(model.cost?.output);
+
+          tr.append(name, id, context, input, output);
+          return tr;
+        })
+      );
+
+      const rate = currentRate();
+      const conversion =
+        currencySelect.value === 'USD'
+          ? ''
+          : rate === null
+            ? ', shown in USD — no live rate for that currency'
+            : `, converted at ${rate.toLocaleString()} ${currencySelect.value} to the dollar`;
+
+      note.textContent = `${rows.length} of ${models.length} models. Prices are per one million tokens${conversion}.`;
+    }
+
+    function fail() {
+      note.innerHTML =
+        'The live catalog could not be reached. Every model and its current price is on the ' +
+        '<a href="https://rovie.africa/models">models page</a>, and ' +
+        '<a href="/api/operations/listcatalog/"><code>GET /models</code></a> serves the same data.';
+    }
+
+    // Settled, not all: the catalog is the point and the rates are a
+    // refinement. Losing the FX feed should downgrade this to dollars, not
+    // blank the table.
+    Promise.allSettled([
+      fetch(`${API}/models`).then((response) => response.json()),
+      fetch(`${API}/fx/rates`).then((response) => response.json()),
+    ]).then(([catalog, fx]) => {
+      if (catalog.status !== 'fulfilled' || !Array.isArray(catalog.value?.models)) {
+        fail();
+        return;
+      }
+
+      models = catalog.value.models;
+
+      if (fx.status === 'fulfilled' && fx.value?.currencies) {
+        rates = fx.value as FxRates;
+        currencySelect.append(
+          ...(rates.supported ?? []).map((code) => new Option(code, code))
+        );
+        currencySelect.disabled = false;
+      }
+
+      filter.disabled = false;
+      filter.addEventListener('input', render);
+      currencySelect.addEventListener('change', render);
+      render();
+    });
+  }
+</script>

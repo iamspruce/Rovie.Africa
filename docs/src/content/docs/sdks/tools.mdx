@@ -1,0 +1,165 @@
+---
+title: Editors and agents
+description: Running Cursor, Continue, OpenCode, Zed, Aider and other coding tools against Rovie's model list on your own balance.
+sidebar:
+  order: 4
+---
+
+import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+Most coding tools let you point at a custom OpenAI-compatible endpoint. That
+means one Rovie key gives them the whole catalog — you can put Claude behind a
+tool that ships with GPT defaults, and pay for it from a balance you topped up
+in naira.
+
+Everything below needs the same two values:
+
+| | |
+| --- | --- |
+| **Base URL** | `https://api.getrovie.com/v1` |
+| **API key** | `rv_...` from [your dashboard](https://rovie.africa/dashboard/keys) |
+
+<Aside type="tip" title="Use a separate key">
+Give each machine its own labelled key with a
+[budget cap](/guides/limits/#budgets) — `laptop-adeola`, $20. An editor is the
+easiest key to leak (synced settings, a screenshare, a dotfiles repo), and a
+capped key turns that into a small, bounded problem. It also gives you a clean
+per-machine line in your [usage breakdown](/guides/usage/).
+</Aside>
+
+## Setup by tool
+
+<Tabs>
+<TabItem label="Cursor">
+
+Settings → Models → **Override OpenAI Base URL**.
+
+1. Set the base URL to `https://api.getrovie.com/v1`.
+2. Paste the key into the OpenAI API key field.
+3. Add the models you want by their full ids — `anthropic/claude-sonnet-5`,
+   `openai/gpt-4o` — then verify.
+
+Cursor's own indexing and tab-completion models are not affected by this; the
+override applies to the chat and agent models it sends to your endpoint.
+
+</TabItem>
+<TabItem label="Continue">
+
+In `~/.continue/config.json`:
+
+```json
+{
+  "models": [
+    {
+      "title": "Claude Sonnet 5 (Rovie)",
+      "provider": "openai",
+      "model": "anthropic/claude-sonnet-5",
+      "apiBase": "https://api.getrovie.com/v1",
+      "apiKey": "rv_..."
+    },
+    {
+      "title": "GPT-4o mini (Rovie)",
+      "provider": "openai",
+      "model": "openai/gpt-4o-mini",
+      "apiBase": "https://api.getrovie.com/v1",
+      "apiKey": "rv_..."
+    }
+  ]
+}
+```
+
+`"provider": "openai"` with `apiBase` overridden is the pattern — not a
+Rovie-specific provider, which does not exist.
+
+</TabItem>
+<TabItem label="Zed">
+
+In `settings.json`:
+
+```json
+{
+  "language_models": {
+    "openai": {
+      "api_url": "https://api.getrovie.com/v1",
+      "available_models": [
+        { "name": "anthropic/claude-sonnet-5", "max_tokens": 200000 },
+        { "name": "openai/gpt-4o", "max_tokens": 128000 }
+      ]
+    }
+  }
+}
+```
+
+Set the key through Zed's assistant panel rather than in the settings file.
+`max_tokens` is the model's context window — read it off
+[`GET /models`](/api/operations/listcatalog/) as `limit.context`.
+
+</TabItem>
+<TabItem label="Aider">
+
+```bash
+export OPENAI_API_BASE="https://api.getrovie.com/v1"
+export OPENAI_API_KEY="rv_..."
+
+aider --model openai/anthropic/claude-sonnet-5
+```
+
+The doubled prefix is not a typo: aider routes through LiteLLM, so `openai/`
+tells it *how to talk* (the OpenAI protocol) and `anthropic/claude-sonnet-5` is
+the model id Rovie expects.
+
+</TabItem>
+<TabItem label="OpenCode">
+
+The dashboard generates a ready-to-paste config for OpenCode, built server-side
+from the model list the gateway is actually serving — so the model names in it
+are current by construction. Find it under
+[API keys](https://rovie.africa/dashboard/keys).
+
+</TabItem>
+</Tabs>
+
+## Anything else
+
+The pattern is the same everywhere. Look for whichever of these the tool
+offers:
+
+- "OpenAI-compatible" / "Custom OpenAI endpoint" provider
+- An **API base URL** or **base URL** override
+- `OPENAI_API_BASE` or `OPENAI_BASE_URL` as an environment variable
+
+Then use provider-prefixed model ids. If the tool rejects a model name with a
+slash in it, that is a limitation of the tool rather than of Rovie — some
+validate names against a hard-coded OpenAI list.
+
+## Watching what an agent spends
+
+Coding agents are the least predictable spend on any account. They send large
+prompts (your whole file, sometimes your whole repo), they loop, and they run
+while you are doing something else.
+
+Three things worth doing before you leave one running:
+
+1. **Cap the key.** A [budget](/guides/limits/#budgets) is the only hard stop.
+2. **Watch cached tokens.** Agents resend a lot of identical context, so
+   `cache_read` rates dominate the bill — see
+   [Usage](/guides/usage/#cached-tokens).
+3. **Check the per-key spend** on
+   [the keys page](https://rovie.africa/dashboard/keys) after the first real
+   session, before you form a habit around a model whose cost you have not
+   looked at.
+
+## Model ids
+
+Always provider-prefixed:
+
+```text
+openai/gpt-4o
+openai/gpt-4o-mini
+anthropic/claude-sonnet-5
+google/gemini-2.5-pro
+```
+
+[The catalog](/models/catalog/) has the live list; it is also what
+`GET /v1/models` returns for your key, which is the quickest way to check what
+a given key can actually reach.

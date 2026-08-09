@@ -1,0 +1,86 @@
+name: CI
+
+# Two sites in one repository, built and checked independently.
+#
+# They are separate jobs rather than steps in one, because they fail for
+# unrelated reasons and neither should be blocked by the other: a broken link
+# in a guide must not stop the app shipping, and a failing component test must
+# not stop a documentation fix.
+#
+# `paths` on neither job, deliberately. The docs link into the app's routes and
+# the app links into the docs', so a change to one CAN break the other - and a
+# path filter is exactly what would let that through.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  app:
+    name: App
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      # Not just a compile check: vite/seo-plugin.js runs at closeBundle and
+      # writes one prerendered HTML file per indexable route plus the sitemap.
+      # A route missing its <head> is a build-time failure, not a runtime one.
+      - name: Build
+        run: npm run build
+
+  docs:
+    name: Docs
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: docs
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: docs/package-lock.json
+
+      - run: npm ci
+
+      # Fails in a second with a readable error, rather than thirty seconds
+      # into the build with a stack trace. Same parser starlight-openapi uses.
+      - name: Validate openapi.yaml
+        run: npm run openapi:validate
+
+      # The mark is generated from the app's own wordmark geometry. Rebuilding
+      # it here catches the case where that geometry changed and the committed
+      # SVGs were not regenerated - the docs would otherwise ship a stale logo
+      # indefinitely, with nothing to notice it by.
+      - name: Check the logo is up to date
+        run: |
+          npm run logo:build
+          git diff --exit-code src/assets/logo-light.svg src/assets/logo-dark.svg
+
+      # CI=true turns on starlight-links-validator, so a broken internal link
+      # fails here. `npm run build` also runs check-api-links.mjs, which covers
+      # the reference routes the validator cannot see.
+      - name: Build
+        run: npm run build
+        env:
+          CI: 'true'

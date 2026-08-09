@@ -1,0 +1,142 @@
+---
+title: Choosing a model
+description: How to pick from sixty models across nine providers without guessing — by capability first, then by what a million tokens actually costs you.
+sidebar:
+  order: 1
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+The gateway removes the cost of being wrong: changing model is changing a
+string. That makes the question less "which is best" and more "which is the
+cheapest one that clears the bar", which is a question you can answer by
+measuring.
+
+## Work down, not up
+
+The instinct is to reach for the strongest model and downgrade if the bill
+hurts. Do it the other way. Start at the bottom of the ladder and stop at the
+first rung that passes your own evaluation:
+
+1. **A small model** — `openai/gpt-4o-mini`, `google/gemini-2.5-flash`,
+   `anthropic/claude-haiku-4-5`. Classification, extraction, routing,
+   summarising, rewriting, most chat. This tier is one to two orders of
+   magnitude cheaper than the top, and for a large share of production traffic
+   it is indistinguishable.
+2. **A mid model** — `anthropic/claude-sonnet-5`, `openai/gpt-4o`,
+   `google/gemini-2.5-pro`. Multi-step reasoning, code, long documents,
+   anything where the small tier visibly wavers.
+3. **A reasoning model** — the ones whose catalog `reasoning` flag is true.
+   Genuinely hard problems: novel maths, deep debugging, planning. They think
+   before answering, which costs tokens and seconds, so paying for it on a
+   summarisation task is pure waste.
+
+<Aside type="tip" title="The cheapest optimisation available">
+Moving a high-volume, low-difficulty path from a frontier model to a small one
+is usually a 90%+ cost reduction for no measurable quality loss. Nothing else
+you can do to a prompt comes close.
+</Aside>
+
+## Filter by capability before price
+
+A model that cannot do the thing is not cheap, it is broken. Read the flags off
+[`GET /models`](/api/operations/listcatalog/) before you compare rates:
+
+| You need | Require |
+| --- | --- |
+| Function/tool calling | `tool_call: true` |
+| Guaranteed JSON shape | `structured_output: true` |
+| Image input | `modalities.input` contains `image` |
+| File attachments | `attachment: true` |
+| Extended thinking | `reasoning: true` |
+| To set `temperature` | `temperature: true` |
+| A long document in one call | `limit.context` above your token count |
+
+[Capabilities](/models/capabilities/) covers each flag and the failure you get
+when you ignore it.
+
+## Then compare price properly
+
+`cost.input` and `cost.output` are **USD per one million tokens**. Not per
+token — reading them that way puts a price out by a factor of a million.
+
+The two rates matter differently depending on what you are doing, and this is
+where most cost estimates go wrong:
+
+- **Long prompt, short answer** — RAG, classification, extraction. `cost.input`
+  dominates. A model with a cheap input rate and an expensive output rate can
+  be the right pick.
+- **Short prompt, long answer** — drafting, code generation. `cost.output`
+  dominates, and output is typically three to five times the input rate.
+
+A blended average is a reasonable first sort — it is what
+[the models page](https://rovie.africa/models) ranks by — but for a real
+estimate use your own ratio:
+
+```python
+def cost_per_call(model, prompt_tokens, completion_tokens):
+    """USD for one call. Rates are per MILLION tokens."""
+    return (
+        prompt_tokens * model["cost"]["input"] / 1_000_000
+        + completion_tokens * model["cost"]["output"] / 1_000_000
+    )
+```
+
+Multiply by calls per month before comparing anything. The difference between
+two models is meaningless per call and decisive at a million.
+
+### Don't forget cached input
+
+Models with a `cost.cache_read` rate charge far less for prompt tokens the
+provider served from its own cache. If you send a large, stable system prompt
+on every call, that rate is the one that governs your bill — not
+`cost.input`. See [Usage and cost tracking](/guides/usage/#cached-tokens).
+
+## Check what the continent already runs
+
+[Rankings](https://rovie.africa/rankings) is measured traffic through the
+gateway, not a survey: which models are actually being used, how fast they
+answer, and what a typical session costs. The latency table is the useful part —
+median time to first token is the number your users feel, and it varies far
+more between models than the marketing suggests.
+
+## Then measure, on your own task
+
+Benchmarks are someone else's task. Twenty examples of yours, run through three
+candidates, will tell you more than any leaderboard:
+
+```python
+CANDIDATES = [
+    "openai/gpt-4o-mini",
+    "google/gemini-2.5-flash",
+    "anthropic/claude-sonnet-5",
+]
+
+for model in CANDIDATES:
+    for case in eval_cases:
+        response = client.chat.completions.create(
+            model=model,
+            messages=case["messages"],
+        )
+        record(model, case, response.choices[0].message.content, response.usage)
+```
+
+Use a [key with a budget cap](/start/authentication/#narrowing-a-key) for the
+sweep, and tag it so the spend shows up separately in
+[your usage breakdown](/guides/usage/). Then the evaluation has a known
+maximum cost and a legible line in the bill.
+
+## Practical defaults
+
+If you want to stop reading and ship:
+
+| Job | Start with |
+| --- | --- |
+| Chat, support, general assistant | `google/gemini-2.5-flash` |
+| Classification, extraction, routing | `openai/gpt-4o-mini` |
+| Code generation and review | `anthropic/claude-sonnet-5` |
+| Long documents | whichever candidate's `limit.context` clears your input |
+| Hard reasoning | any model with `reasoning: true` |
+
+Model names move. [`GET /models`](/api/operations/listcatalog/) is always current;
+this table is a starting point, not a maintained ranking.

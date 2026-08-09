@@ -1,0 +1,213 @@
+---
+title: Streaming
+description: Stream tokens as they are generated — the SSE format, how to consume it in each language, and how to still find out what the call cost.
+sidebar:
+  order: 2
+---
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+A model that takes six seconds to answer feels broken if nothing appears for
+six seconds, and fine if the first word lands in four hundred milliseconds.
+Same latency, different product. Stream anything a person is waiting on.
+
+Set `stream: true` and the response becomes a `text/event-stream` — the same
+format OpenAI uses, so an existing SSE consumer works unchanged.
+
+## In each language
+
+<Tabs syncKey="lang">
+<TabItem label="Python">
+
+```python
+stream = client.chat.completions.create(
+    model="anthropic/claude-sonnet-5",
+    messages=[{"role": "user", "content": "Explain FX spreads in three sentences."}],
+    stream=True,
+    stream_options={"include_usage": True},
+)
+
+for chunk in stream:
+    if chunk.choices and chunk.choices[0].delta.content:
+        print(chunk.choices[0].delta.content, end="", flush=True)
+    # The final chunk carries usage and no choices.
+    if chunk.usage:
+        print(f"\n\n{chunk.usage.total_tokens} tokens")
+```
+
+</TabItem>
+<TabItem label="TypeScript">
+
+```ts
+const stream = await client.chat.completions.create({
+  model: 'anthropic/claude-sonnet-5',
+  messages: [{ role: 'user', content: 'Explain FX spreads in three sentences.' }],
+  stream: true,
+  stream_options: { include_usage: true },
+});
+
+for await (const chunk of stream) {
+  const delta = chunk.choices[0]?.delta?.content;
+  if (delta) process.stdout.write(delta);
+
+  if (chunk.usage) console.log(`\n\n${chunk.usage.total_tokens} tokens`);
+}
+```
+
+</TabItem>
+<TabItem label="curl">
+
+```bash
+curl -N https://api.getrovie.com/v1/chat/completions \
+  -H "Authorization: Bearer $ROVIE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "anthropic/claude-sonnet-5",
+    "messages": [{"role": "user", "content": "Explain FX spreads in three sentences."}],
+    "stream": true
+  }'
+```
+
+`-N` disables curl's output buffering. Without it curl collects the whole
+stream and prints it at the end, which looks exactly like streaming not
+working.
+
+</TabItem>
+</Tabs>
+
+## The wire format
+
+Each event is a `data:` line carrying one JSON chunk. The stream ends with a
+literal `data: [DONE]`, which is **not** JSON — parsing it is the classic bug
+in a hand-rolled consumer.
+
+```text
+data: {"id":"chatcmpl-abc","object":"chat.completion.chunk","choices":[{"index":0,"delta":{"role":"assistant"},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-abc","object":"chat.completion.chunk","choices":[{"index":0,"delta":{"content":"FX "},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-abc","object":"chat.completion.chunk","choices":[{"index":0,"delta":{"content":"spreads"},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-abc","object":"chat.completion.chunk","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+data: {"id":"chatcmpl-abc","object":"chat.completion.chunk","choices":[],"usage":{"prompt_tokens":18,"completion_tokens":54,"total_tokens":72}}
+
+data: [DONE]
+```
+
+Three things to know about the shape:
+
+- The first chunk usually carries `delta.role` and no content.
+- `delta.content` is absent — not empty — on chunks that carry nothing. Guard
+  before concatenating.
+- The chunk carrying `usage` has an **empty `choices` array**. Code that
+  reaches for `choices[0]` unconditionally crashes on the last chunk.
+
+## Getting the cost of a streamed call
+
+A streamed response carries no `usage` by default. Ask for it:
+
+```json
+"stream_options": { "include_usage": true }
+```
+
+You almost always want this. Without it you have no per-call token count, and
+the only record of what the call cost is the aggregate on your
+[usage dashboard](https://rovie.africa/dashboard/usage) later.
+
+<Aside type="caution" title="Not every provider sends it">
+`include_usage` is honoured by the providers that implement it. Where an
+upstream does not, no usage chunk arrives — so read it defensively and fall
+back to the dashboard rather than assuming the field will be there.
+</Aside>
+
+## Streaming to a browser
+
+Your key must stay on your server, so the browser talks to you and you talk to
+Rovie. Pass the stream straight through rather than buffering it — buffering is
+the same as not streaming.
+
+```ts
+// A route handler in any Web-standard runtime (Next.js, Hono, Workers, Deno).
+export async function POST(request: Request) {
+  const { messages } = await request.json();
+
+  const upstream = await fetch('https://api.getrovie.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${process.env.ROVIE_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ model: 'openai/gpt-4o-mini', messages, stream: true }),
+  });
+
+  // Hand the body back untouched. No .text(), no .json() - either one waits
+  // for the whole response and throws away the reason you are streaming.
+  return new Response(upstream.body, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      Connection: 'keep-alive',
+    },
+  });
+}
+```
+
+Two things that will bite you in production:
+
+- **Proxies buffer.** nginx does by default; add `proxy_buffering off;` (or
+  `X-Accel-Buffering: no` on the response) or your users see the whole answer
+  at once.
+- **Serverless functions time out.** A long generation can outlive the
+  platform's execution limit. Check the limit against your worst-case
+  completion length before shipping.
+
+## Cancelling
+
+If the user navigates away, stop the stream — you are billed for tokens the
+provider generates, whether or not anyone reads them.
+
+<Tabs syncKey="lang">
+<TabItem label="Python">
+
+```python
+stream = client.chat.completions.create(..., stream=True)
+try:
+    for chunk in stream:
+        if user_gone():
+            break
+finally:
+    stream.close()
+```
+
+</TabItem>
+<TabItem label="TypeScript">
+
+```ts
+const controller = new AbortController();
+const stream = await client.chat.completions.create(
+  { model, messages, stream: true },
+  { signal: controller.signal },
+);
+
+// Later, when the client disconnects:
+controller.abort();
+```
+
+</TabItem>
+</Tabs>
+
+## Errors mid-stream
+
+Once the response has started, the status code is already `200` — a failure
+after that point arrives as an error object inside the stream, or as the
+connection simply ending. So:
+
+- Treat a stream that ends without `finish_reason` as failed, not complete.
+- Retrying means starting over. There is no resume, and you pay for both
+  attempts.
+- `finish_reason: "length"` means the model was cut off by `max_tokens` or its
+  own output ceiling. The answer is incomplete and should be shown as such,
+  not presented as if it had finished.
+
+See [Errors and retries](/guides/errors/) for the rest.

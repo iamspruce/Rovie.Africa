@@ -1,0 +1,152 @@
+---
+title: Authentication
+description: How Rovie API keys work — the header, the one-time reveal, rotation, per-key budgets and where a key must never go.
+sidebar:
+  order: 3
+---
+
+import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+Every inference call carries one header:
+
+```http
+Authorization: Bearer rv_...
+```
+
+That is the whole scheme. No signatures, no client id, no token exchange.
+
+## Getting a key
+
+Keys are created from [the dashboard](https://rovie.africa/dashboard/keys) and
+nowhere else. There is no endpoint that mints one, on purpose: an API that can
+issue keys is an API where one leaked key becomes unlimited keys.
+
+<Aside type="caution" title="You see it once">
+The full key is returned exactly once — at creation, and again at rotation.
+Rovie stores a hash and the leading characters, which is why the dashboard can
+show you `rv_9f3a…` in the list but never the rest. If you lose it, rotate it;
+there is no recovery path, for you or for support.
+</Aside>
+
+## Where to put it
+
+An API key is a bearer credential: whoever holds it can spend your balance. It
+belongs in exactly one class of place — a secret store your server reads at
+runtime.
+
+<Tabs syncKey="lang">
+<TabItem label="Python">
+
+```python
+import os
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.getrovie.com/v1",
+    api_key=os.environ["ROVIE_API_KEY"],  # never a literal
+)
+```
+
+</TabItem>
+<TabItem label="TypeScript">
+
+```ts
+import OpenAI from 'openai';
+
+const client = new OpenAI({
+  baseURL: 'https://api.getrovie.com/v1',
+  apiKey: process.env.ROVIE_API_KEY, // never a literal
+});
+```
+
+</TabItem>
+</Tabs>
+
+### Never in a browser or a mobile app
+
+This is the one rule worth stating bluntly, because it is the most common way
+people lose money.
+
+A key in front-end JavaScript is a key in the page source. A key in a mobile
+binary is a key anyone can pull out with `strings`. Neither is obscured by a
+build step, a minifier, or an environment variable that gets inlined at
+compile time — `VITE_`, `NEXT_PUBLIC_` and `EXPO_PUBLIC_` prefixes all mean
+"put this in the bundle".
+
+If a browser or an app needs a model response, route it through your own
+backend. Your server holds the key, checks that the caller is allowed to spend
+your credit, and forwards the request. That server is also where per-user rate
+limiting belongs.
+
+<Aside type="danger" title="What a leaked key costs">
+Somebody else's traffic on your balance until you notice. Rovie caps the damage
+at your balance — there is no card to overdraft and no invoice at the end of
+the month — but the balance is real money. Revoke immediately from the
+dashboard if a key is ever exposed, then rotate.
+</Aside>
+
+## Narrowing a key
+
+A key can be restricted so that it can do less than your account can. Both
+settings are on the key in your dashboard, and both only ever restrict — a key
+can never be granted access the account doesn't already have.
+
+- **Budget cap** (`maxBudgetUsd`) — a lifetime spend ceiling for this key.
+  Past it, calls fail with `402` and the rest of your balance is untouched.
+  This is what makes a key safe to hand to a prototype, a contractor or a
+  cron job you half-trust.
+- **Model allowlist** — the key may call only these models. Anything else is
+  `404`, which is why a model you know exists can 404 on one key and work on
+  another. `GET /v1/models` returns the list the calling key can actually
+  reach.
+
+The practical shape for a real deployment is one key per environment and per
+service, each labelled, each capped:
+
+| Label | Cap | Models |
+| --- | --- | --- |
+| `prod-api` | none | all |
+| `staging` | $20 | all |
+| `nightly-eval` | $5 | one cheap model |
+| `laptop-adeola` | $10 | all |
+
+Then a compromised laptop key costs ten dollars and one revocation, and your
+[usage breakdown](/guides/usage/) tells you which service spent what without
+any work.
+
+## Rotating a key
+
+Rotation replaces the secret and keeps the key's identity — same label, same
+caps, same row in your usage history. The new value is returned once, exactly
+like creation, and **the old value stops working immediately**.
+
+So the safe order is:
+
+1. Rotate in the dashboard.
+2. Copy the new value into your secret store.
+3. Restart or redeploy the things that read it.
+
+There is no grace period where both work. If you need zero downtime, create a
+second key, deploy it, then revoke the first — that gives you the overlap
+rotation deliberately doesn't.
+
+## Revoking
+
+Revocation is immediate and permanent. A revoked key returns `401` on the next
+call and cannot be un-revoked; create a new one instead.
+
+`401` does not tell you *which* problem you have — missing, malformed, revoked
+or expired all return the same thing. That is deliberate. An endpoint that
+distinguishes them is an endpoint that tells an attacker whether a guessed key
+is real.
+
+## The endpoints that don't need a key
+
+Three of them, all read-only, all documented in the [reference](/api/):
+
+- [`GET /models`](/api/operations/listcatalog/) — the catalog and its prices.
+- [`GET /fx/rates`](/api/operations/getfxrates/) — the conversion rates.
+- [`GET /health/readiness`](/api/operations/getreadiness/) — whether the gateway is up.
+
+You can call these from a browser. They back the public pages on rovie.africa
+and carry nothing account-scoped.

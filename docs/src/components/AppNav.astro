@@ -1,0 +1,71 @@
+---
+/**
+ * Overrides Starlight's SocialIcons slot.
+ *
+ * Starlight has no config key for extra header links, and this is the one slot
+ * that sits in the header's right-hand group next to search and the theme
+ * toggle. So the way back into the product goes here, with the configured
+ * social links still rendered after it - overriding a slot means taking on
+ * what it used to do.
+ *
+ * The links are absolute and cross-origin on purpose: docs.rovie.africa is a
+ * different site from rovie.africa, not a route within it.
+ */
+import Default from '@astrojs/starlight/components/SocialIcons.astro';
+import { APP } from '../../astro.config.mjs';
+
+const links = [
+  { label: 'Models', href: `${APP}/models` },
+  { label: 'Status', href: `${APP}/status` },
+];
+---
+
+<nav class="app-nav" aria-label="Rovie">
+  {links.map(({ label, href }) => <a href={href}>{label}</a>)}
+  <a class="app-nav__cta" href={`${APP}/dashboard`}>Dashboard</a>
+</nav>
+
+<Default><slot /></Default>
+
+<style>
+  .app-nav {
+    display: none;
+    align-items: center;
+    gap: 1rem;
+    font-size: var(--sl-text-sm);
+  }
+
+  /* Below the point where Starlight's header stops being a single row there
+     is no space for these, and the links all exist in the footer of the app
+     anyway. Hiding beats wrapping the header onto two lines. */
+  @media (min-width: 50rem) {
+    .app-nav {
+      display: flex;
+    }
+  }
+
+  .app-nav a {
+    color: var(--sl-color-gray-2);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .app-nav a:hover {
+    color: var(--sl-color-white);
+  }
+
+  /* The one link that is an action rather than a destination. Outlined
+     rather than filled: a solid button up here would outrank the search
+     field, which is what most readers actually came to use. */
+  .app-nav__cta {
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 4px;
+    color: var(--sl-color-white);
+  }
+
+  .app-nav__cta:hover {
+    border-color: var(--sl-color-text-accent);
+    color: var(--sl-color-text-accent);
+  }
+</style>

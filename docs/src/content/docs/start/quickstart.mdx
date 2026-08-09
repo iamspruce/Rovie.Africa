@@ -1,0 +1,207 @@
+---
+title: Quickstart
+description: From no account to a model's response in about five minutes — sign up, top up, get a key, make the call.
+sidebar:
+  order: 2
+---
+
+import { Steps, Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+Five minutes, four steps, one working request.
+
+<Steps>
+
+1. ### Create an account
+
+   [Sign up](https://rovie.africa/signup) with an email address, Google or
+   GitHub. You will be asked which country you are in — that is what decides
+   the currency every price on the site is quoted in, and it can be changed
+   later from your account settings.
+
+2. ### Put something on the balance
+
+   Rovie spends against a balance, not a card, so there is nothing to call
+   until there is credit behind it.
+
+   Go to [Billing](https://rovie.africa/dashboard/billing) and top up by bank
+   transfer or stablecoin. The minimum is small and deliberately so — a couple
+   of dollars is enough to run the rest of this page many times over.
+
+   <Aside type="tip" title="What a test costs">
+   The call below, on `gpt-4o-mini`, is a few hundred tokens. At its current
+   rate that is a fraction of a US cent. You are not spending your top-up on a
+   quickstart.
+   </Aside>
+
+3. ### Create an API key
+
+   On [API keys](https://rovie.africa/dashboard/keys), create one and give it a
+   label you will recognise in six months (`billing-service`, `laptop`,
+   `staging`).
+
+   <Aside type="caution" title="Shown once">
+   The full key appears exactly once, at the moment you create it. Rovie stores
+   only a hash and the first few characters, so it cannot be shown again and
+   support cannot recover it. Put it in your password manager or your secret
+   store before closing the dialog. Lost one? [Rotate
+   it](/start/authentication/#rotating-a-key).
+   </Aside>
+
+   ```bash
+   export ROVIE_API_KEY="rv_..."
+   ```
+
+4. ### Make the call
+
+   <Tabs syncKey="lang">
+   <TabItem label="curl">
+
+   ```bash
+   curl https://api.getrovie.com/v1/chat/completions \
+     -H "Authorization: Bearer $ROVIE_API_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "model": "openai/gpt-4o-mini",
+       "messages": [
+         {"role": "user", "content": "Name three rivers in West Africa."}
+       ]
+     }'
+   ```
+
+   </TabItem>
+   <TabItem label="Python">
+
+   ```python
+   # pip install openai
+   import os
+   from openai import OpenAI
+
+   client = OpenAI(
+       base_url="https://api.getrovie.com/v1",
+       api_key=os.environ["ROVIE_API_KEY"],
+   )
+
+   response = client.chat.completions.create(
+       model="openai/gpt-4o-mini",
+       messages=[{"role": "user", "content": "Name three rivers in West Africa."}],
+   )
+
+   print(response.choices[0].message.content)
+   ```
+
+   </TabItem>
+   <TabItem label="TypeScript">
+
+   ```ts
+   // npm install openai
+   import OpenAI from 'openai';
+
+   const client = new OpenAI({
+     baseURL: 'https://api.getrovie.com/v1',
+     apiKey: process.env.ROVIE_API_KEY,
+   });
+
+   const response = await client.chat.completions.create({
+     model: 'openai/gpt-4o-mini',
+     messages: [{ role: 'user', content: 'Name three rivers in West Africa.' }],
+   });
+
+   console.log(response.choices[0].message.content);
+   ```
+
+   </TabItem>
+   <TabItem label="Go">
+
+   ```go
+   // go get github.com/openai/openai-go/v2
+   package main
+
+   import (
+       "context"
+       "fmt"
+       "os"
+
+       "github.com/openai/openai-go/v2"
+       "github.com/openai/openai-go/v2/option"
+   )
+
+   func main() {
+       client := openai.NewClient(
+           option.WithBaseURL("https://api.getrovie.com/v1"),
+           option.WithAPIKey(os.Getenv("ROVIE_API_KEY")),
+       )
+
+       response, err := client.Chat.Completions.New(context.Background(), openai.ChatCompletionNewParams{
+           Model: "openai/gpt-4o-mini",
+           Messages: []openai.ChatCompletionMessageParamUnion{
+               openai.UserMessage("Name three rivers in West Africa."),
+           },
+       })
+       if err != nil {
+           panic(err)
+       }
+
+       fmt.Println(response.Choices[0].Message.Content)
+   }
+   ```
+
+   </TabItem>
+   </Tabs>
+
+</Steps>
+
+## What comes back
+
+The OpenAI response shape, unmodified:
+
+```json {4,14-18}
+{
+  "id": "chatcmpl-9x8Kd2mQ",
+  "object": "chat.completion",
+  "model": "openai/gpt-4o-mini",
+  "created": 1786579200,
+  "choices": [
+    {
+      "index": 0,
+      "message": { "role": "assistant", "content": "The Niger, the Volta and the Senegal." },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 17,
+    "completion_tokens": 11,
+    "total_tokens": 28
+  }
+}
+```
+
+Two fields are worth looking at every time:
+
+- **`model`** is what actually answered. Rovie never substitutes a different
+  model, so this should always match what you asked for — but it is the honest
+  record of what you are paying for.
+- **`usage`** is what the call cost, in tokens. Multiply by the model's
+  per-million rate from [`GET /models`](/api/operations/listcatalog/) to get the
+  dollar figure, or just read it off your
+  [usage dashboard](https://rovie.africa/dashboard/usage) afterwards.
+
+## If it didn't work
+
+| What you got | What it means |
+| --- | --- |
+| `401` | Key missing, malformed, revoked or expired. Check for a stray newline in the env var — that is the usual culprit. |
+| `402` | No balance, or past this key's budget cap. [Top up](https://rovie.africa/dashboard/billing). |
+| `404` | No such model, or this key has been narrowed to a list that excludes it. `GET /v1/models` shows what the key can reach. |
+| `429` | Over a rate limit. [Back off and retry](/guides/errors/#retrying-well). |
+| Connection refused | Check the base URL. It is `https://api.getrovie.com` — the SDKs above append `/v1` themselves, curl does not. |
+
+The full list, with the retry strategy each one deserves, is in
+[Errors and retries](/guides/errors/).
+
+## Next
+
+- [Authentication](/start/authentication/) — key handling, rotation, scoping.
+- [Choosing a model](/guides/choosing-a-model/) — you almost certainly should
+  not stay on `gpt-4o-mini`.
+- [Streaming](/guides/streaming/) — because a four-second wait with no output
+  feels broken.

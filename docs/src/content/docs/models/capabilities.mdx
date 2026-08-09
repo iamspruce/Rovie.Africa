@@ -1,0 +1,143 @@
+---
+title: Capabilities
+description: The boolean flags on every catalog entry — what each one gates, and what failure you get if you ignore it.
+sidebar:
+  order: 2
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Rovie's API is one shape across nine providers' models, and those models do not
+all accept the same fields. The catalog tells you which does what, so you can
+find out before you call rather than from a `400`.
+
+Each flag is a plain boolean on the model from
+[`GET /models`](/api/operations/listcatalog/).
+
+## The flags
+
+| Flag | True means | If you ignore it |
+| --- | --- | --- |
+| `tool_call` | Function calling works | `tools` is **silently ignored** — the model answers in prose |
+| `reasoning` | Extended thinking before answering | You pay frontier rates for no thinking |
+| `structured_output` | Honours a JSON schema in `response_format` | The field is ignored, not enforced — you get JSON-ish text |
+| `attachment` | Accepts file attachments | The attachment is dropped |
+| `temperature` | `temperature` is an accepted parameter | **`400`** |
+| `open_weights` | Weights are published, so it runs off-platform too | Nothing — informational |
+
+<Aside type="caution" title="Silent is worse than loud">
+Only `temperature` fails loudly. The rest degrade quietly: ask a model without
+`structured_output` for JSON and you get something that usually parses and
+occasionally doesn't, which is the failure mode that reaches production. Check
+the flag; don't rely on the error.
+</Aside>
+
+## Modalities
+
+`modalities.input` and `modalities.output` are arrays drawn from `text`,
+`image`, `audio`, `video` and `pdf`.
+
+Almost everything takes and returns `text`. Image input is common on the
+current generation; audio and video are not. Check before sending a part that
+isn't text:
+
+```python
+def accepts_images(model) -> bool:
+    return "image" in (model.get("modalities", {}).get("input") or [])
+```
+
+An image sent to a model that does not accept one is dropped, and the model
+answers as though you had sent only the text — confidently, and about nothing.
+
+## Picking by requirement, in code
+
+Filter first, then compare price. A model that cannot do the job is not cheap:
+
+```python
+def candidates(models, *, needs_tools=False, needs_json=False, min_context=0):
+    for model in models:
+        if needs_tools and not model.get("tool_call"):
+            continue
+        if needs_json and not model.get("structured_output"):
+            continue
+        if (model.get("limit", {}).get("context") or 0) < min_context:
+            continue
+        if "cost" not in model:          # no published price
+            continue
+        yield model
+
+
+cheapest = min(
+    candidates(catalog, needs_tools=True, min_context=100_000),
+    key=lambda m: (m["cost"]["input"] + m["cost"]["output"]) / 2,
+)
+```
+
+## Reasoning models are a different shape
+
+Models with `reasoning: true` think before they answer. Practically:
+
+- **They cost more than the rate suggests.** Thinking tokens are billed. A
+  reasoning model on a summarisation task is the most expensive way to do
+  something a small model does well.
+- **They are slower**, sometimes by tens of seconds. Time to first token stops
+  being a useful progress signal, so a spinner beats
+  [streaming](/guides/streaming/) for the waiting state.
+- **Many fix their own sampling.** That is what `temperature: false` is
+  telling you, and passing one anyway is a `400`.
+
+Use them where the problem is genuinely hard — novel maths, deep debugging,
+multi-step planning. Everywhere else they are a worse answer, slower, for more
+money.
+
+## Structured output
+
+With `structured_output: true`, `response_format` is enforced by the provider
+and the model cannot emit something that violates the schema:
+
+```python
+response = client.chat.completions.create(
+    model="openai/gpt-4o-mini",
+    messages=[{"role": "user", "content": text}],
+    response_format={
+        "type": "json_schema",
+        "json_schema": {
+            "name": "invoice",
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "total": {"type": "number"},
+                    "currency": {"type": "string"},
+                    "due_date": {"type": "string"},
+                },
+                "required": ["total", "currency"],
+                "additionalProperties": False,
+            },
+        },
+    },
+)
+```
+
+Without the flag, the same request produces JSON-shaped prose. Parse
+defensively either way — a schema constrains the structure, not the truth of
+what is in it.
+
+## Verifying at runtime
+
+Capabilities move. A model gains tool calling in a point release; a provider
+retires one you depend on. Rather than hard-coding assumptions, fetch the
+catalog at startup and assert what you rely on:
+
+```python
+def require(model_id, *flags):
+    model = next(m for m in fetch_catalog() if m["litellmModelName"] == model_id)
+    missing = [flag for flag in flags if not model.get(flag)]
+    if missing:
+        raise RuntimeError(f"{model_id} no longer supports: {', '.join(missing)}")
+    return model
+
+
+require("openai/gpt-4o-mini", "tool_call", "structured_output")
+```
+
+Failing at boot with a clear message beats discovering it from a customer.

@@ -1,0 +1,245 @@
+---
+title: Python
+description: Using the OpenAI Python client with Rovie — setup, async, streaming, structured output, and a FastAPI endpoint that streams.
+sidebar:
+  order: 3
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+```bash
+pip install openai
+```
+
+## Setup
+
+```python
+# rovie.py
+import os
+from openai import OpenAI
+
+api_key = os.environ.get("ROVIE_API_KEY")
+if not api_key:
+    # Fail at import, not on the first user request.
+    raise RuntimeError("ROVIE_API_KEY is not set")
+
+client = OpenAI(
+    base_url="https://api.getrovie.com/v1",
+    api_key=api_key,
+    # The client retries 429s and 5xx itself. Leave it on, and do NOT add a
+    # second retry loop around it - two loops multiply.
+    max_retries=3,
+    # Generous on purpose: the default is short enough to turn a long
+    # generation into a timeout, and a timed-out call you retry is a call you
+    # pay for twice.
+    timeout=120.0,
+)
+```
+
+<Aside type="danger" title="Server side only">
+The key spends your balance. It belongs in a process you control, reading from
+an environment variable or a secret manager — never in a notebook you will
+share, a Streamlit app users can reach, or anything shipped to a device. See
+[Authentication](/start/authentication/#never-in-a-browser-or-a-mobile-app).
+</Aside>
+
+## A call
+
+```python
+response = client.chat.completions.create(
+    model="openai/gpt-4o-mini",
+    messages=[
+        {"role": "system", "content": "You answer in one sentence."},
+        {"role": "user", "content": "What is a stablecoin?"},
+    ],
+)
+
+print(response.choices[0].message.content)
+print(response.usage.total_tokens, "tokens")
+```
+
+## Async
+
+Use the async client for anything serving concurrent requests — a sync client
+in an async web framework serialises every call behind one connection.
+
+```python
+import asyncio
+from openai import AsyncOpenAI
+
+client = AsyncOpenAI(
+    base_url="https://api.getrovie.com/v1",
+    api_key=os.environ["ROVIE_API_KEY"],
+)
+
+async def summarise(text: str) -> str:
+    response = await client.chat.completions.create(
+        model="openai/gpt-4o-mini",
+        messages=[{"role": "user", "content": f"Summarise:\n\n{text}"}],
+    )
+    return response.choices[0].message.content
+
+
+async def main(documents: list[str]) -> list[str]:
+    # Bound the concurrency to the key's maxParallelRequests. Firing all of
+    # them at once is how you turn a batch job into a wall of 429s.
+    semaphore = asyncio.Semaphore(5)
+
+    async def guarded(document: str) -> str:
+        async with semaphore:
+            return await summarise(document)
+
+    return await asyncio.gather(*(guarded(d) for d in documents))
+```
+
+See [Rate limits and budgets](/guides/limits/).
+
+## Streaming
+
+```python
+stream = client.chat.completions.create(
+    model="anthropic/claude-sonnet-5",
+    messages=messages,
+    stream=True,
+    stream_options={"include_usage": True},
+)
+
+for chunk in stream:
+    # The final chunk carries usage and an EMPTY choices list, so indexing
+    # choices[0] unconditionally crashes on it.
+    if chunk.choices and chunk.choices[0].delta.content:
+        print(chunk.choices[0].delta.content, end="", flush=True)
+
+    if chunk.usage:
+        print(f"\n\n{chunk.usage.total_tokens} tokens")
+```
+
+## Streaming from FastAPI
+
+```python
+from fastapi import FastAPI, Depends
+from fastapi.responses import StreamingResponse
+
+app = FastAPI()
+
+@app.post("/chat")
+async def chat(body: ChatBody, session=Depends(require_session)):
+    stream = await client.chat.completions.create(
+        model="openai/gpt-4o-mini",
+        messages=body.messages,
+        stream=True,
+        user=f"acct_{session.account_id}",  # opaque, for your usage breakdown
+    )
+
+    async def tokens():
+        async for chunk in stream:
+            if chunk.choices and chunk.choices[0].delta.content:
+                yield chunk.choices[0].delta.content
+
+    return StreamingResponse(tokens(), media_type="text/plain")
+```
+
+Two deployment notes that bite in production: nginx buffers proxied responses
+by default (`proxy_buffering off;`), and serverless platforms cap execution
+time — check the cap against your worst-case generation length.
+
+## Structured output
+
+On a model whose catalog `structured_output` flag is true, the provider
+enforces the schema:
+
+```python
+from pydantic import BaseModel
+
+class Invoice(BaseModel):
+    total: float
+    currency: str
+    due_date: str | None = None
+
+response = client.chat.completions.parse(
+    model="openai/gpt-4o-mini",
+    messages=[{"role": "user", "content": raw_text}],
+    response_format=Invoice,
+)
+
+invoice = response.choices[0].message.parsed
+```
+
+On a model without the flag the field is **ignored, not rejected**, and you get
+JSON-shaped prose that usually parses. Check the flag — see
+[Capabilities](/models/capabilities/#structured-output).
+
+## Errors
+
+```python
+from openai import APIStatusError, APITimeoutError
+
+try:
+    response = client.chat.completions.create(model=model, messages=messages)
+except APIStatusError as error:
+    if error.status_code == 402:
+        # Out of balance. Alert; do not retry.
+        notify_ops("Rovie balance exhausted")
+    elif error.status_code == 404:
+        # Wrong model id, or this key is scoped away from it.
+        logger.error("model %s unavailable to this key", model)
+    else:
+        raise
+except APITimeoutError:
+    # You stopped waiting - the provider may have generated (and billed) a
+    # full response anyway. Retry sparingly.
+    logger.warning("timeout on %s", model)
+    raise
+```
+
+The whole table is in [Errors and retries](/guides/errors/).
+
+## Reading the catalog
+
+No client library for the public endpoints — they are plain JSON, no key
+needed:
+
+```python
+import requests
+
+BASE = "https://api.getrovie.com"
+
+def catalog() -> list[dict]:
+    return requests.get(f"{BASE}/models", timeout=10).json()["models"]
+
+def rates() -> dict:
+    return requests.get(f"{BASE}/fx/rates", timeout=10).json()
+
+def cheapest_with_tools() -> dict:
+    priced = [m for m in catalog() if m.get("tool_call") and "cost" in m]
+    return min(priced, key=lambda m: (m["cost"]["input"] + m["cost"]["output"]) / 2)
+```
+
+`cost.input` and `cost.output` are **USD per one million tokens** — see
+[Pricing in local currency](/guides/local-pricing/).
+
+## LangChain and LlamaIndex
+
+```python
+# LangChain
+from langchain_openai import ChatOpenAI
+
+llm = ChatOpenAI(
+    model="anthropic/claude-sonnet-5",
+    base_url="https://api.getrovie.com/v1",
+    api_key=os.environ["ROVIE_API_KEY"],
+)
+
+# LlamaIndex
+from llama_index.llms.openai import OpenAI as LlamaOpenAI
+
+llm = LlamaOpenAI(
+    model="anthropic/claude-sonnet-5",
+    api_base="https://api.getrovie.com/v1",
+    api_key=os.environ["ROVIE_API_KEY"],
+)
+```
+
+Both need the provider-prefixed model id. Some framework helpers try to infer a
+model's context window or capabilities from its name and will not recognise a
+prefixed one — pass those explicitly if the framework offers the option.

@@ -1,0 +1,110 @@
+---
+title: Rate limits and budgets
+description: What governs how fast and how much a key can spend — RPM, TPM, parallel requests and the per-key budget cap.
+sidebar:
+  order: 5
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Two different things can stop a call, and they fail with different status
+codes because they need different responses:
+
+- **A rate limit** — too fast. `429`. [Back off and retry](/guides/errors/#retrying-well).
+- **A budget** — too much. `402`. Retrying will never help.
+
+## Rate limits
+
+Set per key, and visible on the key in
+[your dashboard](https://rovie.africa/dashboard/keys):
+
+| Limit | What it counts |
+| --- | --- |
+| `rpmLimit` | Requests per minute |
+| `tpmLimit` | Tokens per minute, prompt and completion together |
+| `maxParallelRequests` | Calls in flight at once |
+
+A `null` on any of these means the limit is not set on this key, and the
+account's own capacity governs instead.
+
+There is no usage tier to climb and no waiting period. If your limits are too
+low for what you are building, ask — [hello@rovie.africa](mailto:hello@rovie.africa).
+
+### Staying under them
+
+- **Cap concurrency at the source.** A semaphore sized to
+  `maxParallelRequests` prevents `429`s rather than reacting to them, and is
+  far cheaper than retrying.
+- **Batch offline work.** A nightly job that fires ten thousand requests in a
+  burst will trip every limit you have; spread it over the window instead.
+- **Count tokens, not just requests.** TPM is the limit long-prompt workloads
+  actually hit. One request with a 100k-token document is worth thousands of
+  short ones.
+- **Use separate keys for separate workloads.** A batch job on its own key
+  cannot starve your interactive traffic, because the limits are per key.
+
+## Budgets
+
+`maxBudgetUsd` is a **lifetime** spend ceiling on a key — not monthly, not
+per-window. Once a key has spent that much, it returns `402` until you raise
+the cap or replace the key.
+
+That makes it the control worth reaching for whenever you are handing out
+access you cannot fully supervise:
+
+| Situation | Cap |
+| --- | --- |
+| An experiment or eval sweep | $5–20 |
+| A contractor or an intern | $25 |
+| A demo you are about to publish | Whatever you can afford to lose |
+| Production | None — the account balance is the ceiling |
+
+<Aside type="tip" title="A cap is a blast radius, not a budget">
+The point is not tracking spend — [usage](/guides/usage/) does that better.
+The point is that a leaked or runaway key costs a known maximum. Set it to the
+number you would shrug at.
+</Aside>
+
+Rotating a key keeps its cap and its accumulated spend; the cap follows the
+key's identity, not its secret. To reset the counter, create a new key.
+
+## The account balance
+
+Underneath every key is one balance. When it reaches zero, every key on the
+account returns `402` regardless of its own cap — a per-key budget can only
+ever restrict further, never grant credit that isn't there.
+
+Two things to set up once, and then stop thinking about:
+
+1. **A low-balance email.** On
+   [your account settings](https://rovie.africa/dashboard/account), set the USD
+   figure below which Rovie emails you. Users finding out before you do is the
+   avoidable version of running out.
+2. **A `402` alert in your own monitoring.** It is a distinct signal from
+   `429` and deserves a distinct page.
+
+See [Balance and top-ups](/guides/billing/) for how credit gets there.
+
+## Model allowlists
+
+A key can be restricted to specific models. Anything outside the list is `404`,
+not `403` — the key is told the model does not exist, rather than that it
+exists and is forbidden.
+
+Useful for pinning cost: a key allowed only `openai/gpt-4o-mini` cannot
+accidentally spend at frontier rates because somebody changed a config string.
+`GET /v1/models` returns what the calling key can actually reach.
+
+## Working out what you need
+
+Before asking for higher limits, work out the number:
+
+```
+peak requests/minute  = peak users/minute × calls per user
+peak tokens/minute    = peak requests/minute × (prompt + completion) tokens
+concurrency           = peak requests/minute × average seconds per call ÷ 60
+```
+
+That last line is the one people skip. Ten requests a minute that each take
+thirty seconds is five in flight at once, not ten a minute — and it is
+`maxParallelRequests` you will hit first.

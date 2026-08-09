@@ -1,0 +1,94 @@
+---
+title: Rovie docs
+description: One API key for GPT, Claude, Gemini, Llama and every other frontier model — OpenAI-compatible, billed against a balance you top up in your own currency.
+template: splash
+hero:
+  tagline: One key. Every model. Priced where you are.
+  actions:
+    - text: Quickstart
+      link: /start/quickstart/
+      icon: right-arrow
+      variant: primary
+    - text: API reference
+      link: /api/
+      icon: open-book
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard, Code } from '@astrojs/starlight/components';
+
+Rovie is a gateway. You send it the request body you would have sent OpenAI, it
+routes to whichever provider actually serves the model you named, and it draws
+the cost down from a balance you topped up in naira, shillings or cedis.
+
+The integration is a base URL and a key.
+
+<Code
+  lang="diff"
+  title="Any OpenAI client, unchanged"
+  code={`  from openai import OpenAI
+
+  client = OpenAI(
+-     base_url="https://api.openai.com/v1",
+-     api_key=os.environ["OPENAI_API_KEY"],
++     base_url="https://api.getrovie.com/v1",
++     api_key=os.environ["ROVIE_API_KEY"],
+  )
+
+  response = client.chat.completions.create(
+-     model="gpt-4o",
++     model="anthropic/claude-sonnet-5",
+      messages=[{"role": "user", "content": "Hello"}],
+  )`}
+/>
+
+<CardGrid stagger>
+  <Card title="Start here" icon="rocket">
+    Key, first call, and a working request in under five minutes.
+
+    [Quickstart →](/start/quickstart/)
+  </Card>
+  <Card title="Already on OpenAI?" icon="random">
+    Three lines change. Everything else — streaming, tools, structured output —
+    keeps working.
+
+    [Coming from OpenAI →](/start/from-openai/)
+  </Card>
+  <Card title="Pick a model" icon="setting">
+    Sixty-odd models across nine providers. What each is good at, and what a
+    million tokens of it costs.
+
+    [Choosing a model →](/guides/choosing-a-model/)
+  </Card>
+  <Card title="Understand the bill" icon="approve-check">
+    Why the price is quoted in your currency, what the markup is, and where the
+    money went.
+
+    [Balance and top-ups →](/guides/billing/)
+  </Card>
+</CardGrid>
+
+## The reference
+
+Generated from [`openapi.yaml`](https://github.com/rovie-africa/rovie-africa/blob/main/docs/openapi.yaml),
+so it cannot drift from what the gateway actually serves.
+
+<CardGrid>
+  <LinkCard
+    title="POST /v1/chat/completions"
+    description="The one endpoint most integrations ever call."
+    href="/api/operations/createchatcompletion/"
+  />
+  <LinkCard
+    title="GET /models"
+    description="Every model Rovie serves, with prices. No key needed."
+    href="/api/operations/listcatalog/"
+  />
+</CardGrid>
+
+## Reading this with a model
+
+There is an [`/llms.txt`](/llms.txt) index, a
+[condensed](/llms-small.txt) full-text version and a
+[complete](/llms-full.txt) one. Point Claude, ChatGPT or a coding agent at
+whichever fits its context and it can write against Rovie without guessing.

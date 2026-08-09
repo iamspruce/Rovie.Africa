@@ -1,0 +1,99 @@
+---
+title: The catalog
+description: Every model Rovie serves, live from the API, with context windows and per-million prices in your own currency.
+sidebar:
+  order: 1
+---
+
+import ModelTable from '../../../components/ModelTable.astro';
+import { Aside } from '@astrojs/starlight/components';
+
+The catalog is the list of models one Rovie key can reach, together with what
+each one costs. It changes as providers ship and retire things, so the table
+below is fetched live from
+[`GET /models`](/api/operations/listcatalog/) rather than written into this page.
+
+<ModelTable />
+
+<Aside type="note" title="Per million tokens">
+Both price columns are **USD per one million tokens** before conversion — the
+same basis the API returns. `$3.00` means three dollars per million, not three
+dollars per token. See [Pricing in local currency](/guides/local-pricing/) for
+the arithmetic.
+</Aside>
+
+## Model ids
+
+The `model` field of a request takes the id in the second column — always
+provider-prefixed:
+
+```text
+openai/gpt-4o
+anthropic/claude-sonnet-5
+google/gemini-2.5-pro
+meta/llama-3.3-70b
+```
+
+The prefix is not decoration. One key here reaches nine providers, several of
+whom ship a model called `llama-3.3-70b`; the prefix is what makes one
+namespace out of nine. Dropping it is the most common cause of a
+[`404`](/guides/errors/).
+
+## What each row carries
+
+`GET /models` returns more than the table shows. The full shape is in the
+[reference](/api/operations/listcatalog/); the fields worth knowing:
+
+| Field | Meaning |
+| --- | --- |
+| `litellmModelName` | What goes in a request's `model` field |
+| `provider` | Who serves it |
+| `name` | Human-readable |
+| `limit.context` | Total window in tokens — prompt and completion together |
+| `limit.output` | Ceiling on a single completion |
+| `cost.input` / `cost.output` | USD per million tokens |
+| `cost.cache_read` | The cheaper rate for cached prompt tokens |
+| `tool_call`, `reasoning`, `structured_output`, `attachment` | Capability flags |
+| `temperature` | Whether `temperature` is accepted at all |
+| `modalities.input` / `.output` | text, image, audio, video, pdf |
+| `knowledge` | Training cutoff |
+| `release_date`, `status` | When it shipped; `beta` or `deprecated` if marked |
+
+Metadata is passed through from [models.dev](https://models.dev), so a field
+absent there is absent here. **Treat everything except `litellmModelName`,
+`provider` and `name` as optional** and render around the gaps — a model with
+no published price is a real case, not a bug.
+
+## Context windows
+
+`limit.context` is the whole window: your prompt, the conversation history,
+tool definitions, tool results, and the completion, all together. It is not a
+prompt allowance with the answer on top.
+
+Two consequences that catch people out:
+
+- A conversation that grows will eventually exceed the window even though no
+  single message is large. Trim or summarise history before you get there.
+- `limit.output` caps a single completion separately, and it is usually far
+  smaller than the context window. A model with a 200K context and a 64K output
+  ceiling cannot write you a 100K-token document in one call.
+
+Hitting either shows up as `finish_reason: "length"` — the answer is truncated
+and should be presented as truncated, not as finished.
+
+## Deprecations
+
+Providers retire models. When one is marked `deprecated` in the catalog it
+still works, but it has an end date set by the provider, not by Rovie.
+
+The safe pattern is to keep the model id in configuration rather than in code,
+so changing it is a deploy and not a patch. If you want to be told, poll
+`GET /models` weekly and alert on `status` changing — it is a cheap,
+unauthenticated request.
+
+## The whole list, elsewhere
+
+[rovie.africa/models](https://rovie.africa/models) is the same catalog with
+filtering by capability and modality, sorting, and prices converted into your
+account's currency automatically. This page is the developer-facing view of the
+same data; that one is the one to send a colleague.

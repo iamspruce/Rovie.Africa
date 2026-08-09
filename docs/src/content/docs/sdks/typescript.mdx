@@ -1,0 +1,241 @@
+---
+title: TypeScript
+description: Using the OpenAI Node client with Rovie — setup, streaming, tools, retries and the Next.js route handler you probably want.
+sidebar:
+  order: 2
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+```bash
+npm install openai
+```
+
+## Setup
+
+```ts
+// lib/rovie.ts
+import OpenAI from 'openai';
+
+if (!process.env.ROVIE_API_KEY) {
+  // Fail at boot, not on the first user request.
+  throw new Error('ROVIE_API_KEY is not set');
+}
+
+export const rovie = new OpenAI({
+  baseURL: 'https://api.getrovie.com/v1',
+  apiKey: process.env.ROVIE_API_KEY,
+
+  // The client retries 429s and 5xx on its own. Leave it on, and do NOT wrap
+  // it in a second retry loop - two independent loops multiply.
+  maxRetries: 3,
+
+  // Generous, deliberately. The default is short enough to turn a long
+  // generation into a timeout, and a timed-out request you retry is a request
+  // you pay for twice.
+  timeout: 120_000,
+});
+```
+
+<Aside type="danger" title="Server only">
+This module must never be imported into client-side code. In Next.js that means
+never from a Client Component, and never behind a `NEXT_PUBLIC_` variable — a
+key in the bundle is a key anyone can read. See
+[Authentication](/start/authentication/#never-in-a-browser-or-a-mobile-app).
+</Aside>
+
+## A call
+
+```ts
+const response = await rovie.chat.completions.create({
+  model: 'openai/gpt-4o-mini',
+  messages: [
+    { role: 'system', content: 'You answer in one sentence.' },
+    { role: 'user', content: 'What is a stablecoin?' },
+  ],
+});
+
+console.log(response.choices[0].message.content);
+console.log(response.usage?.total_tokens, 'tokens');
+```
+
+## Streaming
+
+```ts
+const stream = await rovie.chat.completions.create({
+  model: 'anthropic/claude-sonnet-5',
+  messages,
+  stream: true,
+  stream_options: { include_usage: true },
+});
+
+for await (const chunk of stream) {
+  const delta = chunk.choices[0]?.delta?.content;
+  if (delta) process.stdout.write(delta);
+
+  // The usage chunk arrives last and carries an EMPTY choices array, so
+  // chunk.choices[0] is undefined on it. The optional chaining above is not
+  // decoration.
+  if (chunk.usage) console.log(`\n${chunk.usage.total_tokens} tokens`);
+}
+```
+
+## A Next.js route handler
+
+The shape most people actually need: browser talks to you, you talk to Rovie,
+the stream passes straight through.
+
+```ts
+// app/api/chat/route.ts
+import { rovie } from '@/lib/rovie';
+
+export const runtime = 'nodejs';
+
+export async function POST(request: Request) {
+  const { messages } = await request.json();
+
+  // Your own auth and rate limiting belong here. This route spends your
+  // balance, so anyone who can reach it can spend it.
+  const session = await requireSession(request);
+  if (!session) return new Response('Unauthorized', { status: 401 });
+
+  const stream = await rovie.chat.completions.create({
+    model: 'openai/gpt-4o-mini',
+    messages,
+    stream: true,
+    user: `acct_${session.accountId}`, // opaque, for your usage breakdown
+  });
+
+  return new Response(
+    new ReadableStream({
+      async start(controller) {
+        const encoder = new TextEncoder();
+        try {
+          for await (const chunk of stream) {
+            const delta = chunk.choices[0]?.delta?.content;
+            if (delta) controller.enqueue(encoder.encode(delta));
+          }
+        } finally {
+          controller.close();
+        }
+      },
+    }),
+    { headers: { 'Content-Type': 'text/plain; charset=utf-8' } },
+  );
+}
+```
+
+<Aside type="tip" title="Or use the Vercel AI SDK">
+If you want message state, tool calls and a `useChat` hook rather than raw
+tokens, `@ai-sdk/openai` points at Rovie the same way:
+
+```ts
+import { createOpenAI } from '@ai-sdk/openai';
+
+const rovie = createOpenAI({
+  baseURL: 'https://api.getrovie.com/v1',
+  apiKey: process.env.ROVIE_API_KEY,
+});
+
+const model = rovie('anthropic/claude-sonnet-5');
+```
+</Aside>
+
+## Tools
+
+```ts
+const tools: OpenAI.Chat.ChatCompletionTool[] = [
+  {
+    type: 'function',
+    function: {
+      name: 'get_balance',
+      description:
+        "Look up a user's Rovie balance. Use whenever they ask how much credit is left.",
+      parameters: {
+        type: 'object',
+        properties: { userId: { type: 'string', description: 'e.g. usr_4f2a' } },
+        required: ['userId'],
+      },
+    },
+  },
+];
+
+const response = await rovie.chat.completions.create({
+  model: 'anthropic/claude-sonnet-5',
+  messages,
+  tools,
+});
+
+for (const call of response.choices[0].message.tool_calls ?? []) {
+  // arguments is a JSON *string*, and a model can emit one that does not
+  // parse. Treat that as an ordinary case.
+  let args: unknown;
+  try {
+    args = JSON.parse(call.function.arguments);
+  } catch {
+    args = null;
+  }
+}
+```
+
+The full loop, and the mistakes worth avoiding in it, are in
+[Tool calling](/guides/tool-calling/).
+
+## Errors
+
+```ts
+import OpenAI from 'openai';
+
+try {
+  await rovie.chat.completions.create({ model, messages });
+} catch (error) {
+  if (error instanceof OpenAI.APIError) {
+    switch (error.status) {
+      case 402:
+        // Out of balance. Alert somebody; retrying will never help.
+        await notifyOps('Rovie balance exhausted');
+        break;
+      case 404:
+        // Wrong model id, or this key is scoped away from it.
+        logger.error({ model }, 'model unavailable to this key');
+        break;
+      case 429:
+        // The client already retried. Reaching here means it kept failing.
+        break;
+      default:
+        throw error;
+    }
+  }
+  throw error;
+}
+```
+
+See [Errors and retries](/guides/errors/) for the whole table.
+
+## Typing your own catalog reads
+
+The two public endpoints have no client library, but they are plain JSON:
+
+```ts
+interface CatalogModel {
+  litellmModelName: string;
+  provider: string;
+  name: string;
+  limit?: { context?: number; output?: number };
+  // USD per ONE MILLION tokens. Not per token.
+  cost?: { input: number; output: number; cache_read?: number };
+  tool_call?: boolean;
+  structured_output?: boolean;
+}
+
+export async function fetchCatalog(): Promise<CatalogModel[]> {
+  const response = await fetch('https://api.getrovie.com/models');
+  if (!response.ok) throw new Error(`catalog: ${response.status}`);
+  const { models } = (await response.json()) as { models: CatalogModel[] };
+  return models;
+}
+```
+
+Only the first three fields are guaranteed — everything else is passed through
+from models.dev and may be absent. The full shape is in the
+[reference](/api/operations/listcatalog/).

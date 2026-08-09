@@ -1,0 +1,158 @@
+---
+title: Usage and cost tracking
+description: Where the money went — reading usage off each response, attributing spend to a feature or a customer, and reconciling it against the dashboard.
+sidebar:
+  order: 8
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+There are two places to find out what you spent: the `usage` object on each
+response, and the dashboard. They come from the same meter, so they cannot
+disagree — the balance you have left and the history of where it went are
+computed from one set of numbers.
+
+## Per call
+
+```json
+"usage": {
+  "prompt_tokens": 2043,
+  "completion_tokens": 512,
+  "total_tokens": 2555,
+  "prompt_tokens_details": { "cached_tokens": 1800 }
+}
+```
+
+Log it. Three fields — model, prompt tokens, completion tokens — recorded
+against whatever your application considers a unit of work is the difference
+between "our AI bill went up 40%" and "the summariser's prompt grew when we
+added the changelog."
+
+```python
+response = client.chat.completions.create(model=model, messages=messages)
+
+logger.info(
+    "llm_call",
+    extra={
+        "model": response.model,
+        "feature": "invoice_summary",
+        "prompt_tokens": response.usage.prompt_tokens,
+        "completion_tokens": response.usage.completion_tokens,
+        "cached_tokens": getattr(
+            response.usage.prompt_tokens_details, "cached_tokens", 0
+        ),
+    },
+)
+```
+
+<Aside type="caution" title="Streaming hides this by default">
+A streamed response carries no `usage` unless you send
+`stream_options: {"include_usage": true}`. If you stream and don't set it, you
+have no per-call cost data at all. See [Streaming](/guides/streaming/#getting-the-cost-of-a-streamed-call).
+</Aside>
+
+### Cached tokens
+
+`prompt_tokens_details.cached_tokens` is the part of your prompt the provider
+served from its own cache, billed at the model's `cost.cache_read` rate instead
+of `cost.input` — often ten times cheaper.
+
+It is reported in **tokens, not dollars**, because the discount differs per
+provider and Rovie does not invent a figure. If you send a large stable system
+prompt on every call, this number is where most of your savings live, and a
+prompt change that reorders it can silently destroy them. Watch it.
+
+## Across your account
+
+[The usage dashboard](https://rovie.africa/dashboard/usage) reports over a
+window — 7, 30 or 90 days — broken down by:
+
+- **Totals** — tokens, prompt/completion split, spend, requests, successes and
+  failures, cached tokens.
+- **Trend** — one point per day.
+- **Model and provider** — spend and tokens each, with failed requests counted
+  separately.
+- **Sessions** — median and p90 spend per session, which is the figure to use
+  when working out what a customer costs you.
+- **Latency** — median duration, tokens per second and time to first token, per
+  model.
+- **Requests** — the individual calls, filterable to failures only.
+
+There is a CSV export for the window if you would rather do the analysis
+yourself.
+
+<Aside type="note" title="Prompts are not in there">
+Every one of these is an aggregate. Rovie's usage reporting never returns
+prompts or completions — not to you through the dashboard, not to anyone. Your
+own logging is the only place your prompt text exists on your side, and that is
+deliberate. See the [data policy](https://rovie.africa/data-policy).
+</Aside>
+
+## Attributing spend
+
+The account-level breakdown answers "what did we spend". To answer "on what",
+you need to label the traffic. Three mechanisms, and they compose:
+
+### One key per service
+
+The coarsest and most reliable. Each key is labelled and every request records
+which key made it, so the per-key spend on
+[the keys page](https://rovie.africa/dashboard/keys) is a free breakdown by
+service with no code changes at all.
+
+Give the key a name you will recognise later — `checkout-api`, not `key-2`.
+
+### The `user` field
+
+`user` on the request is an opaque id for the end user a call is on behalf of.
+Rovie records it against the request, so it appears in your own usage data.
+
+```python
+response = client.chat.completions.create(
+    model="openai/gpt-4o-mini",
+    messages=messages,
+    user=f"acct_{account.id}",   # opaque; never an email or a name
+)
+```
+
+Keep it opaque. An id you can resolve internally is enough; a personal
+identifier in a field that ends up in logs is not.
+
+### Your own log line
+
+The finest-grained and the most work: correlate your `llm_call` records with
+your product events. This is the only way to answer "what does one invoice
+summary cost", because Rovie cannot know what an invoice summary is.
+
+## Reconciling
+
+Roughly monthly, and any time a bill surprises you:
+
+1. Sum your own logged tokens per model for the window.
+2. Compare with the dashboard's per-model totals.
+3. Explain any gap.
+
+Gaps have honest causes worth knowing:
+
+- **Streamed calls without `include_usage`** — you logged nothing, Rovie
+  metered everything. The most common gap by far.
+- **Timeouts and cancelled streams** — you never saw a response, so you logged
+  nothing, but the provider generated tokens and you were billed. These appear
+  as failed requests with non-zero spend.
+- **Retries** — every attempt that reached a provider is a real call. A retry
+  loop you forgot about is the classic cause of a bill that doubled overnight.
+- **`n > 1`** — you are billed for all of the completions, not the one you
+  used.
+
+## Forecasting
+
+```text
+monthly USD = calls/month × (avg prompt tokens × input rate
+                           + avg completion tokens × output rate) ÷ 1,000,000
+```
+
+Take the averages from your logged data rather than guessing, and the rates
+from [`GET /models`](/api/operations/listcatalog/). Then run the same arithmetic
+for the next model down the ladder — the comparison is usually the point.
+[Choosing a model](/guides/choosing-a-model/) has more on that;
+[Pricing in local currency](/guides/local-pricing/) has the conversion.

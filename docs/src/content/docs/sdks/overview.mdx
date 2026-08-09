@@ -1,0 +1,144 @@
+---
+title: SDKs
+description: There is no Rovie SDK to install — every OpenAI client already works. What to point where, in each language and framework.
+sidebar:
+  order: 1
+---
+
+import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+**There is no Rovie SDK, and that is the design.**
+
+The gateway speaks OpenAI's protocol, so every OpenAI client library — the
+official ones, the community ones, and every framework built on top of them —
+already works. A Rovie-specific SDK would be a wrapper that has to be kept in
+step with all of them, and one more dependency for you to audit.
+
+You need two values:
+
+| | |
+| --- | --- |
+| **Base URL** | `https://api.getrovie.com/v1` |
+| **API key** | `rv_...`, from [your dashboard](https://rovie.africa/dashboard/keys) |
+
+<Aside type="note" title="Where /v1 goes">
+Most SDKs append paths to whatever base URL you give them, so they want
+`https://api.getrovie.com/v1`. Raw HTTP calls need the full path,
+`https://api.getrovie.com/v1/chat/completions`. If you are getting 404s from a
+client library, this is the first thing to check.
+</Aside>
+
+## The official clients
+
+<Tabs syncKey="lang">
+<TabItem label="Python">
+
+```bash
+pip install openai
+```
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.getrovie.com/v1",
+    api_key=os.environ["ROVIE_API_KEY"],
+)
+```
+
+[More →](/sdks/python/)
+
+</TabItem>
+<TabItem label="TypeScript">
+
+```bash
+npm install openai
+```
+
+```ts
+import OpenAI from 'openai';
+
+const client = new OpenAI({
+  baseURL: 'https://api.getrovie.com/v1',
+  apiKey: process.env.ROVIE_API_KEY,
+});
+```
+
+[More →](/sdks/typescript/)
+
+</TabItem>
+<TabItem label="Go">
+
+```bash
+go get github.com/openai/openai-go/v2
+```
+
+```go
+client := openai.NewClient(
+    option.WithBaseURL("https://api.getrovie.com/v1"),
+    option.WithAPIKey(os.Getenv("ROVIE_API_KEY")),
+)
+```
+
+</TabItem>
+<TabItem label="Java">
+
+```java
+OpenAIClient client = OpenAIOkHttpClient.builder()
+    .baseUrl("https://api.getrovie.com/v1")
+    .apiKey(System.getenv("ROVIE_API_KEY"))
+    .build();
+```
+
+</TabItem>
+</Tabs>
+
+## Frameworks
+
+Everything below takes an OpenAI-compatible endpoint, so the change is the same
+two values in whatever shape the framework wants them.
+
+| Framework | Configure |
+| --- | --- |
+| LangChain | `ChatOpenAI(base_url=…, api_key=…, model="openai/gpt-4o")` |
+| LlamaIndex | `OpenAI(api_base=…, api_key=…, model=…)` |
+| Vercel AI SDK | `createOpenAI({ baseURL, apiKey })` |
+| Mastra / Genkit | The OpenAI provider, with `baseURL` overridden |
+| Instructor | Wraps an already-configured OpenAI client — no change |
+| LiteLLM (as a client) | `custom_llm_provider="openai"`, `api_base=…` |
+| Semantic Kernel | The OpenAI connector, with the endpoint overridden |
+
+The only Rovie-specific detail anywhere in that table is the **model id**,
+which is provider-prefixed: `openai/gpt-4o`, not `gpt-4o`. See
+[the catalog](/models/catalog/#model-ids).
+
+## No SDK at all
+
+The API is HTTP and JSON. If your language has no OpenAI client, or you would
+rather not add one, the [reference](/api/) carries a working curl, JavaScript
+and Go snippet on every operation.
+
+```bash
+curl https://api.getrovie.com/v1/chat/completions \
+  -H "Authorization: Bearer $ROVIE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "openai/gpt-4o-mini", "messages": [{"role": "user", "content": "Hi"}]}'
+```
+
+## Editors and coding agents
+
+Cursor, Continue, OpenCode, Zed, Aider and the rest all accept a custom
+OpenAI-compatible endpoint, which means they can run against Rovie's whole
+model list on your balance. Setup for each is on
+[Editors and agents](/sdks/tools/).
+
+## The client this site is built on
+
+[rovie.africa](https://rovie.africa) is a React app talking to the same origin
+you are, through a small typed HTTP layer in its own repository — one module
+per service over a shared `fetch` wrapper.
+
+It is worth reading if you want to see the request shapes exercised in anger,
+but it is **not** a published package and is not intended as one: it is coupled
+to that app's session handling and to endpoints that are first-party rather
+than public. For your own integration, use an OpenAI client.

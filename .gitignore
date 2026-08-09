@@ -12,6 +12,12 @@ dist
 dist-ssr
 *.local
 
+# The docs site (docs/) is a second Astro project with its own build. `dist`
+# above matches at any depth, so docs/dist is already covered; these two are
+# Astro's own generated directories and are not.
+docs/.astro
+docs/.starlight-links-validator
+
 # Secrets. `*.local` above already covers .env.local, but only by accident of
 # its name — these make the rule explicit and cover any other variant. The
 # example file is the one that is meant to be public.

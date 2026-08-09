@@ -1,0 +1,975 @@
+# -----------------------------------------------------------------------
+# The Rovie public API.
+#
+# SCOPE - read this before adding a path.
+#
+# Rovie runs three services behind one origin (see infra/caddy), and only one
+# of them is a public API:
+#
+#   * the gateway (LiteLLM)  - Bearer `rv_...`, called by customers. PUBLIC.
+#   * account-service        - gated by ONE shared secret that grants access to
+#                              every user's data. Its read-only catalog routes
+#                              back this site's public pages and are documented
+#                              below; its user/key/admin routes are NOT, and
+#                              must not be. Publishing them here would put a
+#                              map of an internal control plane on a public
+#                              domain, and src/sdk/config.ts is explicit that
+#                              the key behind them may never reach a browser.
+#   * portal-api (`/me/*`)   - session-cookie only, first party, drives the
+#                              dashboard. Not callable by a third party with an
+#                              API key, so it is not an API reference page. The
+#                              behaviour it implements - balance, top-ups,
+#                              usage, key limits - is documented as prose under
+#                              /guides instead.
+#
+# Everything here was read off src/sdk/*.ts and the pages that consume it. If a
+# response field is not in this file, it is because nothing in the app depends
+# on it and it was not invented.
+# -----------------------------------------------------------------------
+
+openapi: 3.1.0
+
+info:
+  title: Rovie API
+  version: '1.0.0'
+  summary: One OpenAI-compatible key for every frontier model, billed in local currency.
+  description: |
+    Rovie is a gateway. You send it the same request body you would send
+    OpenAI; it routes to whichever provider actually serves that model, meters
+    what the call cost, and draws it down from a balance you topped up in
+    naira, shillings or cedis.
+
+    **The whole integration is a base URL and a key.** Any OpenAI client
+    library works unmodified - see [Coming from
+    OpenAI](https://docs.rovie.africa/start/from-openai/).
+
+    ### Authentication
+
+    Every inference call carries an API key issued from your dashboard:
+
+    ```
+    Authorization: Bearer rv_...
+    ```
+
+    Keys are shown once, at the moment they are created, and never again -
+    Rovie stores a hash. If you lose one, rotate it.
+
+    ### What a call costs
+
+    Nothing is charged per request. You are charged for tokens, at the
+    provider's own per-million rate plus Rovie's markup, converted from USD at
+    the rate locked when you topped up. The live rate for every model is on
+    the [models page](https://rovie.africa/models).
+  contact:
+    name: Rovie support
+    email: hello@rovie.africa
+    url: https://rovie.africa/support
+  license:
+    name: Terms of service
+    url: https://rovie.africa/terms
+
+servers:
+  - url: https://api.getrovie.com
+    description: Production. The gateway, the catalog and the health probe all sit here.
+
+tags:
+  - name: Inference
+    description: |
+      The OpenAI-compatible surface. This is the product: everything else in
+      this reference exists to support it.
+  - name: Catalog
+    description: |
+      What Rovie serves and what it costs, in your currency. Unauthenticated -
+      these back the public pages on rovie.africa, and you are welcome to read
+      them directly to build a model picker or a price check into your own app.
+  - name: Health
+    description: Whether the gateway is answering. Unauthenticated, and free to poll.
+
+security:
+  - bearerAuth: []
+
+paths:
+  /v1/chat/completions:
+    post:
+      tags: [Inference]
+      operationId: createChatCompletion
+      summary: Create a chat completion
+      description: |
+        Byte-for-byte the OpenAI request and response shape. Point an existing
+        OpenAI client at `https://api.getrovie.com` and change nothing else.
+
+        `model` is the only field that needs thought: it takes a Rovie model
+        id (`openai/gpt-4o`, `anthropic/claude-sonnet-5`, `google/gemini-2.5-pro`
+        …), which is provider-prefixed so that one key can reach every provider
+        without the names colliding. `GET /models` lists them all.
+
+        Set `stream: true` and the response is a `text/event-stream` of
+        `data:` lines ending in `data: [DONE]`, again exactly as OpenAI does
+        it. See the [streaming guide](https://docs.rovie.africa/guides/streaming/).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatCompletionRequest'
+            examples:
+              minimal:
+                summary: The smallest call that works
+                value:
+                  model: openai/gpt-4o-mini
+                  messages:
+                    - role: user
+                      content: Name three rivers in West Africa.
+              system:
+                summary: With a system prompt and a temperature
+                value:
+                  model: anthropic/claude-sonnet-5
+                  messages:
+                    - role: system
+                      content: You answer in one sentence, always.
+                    - role: user
+                      content: What is a stablecoin?
+                  temperature: 0.2
+                  max_tokens: 200
+              streaming:
+                summary: Streamed
+                value:
+                  model: openai/gpt-4o
+                  messages:
+                    - role: user
+                      content: Write a haiku about Lagos traffic.
+                  stream: true
+      responses:
+        '200':
+          description: |
+            A completion. When `stream` was true the body is a
+            `text/event-stream` instead, and the schema below describes each
+            chunk's `delta` rather than a whole `message`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatCompletion'
+            text/event-stream:
+              schema:
+                type: string
+                description: |
+                  Server-sent events. Each line is `data: ` followed by a JSON
+                  chunk whose `choices[].delta` carries the new tokens; the
+                  stream ends with a literal `data: [DONE]`.
+                examples:
+                  - |
+                    data: {"id":"chatcmpl-abc","object":"chat.completion.chunk","choices":[{"index":0,"delta":{"content":"Traffic"},"finish_reason":null}]}
+
+                    data: {"id":"chatcmpl-abc","object":"chat.completion.chunk","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+                    data: [DONE]
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+        '404':
+          description: |
+            No such model. Either the id is wrong, or the key has been narrowed
+            to a model list that does not include it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '503':
+          description: |
+            The upstream provider is unavailable. Rovie does not silently
+            reroute to a different model - a request for Claude that quietly
+            answered as GPT would be worse than a failure. Retry, or pick
+            another model yourself.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/models:
+    get:
+      tags: [Inference]
+      operationId: listGatewayModels
+      summary: List models this key can reach
+      description: |
+        The OpenAI-shaped model list, scoped to the calling key. A key narrowed
+        to specific models returns only those, which makes this the endpoint to
+        check when a call comes back 404 for a model you know Rovie serves.
+
+        For prices, context windows and capabilities, use `GET /models`
+        instead - this one is the compatibility surface and carries only what
+        OpenAI's does.
+      responses:
+        '200':
+          description: The models this key may call.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [object, data]
+                properties:
+                  object:
+                    type: string
+                    const: list
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, object]
+                      properties:
+                        id:
+                          type: string
+                          examples: ['anthropic/claude-sonnet-5']
+                        object:
+                          type: string
+                          const: model
+                        created:
+                          type: integer
+                          description: Unix seconds.
+                        owned_by:
+                          type: string
+                          examples: ['anthropic']
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /models:
+    get:
+      tags: [Catalog]
+      operationId: listCatalog
+      summary: List every model Rovie serves, with prices
+      security: []
+      description: |
+        The full catalog behind [rovie.africa/models](https://rovie.africa/models):
+        every model, what it can do, and what a million tokens of it costs in
+        USD before conversion.
+
+        Metadata is passed through from [models.dev](https://models.dev), so a
+        field absent there is absent here. Treat every property except
+        `litellmModelName`, `provider` and `name` as optional and render
+        around the gaps - a model with no published price is a real case, not
+        a bug.
+      responses:
+        '200':
+          description: The catalog.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [models]
+                properties:
+                  models:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CatalogModel'
+
+  /fx/rates:
+    get:
+      tags: [Catalog]
+      operationId: getFxRates
+      summary: Get the USD conversion rates Rovie quotes in
+      security: []
+      description: |
+        What one US dollar is worth in each currency Rovie can quote a price
+        in. This is the rate the models page converts with, so quoting a price
+        from `/models` through these figures gives the reader the same number
+        the site shows them.
+
+        Wider than the list of currencies you can actually *pay* in - see
+        [Balance and top-ups](https://docs.rovie.africa/guides/billing/) for
+        that shorter list. Quoting and settling are different questions.
+      responses:
+        '200':
+          description: Current rates.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [currencies, supported, fetchedAt]
+                properties:
+                  currencies:
+                    type: object
+                    description: Keyed by ISO 4217 code.
+                    additionalProperties:
+                      type: object
+                      required: [ratePerUsd]
+                      properties:
+                        ratePerUsd:
+                          type: number
+                          description: Units of this currency per one USD.
+                          examples: [1512.4]
+                  supported:
+                    type: array
+                    description: Every code present in `currencies`.
+                    items:
+                      type: string
+                      examples: ['NGN']
+                  fetchedAt:
+                    type: integer
+                    description: |
+                      Unix milliseconds. Rates are cached upstream, so this is
+                      when Rovie last refreshed them, not when you asked.
+                    examples: [1786579200000]
+
+  /stats/rankings:
+    get:
+      tags: [Catalog]
+      operationId: getRankings
+      summary: Get aggregate usage across all of Rovie
+      security: []
+      description: |
+        What the continent is actually running, behind
+        [rovie.africa/rankings](https://rovie.africa/rankings). Measured
+        traffic through the gateway, never an estimate.
+
+        Every figure is summed across all users over the window. There is no
+        per-user shape in the response and no way to ask for one - individual
+        usage is only ever readable by the account that produced it, from a
+        signed-in session.
+      parameters:
+        - name: window
+          in: query
+          required: false
+          description: |
+            Days to aggregate over. Only 7, 30 and 90 are honoured; anything
+            else is coerced to 30 rather than rejected.
+          schema:
+            type: integer
+            enum: [7, 30, 90]
+            default: 30
+      responses:
+        '200':
+          description: A snapshot.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RankingsSnapshot'
+
+  /health/readiness:
+    get:
+      tags: [Health]
+      operationId: getReadiness
+      summary: Check whether the gateway is answering
+      security: []
+      description: |
+        The gateway's own readiness probe. No key, no cost, no rate limit worth
+        worrying about - this is what the
+        [status page](https://rovie.africa/status) polls.
+
+        A 200 with `status: "healthy"` means the gateway is up. It does not
+        promise that every upstream provider is: a provider outage shows up as
+        a 503 on the call itself, not here.
+      responses:
+        '200':
+          description: |
+            The gateway answered. Check `status` - a 200 carrying anything
+            other than `healthy` is a degraded service, not a healthy one.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    examples: ['healthy']
+                  db:
+                    type: string
+                    description: State of the gateway's own datastore.
+                    examples: ['connected']
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: |
+        An API key from your [dashboard](https://rovie.africa/dashboard/keys),
+        sent as `Authorization: Bearer rv_...`.
+
+        The full key is returned exactly once, when it is created or rotated.
+        Rovie keeps only a hash and a prefix, so a lost key cannot be recovered
+        and has to be rotated.
+
+        Treat it as a server-side secret. A key in browser JavaScript or a
+        mobile binary is a key anyone can read and spend your balance with;
+        put your own backend in front instead.
+
+  responses:
+    BadRequest:
+      description: |
+        The request body was malformed, or carried a parameter this model does
+        not accept. Reasoning models that fix their own `temperature` are the
+        common case - the catalog's `temperature` flag says which those are.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: |
+        Missing, malformed, revoked or expired key. Rovie does not distinguish
+        between these in the response, deliberately - a key checker that says
+        *which* is a key checker.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    PaymentRequired:
+      description: |
+        Out of balance, or past this key's `maxBudgetUsd` cap. Nothing was
+        charged and nothing was sent upstream. Top up, or raise the cap on the
+        key.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    RateLimited:
+      description: |
+        Over the key's requests-per-minute, tokens-per-minute or parallel
+        request limit. Back off and retry - see
+        [Errors and retries](https://docs.rovie.africa/guides/errors/) for the
+        schedule worth using.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    ServerError:
+      description: Rovie failed. Nothing is charged for a request that errors here.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+    Error:
+      type: object
+      description: |
+        OpenAI's error envelope, so a client's existing error handling keeps
+        working. `code` is the field to branch on; `message` is written for a
+        human and may change wording without warning.
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [message, type]
+          properties:
+            message:
+              type: string
+              examples: ['Insufficient balance. Top up at https://rovie.africa/dashboard/billing']
+            type:
+              type: string
+              examples: ['insufficient_quota']
+            param:
+              type: [string, 'null']
+              description: The offending field, when one field is to blame.
+            code:
+              type: [string, 'null']
+              examples: ['insufficient_quota']
+
+    Message:
+      type: object
+      required: [role]
+      properties:
+        role:
+          type: string
+          enum: [system, user, assistant, tool]
+        content:
+          description: |
+            A string for text. An array of parts for anything else - image
+            input, files - on models whose catalog `modalities.input` says
+            they accept it.
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    enum: [text, image_url]
+                  text:
+                    type: string
+                  image_url:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+                        description: An https URL, or a `data:` URI.
+        name:
+          type: string
+        tool_calls:
+          type: array
+          description: On an assistant message, the calls the model wants made.
+          items:
+            $ref: '#/components/schemas/ToolCall'
+        tool_call_id:
+          type: string
+          description: On a tool message, which call this is the result of.
+
+    ToolCall:
+      type: object
+      required: [id, type, function]
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          const: function
+        function:
+          type: object
+          required: [name, arguments]
+          properties:
+            name:
+              type: string
+            arguments:
+              type: string
+              description: |
+                JSON, as a string - not an object. That is OpenAI's shape and
+                Rovie does not change it. Parse it, and be ready for it not to
+                parse: a model can emit invalid JSON here.
+
+    ChatCompletionRequest:
+      type: object
+      required: [model, messages]
+      properties:
+        model:
+          type: string
+          description: |
+            A provider-prefixed Rovie model id. `GET /models` lists every one.
+          examples: ['anthropic/claude-sonnet-5']
+        messages:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Message'
+        stream:
+          type: boolean
+          default: false
+          description: Return a `text/event-stream` of chunks instead of one body.
+        stream_options:
+          type: object
+          properties:
+            include_usage:
+              type: boolean
+              description: |
+                Send a final chunk carrying `usage`. Worth setting: a streamed
+                response otherwise tells you nothing about what it cost.
+        max_tokens:
+          type: integer
+          minimum: 1
+          description: |
+            Cap on the completion, not on the whole call. The catalog's
+            `limit.output` is the model's own ceiling.
+        temperature:
+          type: number
+          minimum: 0
+          maximum: 2
+          description: |
+            Rejected by models that fix it - the catalog's `temperature` flag
+            marks those.
+        top_p:
+          type: number
+          minimum: 0
+          maximum: 1
+        n:
+          type: integer
+          minimum: 1
+          default: 1
+          description: Completions to generate. You are billed for all of them.
+        stop:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+        presence_penalty:
+          type: number
+          minimum: -2
+          maximum: 2
+        frequency_penalty:
+          type: number
+          minimum: -2
+          maximum: 2
+        seed:
+          type: integer
+          description: |
+            Best-effort determinism, and only on providers that implement it.
+            Never a guarantee.
+        response_format:
+          type: object
+          description: |
+            Constrain the output. Use on models whose catalog
+            `structured_output` is true; elsewhere it is ignored rather than
+            enforced, which is the worse failure of the two.
+          properties:
+            type:
+              type: string
+              enum: [text, json_object, json_schema]
+            json_schema:
+              type: object
+        tools:
+          type: array
+          description: |
+            Functions the model may call. Models whose catalog `tool_call` is
+            false ignore this field.
+          items:
+            type: object
+            required: [type, function]
+            properties:
+              type:
+                type: string
+                const: function
+              function:
+                type: object
+                required: [name]
+                properties:
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  parameters:
+                    type: object
+                    description: JSON Schema for the arguments.
+        tool_choice:
+          description: |
+            `auto` (default when tools are present), `none`, `required`, or an
+            object naming one function.
+          oneOf:
+            - type: string
+              enum: [none, auto, required]
+            - type: object
+        user:
+          type: string
+          description: |
+            An opaque id for the end user this call is on behalf of. Rovie
+            stores it against the request so it appears in your own usage
+            breakdown; it is never sent anywhere it could identify a person.
+
+    ChatCompletion:
+      type: object
+      required: [id, object, created, model, choices]
+      properties:
+        id:
+          type: string
+          examples: ['chatcmpl-9x8Kd2mQ']
+        object:
+          type: string
+          const: chat.completion
+        created:
+          type: integer
+          description: Unix seconds.
+        model:
+          type: string
+          description: |
+            The model that actually answered. Compare it against what you
+            asked for - it is the honest record of which one you are paying
+            for.
+        choices:
+          type: array
+          items:
+            type: object
+            required: [index, message]
+            properties:
+              index:
+                type: integer
+              message:
+                $ref: '#/components/schemas/Message'
+              finish_reason:
+                type: [string, 'null']
+                enum: [stop, length, tool_calls, content_filter, null]
+                description: |
+                  `length` means the model was cut off by `max_tokens` or its
+                  own output ceiling - the answer is incomplete, and worth
+                  surfacing rather than showing as if it had finished.
+        usage:
+          $ref: '#/components/schemas/Usage'
+
+    Usage:
+      type: object
+      description: |
+        What this call cost you, in tokens. Absent on a streamed response
+        unless you set `stream_options.include_usage`.
+      properties:
+        prompt_tokens:
+          type: integer
+        completion_tokens:
+          type: integer
+        total_tokens:
+          type: integer
+        prompt_tokens_details:
+          type: object
+          properties:
+            cached_tokens:
+              type: integer
+              description: |
+                Prompt tokens the provider served from its own cache, billed at
+                the catalog's `cost.cache_read` rate. Reported in tokens rather
+                than dollars because the discount differs per provider and
+                Rovie does not invent a figure.
+
+    CatalogModel:
+      type: object
+      description: |
+        One row of `GET /models`. Only the first three fields are guaranteed.
+      required: [litellmModelName, provider, name]
+      properties:
+        litellmModelName:
+          type: string
+          description: What you put in a request's `model` field.
+          examples: ['anthropic/claude-sonnet-5']
+        provider:
+          type: string
+          examples: ['anthropic']
+        name:
+          type: string
+          description: Human-readable.
+          examples: ['Claude Sonnet 5']
+        id:
+          type: string
+          description: models.dev's canonical id.
+          examples: ['anthropic/claude-sonnet-5']
+        description:
+          type: string
+        family:
+          type: string
+          description: Lineage, as models.dev groups it.
+        limit:
+          type: object
+          properties:
+            context:
+              type: integer
+              description: Total window, in tokens, prompt and completion together.
+              examples: [200000]
+            input:
+              type: integer
+            output:
+              type: integer
+              description: Ceiling on a single completion.
+              examples: [64000]
+        cost:
+          type: object
+          description: |
+            **USD per ONE MILLION tokens.** Not per token. `{"input": 2.5}`
+            means $2.50 per million - reading it as per-token puts a price out
+            by a factor of a million, which is a mistake this codebase has
+            already made once.
+          required: [input, output]
+          properties:
+            input:
+              type: number
+              examples: [3]
+            output:
+              type: number
+              examples: [15]
+            cache_read:
+              type: number
+              description: Same per-million basis. Much cheaper than a fresh input token.
+            cache_write:
+              type: number
+        modalities:
+          type: object
+          properties:
+            input:
+              type: array
+              items:
+                $ref: '#/components/schemas/Modality'
+            output:
+              type: array
+              items:
+                $ref: '#/components/schemas/Modality'
+        tool_call:
+          type: boolean
+          description: Supports function calling.
+        reasoning:
+          type: boolean
+          description: Supports extended thinking.
+        structured_output:
+          type: boolean
+          description: Honours a JSON schema in `response_format`.
+        attachment:
+          type: boolean
+          description: Accepts file attachments.
+        temperature:
+          type: boolean
+          description: |
+            Whether `temperature` is accepted at all. False on models that fix
+            it - passing one there is a 400.
+        open_weights:
+          type: boolean
+          description: Weights are published, so the model is runnable off-platform too.
+        knowledge:
+          type: string
+          description: Training cutoff. `2025-04` or `2025-04-01`.
+        release_date:
+          type: string
+          examples: ['2026-07-09']
+        last_updated:
+          type: string
+        status:
+          type: string
+          description: |
+            Usually absent. models.dev marks a few entries `beta` or
+            `deprecated`.
+
+    Modality:
+      type: string
+      enum: [text, image, audio, video, pdf]
+
+    RankingsSnapshot:
+      type: object
+      required: [windowDays, since, generatedAt, totals]
+      properties:
+        windowDays:
+          type: integer
+          examples: [30]
+        since:
+          type: string
+          format: date-time
+        generatedAt:
+          type: string
+          format: date-time
+        totals:
+          type: object
+          properties:
+            tokens:
+              type: integer
+            spendUsd:
+              type: number
+            requests:
+              type: integer
+            developers:
+              type: integer
+            countries:
+              type: integer
+        trend:
+          type: array
+          description: One point per day across the window.
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              tokens:
+                type: integer
+              spendUsd:
+                type: number
+              requests:
+                type: integer
+        models:
+          type: array
+          items:
+            type: object
+            properties:
+              model:
+                type: string
+              provider:
+                type: [string, 'null']
+              tokens:
+                type: integer
+              spendUsd:
+                type: number
+              requests:
+                type: integer
+        providers:
+          type: array
+          items:
+            type: object
+            properties:
+              provider:
+                type: string
+              tokens:
+                type: integer
+              spendUsd:
+                type: number
+              requests:
+                type: integer
+        countries:
+          type: array
+          items:
+            type: object
+            properties:
+              country:
+                type: string
+                description: ISO 3166-1 alpha-2, from the country captured at signup.
+              tokens:
+                type: integer
+              spendUsd:
+                type: number
+              developers:
+                type: integer
+              topModel:
+                type: [string, 'null']
+        latency:
+          type: array
+          items:
+            type: object
+            properties:
+              model:
+                type: string
+              medianMs:
+                type: integer
+              medianTokensPerSecond:
+                type: number
+              medianFirstTokenMs:
+                type: [integer, 'null']
+                description: Null where too few streamed requests to time.
+              requests:
+                type: integer
+        sessions:
+          type: object
+          properties:
+            sessions:
+              type: integer
+            medianSpendUsd:
+              type: number
+            p90SpendUsd:
+              type: number
+            medianTokens:
+              type: integer
+            medianRequests:
+              type: integer
+        context:
+          type: array
+          items:
+            type: object
+            properties:
+              model:
+                type: string
+              medianPromptTokens:
+                type: integer
+              p90PromptTokens:
+                type: integer
+              maxPromptTokens:
+                type: integer
+              requests:
+                type: integer
+        tools:
+          type: array
+          items:
+            type: object
+            properties:
+              tool:
+                type: string
+              calls:
+                type: integer
+        apps:
+          type: array
+          description: Empty for clients that do not identify themselves.
+          items:
+            type: object
+            properties:
+              app:
+                type: string
+              tokens:
+                type: integer
+              requests:
+                type: integer

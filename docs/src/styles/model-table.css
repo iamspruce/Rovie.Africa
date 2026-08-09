@@ -1,0 +1,88 @@
+/* Styles for the ModelTable island. Kept out of the component so the island
+ * ships behaviour and nothing else - a <style> block inside it would be
+ * re-serialised into the page for a table that is already styled by the time
+ * React hydrates. */
+
+.model-table__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.model-table__controls input,
+.model-table__controls select {
+  padding: 0.45rem 0.6rem;
+  font: inherit;
+  font-size: var(--sl-text-sm);
+  color: var(--sl-color-white);
+  background: var(--sl-color-black);
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 4px;
+}
+
+.model-table__controls input {
+  min-width: 16rem;
+  flex: 1 1 16rem;
+}
+
+.model-table__controls input:focus-visible,
+.model-table__controls select:focus-visible {
+  outline: 2px solid var(--sl-color-text-accent);
+  outline-offset: 1px;
+}
+
+/* The table is wide and the page is not. Scroll the table, never the page. */
+.model-table__scroll {
+  overflow-x: auto;
+  max-height: 32rem;
+  overflow-y: auto;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 6px;
+}
+
+.model-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--sl-text-sm);
+  margin: 0;
+}
+
+.model-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  text-align: left;
+  background: var(--sl-color-gray-6);
+  border-bottom: 1px solid var(--sl-color-gray-5);
+}
+
+.model-table th,
+.model-table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--sl-color-hairline-shade);
+  white-space: nowrap;
+}
+
+.model-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.model-table__provider {
+  display: block;
+  color: var(--sl-color-gray-3);
+  font-size: 0.85em;
+}
+
+/* Money and token counts are read by comparison down a column, so they line
+ * up on the right and on their own digits. */
+.model-table__number {
+  text-align: right;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.model-table__note {
+  margin-top: 0.75rem;
+  color: var(--sl-color-gray-3);
+  font-size: var(--sl-text-sm);
+}

@@ -1,0 +1,201 @@
+---
+title: Tool calling
+description: Let a model call your functions — the request shape, the loop you have to run yourself, and the failure modes worth handling.
+sidebar:
+  order: 3
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+Tool calling lets a model ask you to run a function and then use the result. It
+is how a model gets at anything it cannot know: your database, today's exchange
+rate, a customer's order status.
+
+The model never runs anything. It emits a request to run something; you decide
+whether to, run it, and hand back the result. That distinction is the whole
+security model.
+
+Requires a model whose catalog `tool_call` flag is true. On models where it is
+false, `tools` is ignored rather than rejected — the quieter, worse failure.
+
+## The loop
+
+<Steps>
+
+1. You send the messages **and** a list of tools.
+2. The model answers either with content (done) or with `tool_calls` (it wants
+   something run).
+3. You run the requested functions.
+4. You send the whole conversation back, with a `tool` message per call.
+5. Repeat from 2 until the model answers with content.
+
+</Steps>
+
+There is no framework doing this for you. It is your loop, and it needs a
+bound — see [Bound the loop](#bound-the-loop).
+
+## A complete example
+
+```python
+import json
+
+def get_balance(user_id: str) -> dict:
+    """Whatever this actually is in your system."""
+    return {"user_id": user_id, "available_usd": 12.40, "currency": "NGN"}
+
+
+TOOLS = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_balance",
+            "description": (
+                "Look up a user's current Rovie balance. Use this whenever the "
+                "user asks how much credit they have left."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "user_id": {
+                        "type": "string",
+                        "description": "The user's account id, e.g. usr_4f2a.",
+                    }
+                },
+                "required": ["user_id"],
+            },
+        },
+    }
+]
+
+IMPLEMENTATIONS = {"get_balance": get_balance}
+
+messages = [{"role": "user", "content": "How much credit does usr_4f2a have?"}]
+
+for _ in range(5):  # bounded, deliberately
+    response = client.chat.completions.create(
+        model="anthropic/claude-sonnet-5",
+        messages=messages,
+        tools=TOOLS,
+    )
+    message = response.choices[0].message
+    messages.append(message)
+
+    if not message.tool_calls:
+        print(message.content)
+        break
+
+    for call in message.tool_calls:
+        implementation = IMPLEMENTATIONS.get(call.function.name)
+        if implementation is None:
+            result = {"error": f"unknown tool {call.function.name}"}
+        else:
+            try:
+                # arguments is a JSON *string*, and a model can emit one that
+                # does not parse. That is a normal case, not an exception.
+                args = json.loads(call.function.arguments)
+                result = implementation(**args)
+            except (json.JSONDecodeError, TypeError) as error:
+                result = {"error": str(error)}
+
+        messages.append(
+            {
+                "role": "tool",
+                "tool_call_id": call.id,
+                "content": json.dumps(result),
+            }
+        )
+else:
+    raise RuntimeError("tool loop did not converge")
+```
+
+## The parts that catch people out
+
+### `arguments` is a string
+
+Not an object — a JSON string, because that is OpenAI's shape and Rovie does
+not change it. Parse it, and be ready for it not to parse. Models emit invalid
+JSON here often enough that treating it as an unexpected exception is wrong;
+hand the error back to the model as a tool result and it will usually correct
+itself.
+
+### Every `tool_calls` needs a matching `tool` message
+
+If the model asks for three calls, you owe three `tool` messages, each carrying
+the right `tool_call_id`, before the next request. A missing one is a `400`.
+
+### Append the assistant message too
+
+Step 4 sends back the *whole* conversation, including the assistant message
+that contained the `tool_calls`. Dropping it and sending only the results
+leaves the model with tool output for a call it has no record of making.
+
+### Bound the loop
+
+A model can ask for tools indefinitely — most often when a tool keeps returning
+an error it cannot resolve. Every iteration is a billable call with a growing
+prompt, so an unbounded loop is an unbounded bill. Cap it (five is generous for
+most agents) and fail loudly at the cap.
+
+<Aside type="caution" title="Costs compound">
+Each iteration resends the entire conversation, which now includes every
+previous tool result. A five-step loop is not five times one call — it is
+closer to fifteen, because the prompt grows each time. Watch `usage` per
+iteration while developing.
+</Aside>
+
+## Writing tools a model uses well
+
+The description is the interface. The model has your function's name,
+description and JSON schema, and nothing else.
+
+- **Say when to use it, not just what it does.** "Look up a user's balance" is
+  weaker than "Look up a user's balance. Use whenever the user asks how much
+  credit they have left."
+- **Describe every parameter,** with an example in the description. `user_id`
+  alone gets you a guessed value; "The user's account id, e.g. usr_4f2a" gets
+  you a request for the id.
+- **Mark what is `required`.** Optional-everything schemas produce calls with
+  nothing filled in.
+- **Return errors as data.** `{"error": "no such user"}` back to the model is
+  recoverable; a raised exception in your loop is not.
+- **Keep the list short.** Twenty tools measurably degrades selection accuracy.
+  If you have twenty, route to a subset first.
+
+## Forcing a choice
+
+`tool_choice` controls whether the model may decide:
+
+| Value | Behaviour |
+| --- | --- |
+| `"auto"` | Model decides. The default when `tools` is present. |
+| `"none"` | Never call a tool; answer directly. |
+| `"required"` | Must call some tool. |
+| `{"type": "function", "function": {"name": "get_balance"}}` | Must call this one. |
+
+`"required"` is useful for a first turn where an answer without data would be a
+hallucination.
+
+## Security
+
+A tool call is a request from a model that has read untrusted input — anything
+in the conversation, any document you retrieved, any web page you fetched. If
+a user can get text into the context, they can attempt to steer a tool call.
+
+So:
+
+- **Validate arguments against your own rules**, not just the schema. A schema
+  says `user_id` is a string; it does not say it is *this* user's id.
+- **Scope by session, not by argument.** Take the account id from your
+  authenticated session and ignore any the model supplies. A tool that trusts
+  a model-supplied user id is an IDOR.
+- **Never expose a raw query, shell or file tool** to a model handling user
+  input. Expose the specific operation instead.
+- **Require confirmation for anything irreversible** — payments, deletions,
+  outbound messages. The model proposes; a person approves.
+
+## Streaming with tools
+
+Tool calls arrive in fragments across chunks, with `delta.tool_calls` carrying
+partial `arguments` strings that you accumulate by index before parsing. If you
+do not need to show the reasoning as it happens, it is simpler not to stream
+the tool-calling turns and to stream only the final answer.

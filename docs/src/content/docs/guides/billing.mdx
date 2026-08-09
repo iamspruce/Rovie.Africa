@@ -1,0 +1,118 @@
+---
+title: Balance and top-ups
+description: How Rovie's balance works — paying in naira, shillings, cedis or stablecoin, what the markup is, and what happens when a payment goes quiet.
+sidebar:
+  order: 6
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+Rovie is prepaid. You put credit on an account, calls draw it down, and when it
+reaches zero the calls stop. No card on file, no subscription, no invoice at
+the end of the month, and nothing that can overdraft.
+
+That is not a simplification for its own sake. A dollar-denominated card
+subscription is exactly the thing that stops most of this continent's
+developers from buying tokens at all.
+
+## The two currencies
+
+Rovie holds your balance in **USD**, because that is what the providers charge
+in. You fund it in **your own currency**, and you are quoted in your own
+currency throughout.
+
+<Steps>
+
+1. **You pay** ₦25,000 by bank transfer.
+2. **Rovie converts** at the rate locked at that moment, minus its markup.
+3. **Your balance** goes up by the resulting USD figure.
+4. **Calls draw down** that USD balance at the providers' per-token rates.
+5. **The dashboard shows** the remainder in both — USD, and naira at today's
+   rate.
+
+</Steps>
+
+The rate is locked when the charge is created, not when the money lands. A
+quote you were shown before starting a payment is marked *indicative* for
+exactly that reason: rates move, and the binding one is the one on the charge.
+
+## Paying
+
+Two methods, from [Billing](https://rovie.africa/dashboard/billing):
+
+**Bank transfer** — the accessible option, and the default. Most people have a
+bank account and no stablecoin. Settled in NGN, UGX, GHS or KES.
+
+**Stablecoin** — for anyone already holding one. Carries a hard provider
+minimum of roughly $1.45, which bank transfer does not.
+
+Minimums differ by method, and the dashboard shows the one that applies to what
+you selected — expressed in your own currency, in minor units, converted
+server-side. Where a currency's rate is briefly unavailable, it falls back to
+showing USD rather than printing a wrong local figure.
+
+<Aside type="note" title="Quoting and paying are different lists">
+Rovie can quote a price in every African currency its rate feed carries — that
+is what the map and the models page use. It can *settle* a payment in a shorter
+list: **NGN, UGX, GHS, KES**. Holding funds in a currency is a compliance
+question, not a technical one, so that list grows slowly and deliberately.
+</Aside>
+
+## The markup
+
+Rovie charges the provider's own per-token rate plus a percentage. That
+percentage is shown on the quote before you pay, and it is the entire business
+model — there is no subscription, no per-request fee, and no charge for a
+request that failed before reaching a provider.
+
+What you are buying with it: the dollar relationship with nine providers, the
+FX, and the payment rails. Doing that yourself requires a dollar card with a
+limit high enough to matter.
+
+## When a payment goes quiet
+
+Payments confirm by webhook from the provider. Usually it lands in seconds.
+
+If a transfer shows as **Waiting for payment** after you have definitely paid,
+open the payment on the
+[billing page](https://rovie.africa/dashboard/billing) and refresh it — that
+asks the provider directly what happened rather than waiting for a webhook that
+may not arrive. It is the same check that runs automatically, on demand.
+
+Still stuck after that: [hello@rovie.africa](mailto:hello@rovie.africa) with
+the payment reference. Money that left your account and did not arrive is a
+support case, not something to keep retrying.
+
+## Running out
+
+When the balance hits zero, every key on the account returns
+[`402`](/guides/errors/#402--out-of-balance). Nothing queues, nothing degrades,
+nothing is charged — the call simply does not happen.
+
+Set the **low-balance email** on
+[your account settings](https://rovie.africa/dashboard/account): a USD figure
+below which Rovie emails you. Pick a number that covers a few days of your
+normal burn, so a top-up is something you schedule rather than something you do
+at 2am.
+
+## Watching the spend
+
+- [Usage](https://rovie.africa/dashboard/usage) — where the money went, by
+  model, provider and day. Also a CSV export.
+- [Per-key budgets](/guides/limits/#budgets) — a hard lifetime ceiling per key,
+  so one runaway job cannot spend the balance.
+- [`GET /models`](/api/operations/listcatalog/) — the per-million rates, if you
+  want to estimate before running something large.
+
+[Usage and cost tracking](/guides/usage/) covers the reconciliation in detail.
+
+## Refunds and closing the account
+
+Unspent credit is exactly that — unspent. If you delete your account you
+forfeit whatever is left, which is why the deletion flow makes you type the
+figure you are giving up rather than accepting a generic confirmation. An
+anonymised record is kept afterwards where the payment ledger needs it; see the
+[privacy policy](https://rovie.africa/privacy).
+
+For anything else — a payment that credited the wrong amount, a top-up you want
+reversed — email [hello@rovie.africa](mailto:hello@rovie.africa).
