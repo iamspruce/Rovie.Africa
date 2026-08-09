@@ -2,13 +2,107 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!--
+      The tags below carry the HOMEPAGE's copy. At build time `vite/seo-plugin.js`
+      writes one HTML file per indexable route and rewrites them to that route's
+      entry in `src/content/seo.ts`; at runtime `components/Seo` rewrites the same
+      tags again on every client-side navigation.
+
+      Both halves are needed. Google renders JavaScript, so the runtime half is
+      enough for search - but Slack, WhatsApp, X, LinkedIn and iMessage read the
+      raw HTML and never execute a line of it, so a link to /models pasted in a
+      group chat shows whatever the static file says. Editing these by hand only
+      changes the homepage; the source of truth is seo.ts.
+    -->
+    <title>Rovie — the AI layer for Africa</title>
     <meta
       name="description"
-      content="Rovie - frontier AI, priced for Africa. Live local pricing, one API key, every leading model."
+      content="One account and one API key for GPT, Claude, Gemini, Llama and every leading AI model — priced in your own currency, paid for the way Africa pays."
     />
-    <title>Rovie.africa - Frontier AI, priced for Africa</title>
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://rovie.africa/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Rovie" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content="Rovie — the AI layer for Africa" />
+    <meta
+      property="og:description"
+      content="One account and one API key for GPT, Claude, Gemini, Llama and every leading AI model — priced in your own currency, paid for the way Africa pays."
+    />
+    <meta property="og:url" content="https://rovie.africa/" />
+    <meta property="og:image" content="https://rovie.africa/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Rovie — the AI layer for Africa" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Rovie — the AI layer for Africa" />
+    <meta
+      name="twitter:description"
+      content="One account and one API key for GPT, Claude, Gemini, Llama and every leading AI model — priced in your own currency, paid for the way Africa pays."
+    />
+    <meta name="twitter:image" content="https://rovie.africa/og.png" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+
+    <!--
+      The browser's own furniture - address bar on mobile, form controls -
+      follows the page instead of sitting light against a black one. The values
+      are --rv-bg from each half of base/_theme.scss.
+    -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />
+    <meta name="color-scheme" content="light dark" />
+
+    <!--
+      Identity, for the entity panel and for anything resolving "Rovie" as a
+      company rather than as a string. Site-wide facts only - anything that is
+      true of one page belongs in that page's own markup, not here.
+    -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://rovie.africa/#organization",
+            "name": "Rovie",
+            "url": "https://rovie.africa/",
+            "logo": "https://rovie.africa/og.png",
+            "email": "hello@rovie.africa",
+            "description": "Rovie is the infrastructure between African builders and the world's frontier AI models — one account, every leading model, priced in local currency.",
+            "areaServed": {
+              "@type": "Place",
+              "name": "Africa"
+            }
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://rovie.africa/#website",
+            "url": "https://rovie.africa/",
+            "name": "Rovie",
+            "publisher": { "@id": "https://rovie.africa/#organization" },
+            "inLanguage": "en"
+          },
+          {
+            "@type": "Service",
+            "@id": "https://rovie.africa/#service",
+            "name": "Rovie AI gateway",
+            "provider": { "@id": "https://rovie.africa/#organization" },
+            "serviceType": "AI model API gateway",
+            "description": "A single OpenAI-compatible API key for GPT, Claude, Gemini, Llama, DeepSeek and other frontier models, billed in local African currencies.",
+            "areaServed": {
+              "@type": "Place",
+              "name": "Africa"
+            }
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

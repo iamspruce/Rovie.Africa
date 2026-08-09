@@ -1,5 +1,6 @@
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
+import { seoPlugin } from './vite/seo-plugin';
 
 // account-service sits behind a single shared secret (ROVIE_API_KEY) that also
 // gates user registration, balance lookups and API-key minting. It must never
@@ -16,7 +17,15 @@ export default defineConfig(({ mode }) => {
   const accountServiceKey = env.ROVIE_API_KEY;
 
   return {
-    plugins: [react()],
+    plugins: [react(), seoPlugin()],
+
+    // globe.geo.json is ~170 KB. Emitted as a JS object literal - Vite's
+    // default - the engine parses it as source, which is markedly slower than
+    // JSON.parse on a string of the same size. This makes every JSON import a
+    // JSON.parse call instead.
+    json: {
+      stringify: true,
+    },
     server: {
       proxy: {
         '/api/account': {

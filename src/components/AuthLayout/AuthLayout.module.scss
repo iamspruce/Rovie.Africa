@@ -13,23 +13,42 @@
     // a 50/50 split makes the map read as competing with it.
     grid-template-rows: none;
     grid-template-columns: minmax(360px, 0.8fr) 1fr;
+
+    // Pin the whole page to the viewport so the plate is a fixed backdrop:
+    // it fills its column's full height and never moves, and only the form
+    // column scrolls. Nothing here escapes the grid to do it - a sticky or
+    // fixed plate would have to be told a width it already has.
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
   }
 }
 
 .panel {
   display: flex;
-  align-items: center;
   justify-content: center;
   padding: v.$space-6 v.$space-4;
 
   @include m.respond-to('md') {
     padding: v.$space-8 v.$space-6;
   }
+
+  @include m.respond-to('lg') {
+    // The one scroll container on a desktop viewport.
+    height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain; // a form scrolled to its end must not start scrolling the page behind it
+  }
 }
 
 .column {
   width: 100%;
   max-width: 25rem;
+  // Centres the form vertically the way `align-items: center` on the panel
+  // would, but without that rule's flaw: an auto margin gives way once the
+  // content is taller than the column, where centring clips the top of a
+  // long form out of reach above the scroll container.
+  margin-block: auto;
 }
 
 .heading {

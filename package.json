@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:integration": "ROVIE_RUN_INTEGRATION_TESTS=true vitest run src/sdk/__tests__/integration"
+    "test:integration": "ROVIE_RUN_INTEGRATION_TESTS=true vitest run src/sdk/__tests__/integration",
+    "geo:build": "node scripts/build-geo.mjs"
   },
   "dependencies": {
     "@fontsource-variable/bricolage-grotesque": "^5.3.0",

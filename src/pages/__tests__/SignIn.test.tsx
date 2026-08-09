@@ -8,6 +8,7 @@ const getMe = vi.fn();
 const getAuthMethods = vi.fn();
 const signInWithEmail = vi.fn();
 const sendMagicLink = vi.fn();
+const requestPasswordReset = vi.fn();
 const detectVisitorCountry = vi.fn();
 
 vi.mock('../../sdk', () => ({
@@ -17,9 +18,10 @@ vi.mock('../../sdk', () => ({
       getAuthMethods: (...args: unknown[]) => getAuthMethods(...args),
       signInWithEmail: (...args: unknown[]) => signInWithEmail(...args),
       sendMagicLink: (...args: unknown[]) => sendMagicLink(...args),
+      requestPasswordReset: (...args: unknown[]) => requestPasswordReset(...args),
       signOut: vi.fn(),
-      googleSignInUrl: (callback: string) =>
-        `http://localhost:4002/auth/sign-in/social?provider=google&callbackURL=${encodeURIComponent(callback)}`,
+      socialSignInUrl: (provider: string, callback: string) =>
+        `http://localhost:4002/auth/sign-in/social?provider=${provider}&callbackURL=${encodeURIComponent(callback)}`,
     },
     geo: { detectVisitorCountry: (...args: unknown[]) => detectVisitorCountry(...args) },
   },
@@ -42,7 +44,12 @@ describe('SignIn page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     getMe.mockResolvedValue(null); // signed out
-    getAuthMethods.mockResolvedValue({ google: false, magicLink: true, emailPassword: true });
+    getAuthMethods.mockResolvedValue({
+      google: false,
+      github: false,
+      magicLink: true,
+      emailPassword: true,
+    });
     detectVisitorCountry.mockResolvedValue({ countryCode: 'NG', countryName: 'Nigeria' });
   });
 
@@ -141,7 +148,10 @@ describe('SignIn page', () => {
         signal?.addEventListener('abort', () =>
           reject(Object.assign(new Error('The operation was aborted.'), { name: 'AbortError' }))
         );
-        setTimeout(() => resolve({ google: false, magicLink: true, emailPassword: true }), 0);
+        setTimeout(
+          () => resolve({ google: false, github: false, magicLink: true, emailPassword: true }),
+          0
+        );
       });
     });
 
@@ -163,15 +173,105 @@ describe('SignIn page', () => {
     expect(screen.queryByText(/Can’t reach Rovie|Can't reach Rovie/)).not.toBeInTheDocument();
   });
 
-  it('hides the Google button when the provider is not configured', async () => {
+  it('hides both social buttons when neither provider is configured', async () => {
     renderSignIn();
     await screen.findByLabelText('Email');
     expect(screen.queryByRole('button', { name: /Continue with Google/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Continue with GitHub/ })).not.toBeInTheDocument();
   });
 
-  it('shows the Google button when portal-api reports it configured', async () => {
-    getAuthMethods.mockResolvedValue({ google: true, magicLink: true, emailPassword: true });
+  it('shows Google and GitHub when portal-api reports them configured', async () => {
+    getAuthMethods.mockResolvedValue({
+      google: true,
+      github: true,
+      magicLink: true,
+      emailPassword: true,
+    });
     renderSignIn();
     expect(await screen.findByRole('button', { name: /Continue with Google/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Continue with GitHub/ })).toBeInTheDocument();
+  });
+
+  it('asks for a reset link without making the user retype their address', async () => {
+    const user = userEvent.setup();
+    requestPasswordReset.mockResolvedValue({ status: true });
+    renderSignIn();
+
+    await user.type(await screen.findByLabelText('Email'), 'dev@example.com');
+    await user.click(screen.getByRole('button', { name: 'Forgot your password?' }));
+
+    // The email carried across from the sign-in attempt that just failed.
+    expect(screen.getByRole('heading', { name: 'Reset your password' })).toBeInTheDocument();
+    expect((screen.getByLabelText('Email') as HTMLInputElement).value).toBe('dev@example.com');
+    expect(screen.queryByLabelText('Password')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Email me a reset link' }));
+
+    await waitFor(() =>
+      expect(requestPasswordReset).toHaveBeenCalledWith({
+        email: 'dev@example.com',
+        redirectTo: `${window.location.origin}/reset-password`,
+      })
+    );
+  });
+
+  it('confirms a reset without revealing whether the address has an account', async () => {
+    const user = userEvent.setup();
+    requestPasswordReset.mockResolvedValue({ status: true });
+    renderSignIn();
+
+    await user.type(await screen.findByLabelText('Email'), 'stranger@example.com');
+    await user.click(screen.getByRole('button', { name: 'Forgot your password?' }));
+    await user.click(screen.getByRole('button', { name: 'Email me a reset link' }));
+
+    // "If there's an account" — portal-api answers identically either way and
+    // the copy must not leak what the API withholds.
+    const notice = await screen.findByRole('status');
+    expect(notice).toHaveTextContent(/If there’s an account for stranger@example.com/);
+    expect(notice).not.toHaveTextContent(/no account|not found/i);
+  });
+
+  it('opens straight into the reset form when sent back by an expired link', async () => {
+    renderSignIn('/signin?reset=1');
+
+    expect(
+      await screen.findByRole('heading', { name: 'Reset your password' })
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Email me a reset link' })).toBeInTheDocument();
+    expect(screen.queryByLabelText('Password')).not.toBeInTheDocument();
+  });
+
+  it('sends a social sign-in back to where the visitor was headed', async () => {
+    const user = userEvent.setup();
+    getAuthMethods.mockResolvedValue({
+      google: false,
+      github: true,
+      magicLink: true,
+      emailPassword: true,
+    });
+    // jsdom throws on a real navigation, so the assignment is captured instead.
+    const assigned: string[] = [];
+    const original = Object.getOwnPropertyDescriptor(window, 'location')!;
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: {
+        origin: 'http://localhost:5173',
+        set href(url: string) {
+          assigned.push(url);
+        },
+      },
+    });
+
+    try {
+      renderSignIn('/signin?next=/dashboard/keys');
+      await user.click(await screen.findByRole('button', { name: /Continue with GitHub/ }));
+
+      expect(assigned).toEqual([
+        'http://localhost:4002/auth/sign-in/social?provider=github&callbackURL=' +
+          encodeURIComponent('http://localhost:5173/dashboard/keys'),
+      ]);
+    } finally {
+      Object.defineProperty(window, 'location', original);
+    }
   });
 });

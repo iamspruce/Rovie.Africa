@@ -17,7 +17,8 @@ vi.mock('../../sdk', () => ({
       signUpWithEmail: (...args: unknown[]) => signUpWithEmail(...args),
       sendMagicLink: (...args: unknown[]) => sendMagicLink(...args),
       signOut: vi.fn(),
-      googleSignInUrl: () => 'http://localhost:4002/auth/sign-in/social',
+      socialSignInUrl: (provider: string) =>
+        `http://localhost:4002/auth/sign-in/social?provider=${provider}`,
     },
     geo: { detectVisitorCountry: (...args: unknown[]) => detectVisitorCountry(...args) },
   },
@@ -43,7 +44,12 @@ describe('SignUp page', () => {
     // useVisitorCountry already treats it as optional. Reaching for it would
     // only test the harness.
     getMe.mockResolvedValue(null);
-    getAuthMethods.mockResolvedValue({ google: false, magicLink: true, emailPassword: true });
+    getAuthMethods.mockResolvedValue({
+      google: false,
+      github: false,
+      magicLink: true,
+      emailPassword: true,
+    });
     detectVisitorCountry.mockResolvedValue({ countryCode: 'KE', countryName: 'Kenya' });
   });
 
@@ -127,5 +133,31 @@ describe('SignUp page', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'An account already exists for that email. Sign in instead.'
     );
+  });
+
+  it('offers both social providers when portal-api reports them configured', async () => {
+    getAuthMethods.mockResolvedValue({
+      google: true,
+      github: true,
+      magicLink: true,
+      emailPassword: true,
+    });
+    renderSignUp();
+
+    expect(await screen.findByRole('button', { name: /Continue with Google/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Continue with GitHub/ })).toBeInTheDocument();
+  });
+
+  it('draws only the configured provider, and no orphaned divider', async () => {
+    getAuthMethods.mockResolvedValue({
+      google: false,
+      github: true,
+      magicLink: true,
+      emailPassword: true,
+    });
+    renderSignUp();
+
+    expect(await screen.findByRole('button', { name: /Continue with GitHub/ })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Continue with Google/ })).not.toBeInTheDocument();
   });
 });

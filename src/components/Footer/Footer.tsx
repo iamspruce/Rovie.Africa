@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { LogoMap } from '../LogoMap/LogoMap';
+import { SmartLink } from '../SmartLink/SmartLink';
 import { Button } from '../Button/Button';
 import { CONTACT_EMAIL } from '../../content/navLinks';
 import {
@@ -113,7 +114,9 @@ function Column({ title, links, children }: ColumnProps) {
       <ul>
         {links.map((link) => (
           <li key={link.to}>
-            <Link to={link.to}>{link.label}</Link>
+            <SmartLink to={link.to} external={link.external}>
+              {link.label}
+            </SmartLink>
           </li>
         ))}
         {children}

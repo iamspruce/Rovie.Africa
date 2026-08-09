@@ -60,8 +60,29 @@ describe('Footer', () => {
       ...PLACEHOLDER_PAGES.map((page) => page.path),
     ]);
 
-    [...PRODUCT_LINKS, ...DEVELOPER_LINKS, ...COMPANY_LINKS].forEach((link) => {
-      expect(routed.has(link.to)).toBe(true);
+    [...PRODUCT_LINKS, ...DEVELOPER_LINKS, ...COMPANY_LINKS]
+      .filter((link) => !link.external)
+      .forEach((link) => {
+        expect(routed.has(link.to)).toBe(true);
+      });
+  });
+
+  // The other half of the same guarantee. An off-site link that is not an
+  // absolute URL is the failure this catches: react-router would resolve
+  // "docs.rovie.africa/api/" as a relative path and land on the 404.
+  //
+  // Absolute, not https: DOCS_URL follows the environment, so these are
+  // http://localhost:4321 in dev and under test. Asserting the scheme would be
+  // asserting which environment the suite ran in.
+  it('gives every off-site link an absolute URL', () => {
+    const external = [...PRODUCT_LINKS, ...DEVELOPER_LINKS, ...COMPANY_LINKS].filter(
+      (link) => link.external
+    );
+
+    expect(external.length).toBeGreaterThan(0);
+    external.forEach((link) => {
+      expect(() => new URL(link.to)).not.toThrow();
+      expect(link.to).toMatch(/^https?:\/\//);
     });
   });
 

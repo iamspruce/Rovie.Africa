@@ -103,7 +103,16 @@
   }
 }
 
-.google {
+// Stacked, full width, never side by side: "Continue with GitHub" doesn't fit
+// half of a 25rem column without shrinking the type, and two equal pills in a
+// row read as a choice to make rather than two ways in.
+.socialGroup {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-3;
+}
+
+.social {
   display: inline-flex;
   align-items: center;
   justify-content: center;

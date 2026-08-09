@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import { Legal, LEGAL_DOCS } from '../Legal/Legal';
+import { Legal, LEGAL_BODIES, LEGAL_DOCS } from '../Legal/Legal';
 
 function renderAt(path: string) {
   return render(
@@ -44,7 +44,7 @@ describe('Legal pages', () => {
 
   it('keeps the draft flag honest against the wording itself', () => {
     LEGAL_DOCS.forEach((doc) => {
-      const hasOpenQuestions = doc.body.includes('[To confirm]');
+      const hasOpenQuestions = LEGAL_BODIES[doc.path].includes('[To confirm]');
       expect(doc.isDraft).toBe(hasOpenQuestions);
     });
   });

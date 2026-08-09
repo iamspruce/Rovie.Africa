@@ -91,15 +91,32 @@ export function getClientConfig(
   return portalCall<ClientConfig>(`/me/client-config/${client}`, { signal });
 }
 
+/** The OAuth providers portal-api can be configured with. */
+export type SocialProvider = 'google' | 'github';
+
 export interface AuthMethods {
   google: boolean;
+  github: boolean;
   magicLink: boolean;
   emailPassword: boolean;
 }
 
-/** Which sign-in methods this deployment has configured. */
-export function getAuthMethods(signal?: AbortSignal): Promise<AuthMethods> {
-  return portalCall<AuthMethods>('/auth-config', { signal });
+/**
+ * Which sign-in methods this deployment has configured.
+ *
+ * Normalised to real booleans rather than passed through: a portal-api older
+ * than a given provider simply omits its key, and `undefined` reaching the
+ * pages as a "configured?" answer would type as boolean while behaving as a
+ * third state.
+ */
+export async function getAuthMethods(signal?: AbortSignal): Promise<AuthMethods> {
+  const raw = await portalCall<Partial<AuthMethods>>('/auth-config', { signal });
+  return {
+    google: Boolean(raw.google),
+    github: Boolean(raw.github),
+    magicLink: Boolean(raw.magicLink),
+    emailPassword: Boolean(raw.emailPassword),
+  };
 }
 
 // ------------------------------------------------------------------ auth
@@ -134,13 +151,64 @@ export function signOut(): Promise<unknown> {
 }
 
 /**
- * Google is a full-page redirect, not a fetch: the browser has to visit
- * Google itself. Returning the URL rather than navigating keeps this module
- * free of side effects.
+ * Starts a password reset. `redirectTo` is where portal-api sends the browser
+ * after the emailed link is checked - an absolute URL back into this app,
+ * which arrives carrying either `?token=` or `?error=INVALID_TOKEN`.
+ *
+ * Succeeds whether or not the address has an account: the response is
+ * identical either way, deliberately, so this can't be used to find out which
+ * addresses are registered. Never tell the user "no such account" here.
  */
-export function googleSignInUrl(callbackURL: string): string {
+export function requestPasswordReset(input: {
+  email: string;
+  redirectTo: string;
+}): Promise<{ status: boolean; message?: string }> {
+  return portalCall<{ status: boolean; message?: string }>('/auth/request-password-reset', {
+    method: 'POST',
+    body: input,
+  });
+}
+
+/**
+ * Spends the token from that email on one new password.
+ *
+ * Does not sign anyone in - portal-api revokes every session on reset, so the
+ * next step is always the sign-in form.
+ */
+export function resetPassword(input: {
+  newPassword: string;
+  token: string;
+}): Promise<{ status: boolean }> {
+  return portalCall<{ status: boolean }>('/auth/reset-password', {
+    method: 'POST',
+    body: input,
+  });
+}
+
+/**
+ * Changes the password of the signed-in user, who has to prove they know the
+ * current one - a session alone must not be enough to lock its owner out.
+ *
+ * Fails with CREDENTIAL_ACCOUNT_NOT_FOUND on an account that only ever signed
+ * in through Google or GitHub, which has no password to change.
+ */
+export function changePassword(input: {
+  currentPassword: string;
+  newPassword: string;
+  /** Signs every other device out. On by default at the call site. */
+  revokeOtherSessions?: boolean;
+}): Promise<unknown> {
+  return portalCall('/auth/change-password', { method: 'POST', body: input });
+}
+
+/**
+ * OAuth is a full-page redirect, not a fetch: the browser has to visit Google
+ * or GitHub itself. Returning the URL rather than navigating keeps this
+ * module free of side effects.
+ */
+export function socialSignInUrl(provider: SocialProvider, callbackURL: string): string {
   const url = new URL(`${config.portalApiUrl.replace(/\/+$/, '')}/auth/sign-in/social`);
-  url.searchParams.set('provider', 'google');
+  url.searchParams.set('provider', provider);
   url.searchParams.set('callbackURL', callbackURL);
   return url.toString();
 }

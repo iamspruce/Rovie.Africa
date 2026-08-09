@@ -12,19 +12,27 @@ function renderHome() {
 }
 
 describe('Home page', () => {
+  // The headline says what the company is, not what the product charges. A
+  // price or a feature turning up in the h1 is the regression this catches.
   it('leads with the company mission rather than a product spec', () => {
     renderHome();
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/ai for africa/i);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/the ai layer\s*for africa/i);
   });
 
-  it('keeps the interactive globe in the hero', () => {
+  // The globe is a lazily loaded chunk - see AfricaMapLazy - so it arrives a
+  // tick after the hero text it sits under. The generous timeout is for the
+  // role query rather than the import: computing an accessible name across a
+  // fully drawn globe is slow under jsdom.
+  it('keeps the interactive globe in the hero', async () => {
     renderHome();
-    expect(screen.getByRole('img', { name: /globe.*africa/i })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('img', { name: /globe.*africa/i }, { timeout: 8000 })
+    ).toBeInTheDocument();
   });
 
-  it('prices the top models on the globe itself', () => {
+  it('prices the top models on the globe itself', async () => {
     renderHome();
-    const tags = screen.getByLabelText(/top model prices in the selected currency/i);
+    const tags = await screen.findByLabelText(/top model prices in the selected currency/i);
     // Before the live catalog answers these are name-only fallbacks; either
     // way every tag carries a price line rather than a blank.
     expect(tags.textContent).toMatch(/\$0\.50|tokens|From/i);
@@ -64,9 +72,9 @@ describe('Home page', () => {
     expect(sections[2]).toMatch(/three steps to your first call/i);
   });
 
-  it('never hangs more tags off the globe than it has places to put them', () => {
+  it('never hangs more tags off the globe than it has places to put them', async () => {
     renderHome();
-    const tags = screen.getByLabelText(/top model prices in the selected currency/i);
+    const tags = await screen.findByLabelText(/top model prices in the selected currency/i);
     // The catalog now spans nine families; the globe has five slots, and the
     // rest are carried by the list below it.
     expect(tags.children.length).toBeLessThanOrEqual(5);

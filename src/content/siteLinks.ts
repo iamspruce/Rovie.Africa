@@ -1,8 +1,10 @@
-import { PRIMARY_NAV } from './navLinks';
+import { DEVELOPER_NAV, PRIMARY_NAV } from './navLinks';
 
 export interface SiteLink {
   /** Internal route, or an absolute URL / mailto: for anything off-site. */
   to: string;
+  /** Set when `to` leaves this app, so the footer renders an <a> not a <Link>. */
+  external?: boolean;
   label: string;
 }
 
@@ -27,12 +29,15 @@ export const PRODUCT_LINKS: readonly SiteLink[] = PRIMARY_NAV.map((link) => ({
 
 // ----------------------------------------------------------- developers
 
-export const DEVELOPER_LINKS: readonly SiteLink[] = [
-  { to: '/docs', label: 'Documentation' },
-  { to: '/api-reference', label: 'API reference' },
-  { to: '/sdk', label: 'SDK' },
-  { to: '/status', label: 'Status' },
-];
+// The same four the header's Developers panel offers, under their full names.
+// Derived rather than retyped: adding a developer destination should put it in
+// both places or neither. Three of them now point at docs.rovie.africa, so the
+// `external` flag comes along with them.
+export const DEVELOPER_LINKS: readonly SiteLink[] = DEVELOPER_NAV.map((link) => ({
+  to: link.to,
+  external: link.external,
+  label: link.longLabel,
+}));
 
 // --------------------------------------------------------------- company
 

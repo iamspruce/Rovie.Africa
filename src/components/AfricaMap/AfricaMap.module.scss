@@ -6,6 +6,51 @@
   position: relative;
 }
 
+// Holds the globe's space while its chunk loads - see AfricaMapLazy. The
+// ratios are AfricaMap's own ASPECT and NARROW_ASPECT: if those change and
+// this doesn't, the page will jump when the globe arrives.
+.placeholder {
+  width: 100%;
+  aspect-ratio: 1 / 0.86;
+
+  @media (min-width: 620px) {
+    aspect-ratio: 1 / 0.62;
+  }
+}
+
+// -------------------------------------------------------- while dragging
+//
+// The two feDropShadow filters are the most expensive thing on this canvas:
+// an SVG filter is re-rasterised whenever anything under it moves, and during
+// a drag that is every frame, for every tag and every route line. The country
+// paths' anti-aliasing costs again on top.
+//
+// None of it is perceptible on geometry that is moving, so all of it stands
+// down for the duration of the gesture and comes back on release. These are
+// CSS properties overriding SVG presentation attributes, which is why the
+// `filter="url(...)"` on the elements themselves does not win.
+.svg[data-dragging] {
+  cursor: grabbing;
+
+  .connections,
+  .modelTags {
+    filter: none;
+  }
+
+  .countryWorld,
+  .countryAfrica,
+  .countryHighlighted,
+  .graticule {
+    shape-rendering: optimizeSpeed;
+  }
+
+  // A pulsing ring forces a repaint of its own layer on every frame it
+  // animates, on top of the frames the drag is already producing.
+  .markerPulse {
+    animation: none;
+  }
+}
+
 .svg {
   width: 100%;
   height: auto;

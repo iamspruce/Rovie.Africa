@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState, type MutableRefObject } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type MutableRefObject } from 'react';
+import type { GeoPath } from 'd3-geo';
 import { getWorldFeatureCollection, getAfricaFeatureCollection } from '../../lib/d3/geoData';
 import {
   createGlobeProjection,
@@ -48,6 +49,29 @@ export interface MapModelTag {
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
+}
+
+// -----------------------------------------------------------------------
+// The rest of the world, as one shape.
+//
+// Only African countries are interactive - they hover, they carry a tooltip,
+// they can be clicked to reprice. Everything else is scenery, and drawing 127
+// separate <path> elements of scenery meant React reconciled 127 elements and
+// the browser reparsed 127 `d` attributes on every frame of a drag.
+//
+// As a single GeometryCollection it is one d3 call, one string and one element,
+// and the per-frame element count drops from ~180 to ~56. Built once at module
+// load: it depends on nothing that can change.
+// -----------------------------------------------------------------------
+const REST_OF_WORLD = {
+  type: 'GeometryCollection' as const,
+  geometries: getWorldFeatureCollection()
+    .features.filter((f) => !AFRICA_NUMERIC_IDS.has(String(f.id)))
+    .map((f) => f.geometry),
+};
+
+function restOfWorldPath(pathGenerator: GeoPath): string {
+  return pathGenerator(REST_OF_WORLD as never) || '';
 }
 
 const TAG_LOGO_SIZE = 22;
@@ -106,6 +130,7 @@ export function AfricaMapSvg({
 
   const [rotation, setRotation] = useState(() => rotationForLonLat(africaCenter));
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const dragStateRef: MutableRefObject<{
     startX: number;
     startY: number;
@@ -113,6 +138,32 @@ export function AfricaMapSvg({
     moved: boolean;
   } | null> = useRef(null);
   const suppressClickRef = useRef(false);
+
+  // Pointer events fire faster than the screen refreshes - up to 1000Hz on a
+  // drawing tablet, and commonly 120Hz on a phone. Re-projecting the globe on
+  // each one meant computing frames that were then thrown away without ever
+  // being painted. Rotation is now applied at most once per animation frame,
+  // with the newest pointer position winning.
+  const frameRef = useRef<number | null>(null);
+  const pendingRotationRef = useRef<[number, number] | null>(null);
+
+  const scheduleRotation = useCallback((next: [number, number]) => {
+    pendingRotationRef.current = next;
+    if (frameRef.current !== null) return;
+
+    frameRef.current = requestAnimationFrame(() => {
+      frameRef.current = null;
+      const pending = pendingRotationRef.current;
+      if (pending) setRotation(pending);
+    });
+  }, []);
+
+  useEffect(
+    () => () => {
+      if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
+    },
+    []
+  );
 
   useEffect(() => {
     if (!highlightedFeature) return;
@@ -126,10 +177,13 @@ export function AfricaMapSvg({
 
   const sphereOutline = useMemo(() => getSphereOutlinePath(pathGenerator), [pathGenerator]);
   const graticule = useMemo(() => getGraticulePath(pathGenerator), [pathGenerator]);
+  // Africa is the only part of this map anyone can interact with, so it is the
+  // only part that needs an element per country. See REST_OF_WORLD.
   const countryPaths = useMemo(
-    () => buildCountryPaths(world, pathGenerator),
-    [world, pathGenerator]
+    () => buildCountryPaths(africa, pathGenerator),
+    [africa, pathGenerator]
   );
+  const backdropPath = useMemo(() => restOfWorldPath(pathGenerator), [pathGenerator]);
 
   const markerCentroid = useMemo(() => {
     if (!highlightedFeature) return null;
@@ -139,12 +193,12 @@ export function AfricaMapSvg({
   const hovered = useMemo(() => {
     if (!hoveredId) return null;
     const country = findByNumericId(hoveredId);
-    const feature = world.features.find((f) => String(f.id) === hoveredId);
+    const feature = africa.features.find((f) => String(f.id) === hoveredId);
     if (!country || !feature) return null;
     const centroid = getFeatureCentroid(feature as Feature<Geometry>, pathGenerator);
     if (!centroid) return null;
     return { country, centroid };
-  }, [hoveredId, world, pathGenerator]);
+  }, [hoveredId, africa, pathGenerator]);
 
   const tagScale = clamp(width / TAG_REFERENCE_WIDTH, 0.6, 1);
   const tagBox = { width: TAG_WIDTH * tagScale, height: TAG_HEIGHT * tagScale };
@@ -206,8 +260,9 @@ export function AfricaMapSvg({
     const dy = event.clientY - startY;
     if (!dragStateRef.current.moved && Math.hypot(dx, dy) < CLICK_SLOP) return;
 
+    if (!dragStateRef.current.moved) setIsDragging(true);
     dragStateRef.current.moved = true;
-    setRotation([
+    scheduleRotation([
       startRotation[0] + dx * DRAG_SENSITIVITY,
       clamp(startRotation[1] - dy * DRAG_SENSITIVITY, -MAX_PHI, MAX_PHI),
     ]);
@@ -216,6 +271,7 @@ export function AfricaMapSvg({
   function handlePointerUp(event: React.PointerEvent<SVGSVGElement>) {
     suppressClickRef.current = Boolean(dragStateRef.current?.moved);
     dragStateRef.current = null;
+    setIsDragging(false);
     if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
@@ -248,6 +304,11 @@ export function AfricaMapSvg({
       role="img"
       aria-label="Interactive globe highlighting Africa - drag to rotate, tap a country to price models in its currency"
       className={styles.svg}
+      // Read by the stylesheet to drop the two drop-shadow filters and switch
+      // off anti-aliased path rendering while the globe is moving. Both are
+      // re-rasterised from scratch on every frame otherwise, and neither is
+      // perceptible on geometry that is in motion.
+      data-dragging={isDragging || undefined}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
@@ -300,13 +361,21 @@ export function AfricaMapSvg({
       <path d={sphereOutline} fill="url(#rovieGlobeFill)" className={styles.sphere} />
       <path d={graticule} className={styles.graticule} />
 
+      {/* Every country that isn't African, in one path. Nothing here responds
+          to a pointer, so nothing here needs to be its own element. */}
+      <path
+        d={backdropPath}
+        className={styles.countryWorld}
+        data-testid="rest-of-world"
+        pointerEvents="none"
+      />
+
       <g>
         {countryPaths.map((country: { id: string; d: string }, index: number) => {
           const isHighlighted = highlightedFeature && country.id === String(highlightedFeature.id);
-          const isAfrica = AFRICA_NUMERIC_IDS.has(country.id);
-          const isHovered = isAfrica && country.id === hoveredId;
+          const isHovered = country.id === hoveredId;
           const className = [
-            isHighlighted ? styles.countryHighlighted : isAfrica ? styles.countryAfrica : styles.countryWorld,
+            isHighlighted ? styles.countryHighlighted : styles.countryAfrica,
             isHovered ? styles.countryHovered : '',
           ]
             .filter(Boolean)
@@ -317,8 +386,8 @@ export function AfricaMapSvg({
               d={country.d}
               data-testid={`country-${country.id}`}
               className={className}
-              onPointerEnter={isAfrica ? () => setHoveredId(country.id) : undefined}
-              onClick={isAfrica ? () => handleCountryClick(country.id) : undefined}
+              onPointerEnter={() => setHoveredId(country.id)}
+              onClick={() => handleCountryClick(country.id)}
             />
           );
         })}

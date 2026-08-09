@@ -1,26 +1,53 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { AfricaMapSvg } from '../../components/AfricaMap/AfricaMapSvg';
-import { getWorldFeatureCollection } from '../../lib/d3/geoData';
+import { getAfricaFeatureCollection, getWorldFeatureCollection } from '../../lib/d3/geoData';
+import { AFRICA_COUNTRIES } from '../../lib/d3/africaCountries';
 
 describe('AfricaMapSvg', () => {
-  it('renders one path per country in the real world dataset', () => {
+  // Africa gets an element each because each one is a hover target and a
+  // click that reprices the page. The rest of the world is scenery, and is
+  // drawn as a single path so a drag doesn't reconcile 127 elements it can
+  // never interact with.
+  it('renders one addressable path per African country', () => {
     const { container } = render(<AfricaMapSvg width={800} height={800} />);
-    const world = getWorldFeatureCollection();
-    world.features.forEach((f) => {
+    getAfricaFeatureCollection().features.forEach((f) => {
       expect(container.querySelector(`[data-testid="country-${f.id}"]`)).toBeTruthy();
     });
+  });
+
+  // The performance shortcut above must not quietly cost anyone their country.
+  it('carries every African country in the table, islands included', () => {
+    const { container } = render(<AfricaMapSvg width={800} height={800} />);
+    const missing = AFRICA_COUNTRIES.filter(
+      (country) => !container.querySelector(`[data-testid="country-${country.numericId}"]`)
+    );
+    expect(missing.map((country) => country.name)).toEqual([]);
+  });
+
+  it('draws the rest of the world behind them, as one non-interactive shape', () => {
+    const { container } = render(<AfricaMapSvg width={800} height={800} />);
+    const backdrop = container.querySelector('[data-testid="rest-of-world"]');
+
+    expect(backdrop).toBeTruthy();
+    expect(backdrop?.getAttribute('d')?.startsWith('M')).toBe(true);
+    expect(backdrop?.getAttribute('pointer-events')).toBe('none');
+
+    // Non-African countries are inside that shape, not elements of their own.
+    const nonAfrican = getWorldFeatureCollection().features.find(
+      (f) => String(f.id) === '840' // United States
+    );
+    expect(nonAfrican).toBeTruthy();
+    expect(container.querySelector(`[data-testid="country-${nonAfrican!.id}"]`)).toBeNull();
   });
 
   it('renders a sphere outline and a graticule grid, the hallmarks of a globe rather than a flat map', () => {
     const { container } = render(<AfricaMapSvg width={800} height={800} />);
     const paths = container.querySelectorAll('path');
-    // sphere fill + shading + sphere stroke + graticule + >100 country paths.
-    // The geometry is what makes this a real projection; the gradients on top
-    // of it are only lighting.
-    expect(paths.length).toBeGreaterThan(100);
-    const world = getWorldFeatureCollection();
-    expect(container.querySelector(`[data-testid="country-${world.features[0].id}"]`)).toBeTruthy();
+    // sphere fill + shading + sphere stroke + graticule + the world backdrop
+    // + one path per African country. The geometry is what makes this a real
+    // projection; the gradients on top of it are only lighting.
+    expect(paths.length).toBeGreaterThan(50);
   });
 
   it('shades the sphere so it reads as a lit ball rather than a flat disc', () => {

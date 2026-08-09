@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { GetStartedSteps } from '../GetStartedSteps/GetStartedSteps';
+import { DOCS_URL } from '../../content/navLinks';
 
 function renderSteps() {
   return render(
@@ -33,11 +34,14 @@ describe('GetStartedSteps', () => {
     expect(within(buy).getByText(/naira, shillings or cedis/i)).toBeInTheDocument();
   });
 
+  // The quickstart lives on docs.rovie.africa now, so this is an absolute URL
+  // rather than a route. Asserted against DOCS_URL rather than a literal: the
+  // point is that the CTA and the nav agree on where the docs are.
   it('sends the reader somewhere real to start', () => {
     renderSteps();
     expect(screen.getByRole('link', { name: /read the setup guide/i })).toHaveAttribute(
       'href',
-      '/docs'
+      `${DOCS_URL}/start/quickstart/`
     );
   });
 

@@ -11,25 +11,11 @@ export interface PlaceholderPage {
   summary: string;
 }
 
+// Documentation, the API reference and the SDK guide used to be three
+// placeholders here. They are now written, and they live on their own site -
+// docs.rovie.africa, built from docs/ in this repository. The three routes stay
+// alive as redirects in routes/router.tsx and as 301s in public/_redirects.
 export const PLACEHOLDER_PAGES: readonly PlaceholderPage[] = [
-  {
-    path: '/docs',
-    title: 'Documentation',
-    summary:
-      'Signing up, getting a key, and making a first call, plus how balance and local pricing work end to end.',
-  },
-  {
-    path: '/api-reference',
-    title: 'API reference',
-    summary:
-      'Every endpoint on the Account, Payment and gateway services - parameters, responses and errors. The OpenAI-compatible chat endpoint lives here too.',
-  },
-  {
-    path: '/sdk',
-    title: 'SDK',
-    summary:
-      'The client this site is built on, and how to drop it into your own project. One module per service, with a shared HTTP client.',
-  },
   {
     path: '/about',
     title: 'About',

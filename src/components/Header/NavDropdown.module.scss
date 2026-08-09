@@ -1,0 +1,251 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+.wrapper {
+  position: relative;
+}
+
+// Matches .navLink in Header.module.scss - the two sit side by side in the bar
+// and any difference in padding or weight reads as a mistake.
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: v.$space-2 v.$space-3;
+  border-radius: v.$radius-md;
+  font-family: inherit;
+  font-size: v.$font-size-base;
+  font-weight: 500;
+  color: v.$color-text-muted;
+  background: none;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+
+  @include m.focus-ring;
+
+  &:hover {
+    color: v.$color-text;
+    background: v.$color-surface;
+  }
+
+  &[aria-expanded='true'],
+  &[data-active] {
+    color: v.$color-text;
+  }
+}
+
+.chevron {
+  transition: transform 0.18s ease;
+
+  .trigger[aria-expanded='true'] & {
+    transform: rotate(180deg);
+  }
+}
+
+// ---------------------------------------------------------------- panel
+
+.panel {
+  position: absolute;
+  // Directly under the bar with no gap. A gap is a strip the pointer has to
+  // cross to reach the panel, and it loses the hover doing it.
+  top: 100%;
+  left: 0;
+  z-index: v.$z-hamburger-menu;
+  padding: v.$space-2;
+  border: 1px solid v.$color-border;
+  // Square-ish on purpose. At this size a 16px radius reads as a bubble; the
+  // panel should read as a sheet of the page, so it takes the smaller token.
+  border-radius: v.$radius-md;
+  background: v.$color-bg;
+  // Three layers rather than one big blur: a hairline that seats the panel on
+  // the surface, a short shadow for the near edge, and a wide soft one for the
+  // cast. One 34px blur reads as fog under a floating rectangle.
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, #000 3%, transparent),
+    0 2px 4px color-mix(in srgb, #000 5%, transparent),
+    0 8px 16px color-mix(in srgb, #000 8%, transparent),
+    0 24px 44px color-mix(in srgb, #000 16%, transparent);
+  animation: panel-in 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+// Two columns: how to work with the product on the left, what there is on the
+// right. The left column is sized by its longest description so none of them
+// wrap; the right is sized to hold four marks a row.
+.panel[data-columns='two'] {
+  display: grid;
+  grid-template-columns: 24rem 15rem;
+  gap: v.$space-2;
+  // Never wider than the window on a laptop that is only just wide enough to
+  // be showing this menu at all.
+  max-width: calc(100vw - 2rem);
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+// ----------------------------------------------------------------- rows
+
+// This list lives inside the header's nav <ul>, so it states its own layout
+// rather than inheriting whatever the bar's list is doing. It was picking up
+// `display: flex` from `.nav ul` and running its rows across the panel.
+.list {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+// One row per destination: the mark, then the name and the line about it.
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: v.$space-3;
+  padding: v.$space-3;
+  border-radius: v.$radius-sm;
+  transition: background-color 0.14s ease;
+
+  @include m.focus-ring;
+
+  &:hover {
+    background: v.$color-surface;
+  }
+}
+
+.itemIcon {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  // Optical alignment: the mark sits with the label's x-height rather than its
+  // ascender, which would leave it visibly high.
+  margin-top: 0.1rem;
+  color: v.$color-text-muted;
+  transition: color 0.14s ease;
+
+  .item:hover &,
+  .item:focus-visible & {
+    color: v.$color-primary;
+  }
+}
+
+.itemBody {
+  min-width: 0;
+}
+
+.itemLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  line-height: 1.35;
+}
+
+.itemActive .itemLabel {
+  color: v.$color-primary;
+}
+
+// Hidden until the row is under the pointer, then it slides out from behind
+// the label. One movement, on the thing you are pointing at.
+.itemArrow {
+  width: 0.875rem;
+  height: 0.875rem;
+  flex-shrink: 0;
+  opacity: 0;
+  transform: translateX(-3px);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+
+  .item:hover &,
+  .item:focus-visible & {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: opacity 0.16s ease;
+    transform: none;
+  }
+}
+
+.itemDescription {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: v.$font-size-sm;
+  line-height: 1.45;
+  color: v.$color-text-muted;
+}
+
+// -------------------------------------------------------- feature column
+
+.feature {
+  display: flex;
+  flex-direction: column;
+  padding: v.$space-4;
+  border-radius: v.$radius-sm;
+  // Tinted rather than bordered, so the two columns read as one panel with a
+  // quieter half rather than as two stacked cards.
+  background: v.$color-surface;
+  transition: background-color 0.14s ease;
+
+  @include m.focus-ring;
+
+  &:hover {
+    background: color-mix(in srgb, v.$color-primary 8%, v.$color-surface);
+  }
+}
+
+.featureMarks {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: v.$space-3;
+  margin-bottom: auto;
+  padding-bottom: v.$space-4;
+}
+
+// The marks are authored at 1em in currentColor, so they take their size and
+// colour from here. Held back to a tint until the card is hovered - eight
+// logos at full strength would out-shout the four destinations beside them.
+.featureMark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: color-mix(in srgb, v.$color-text 55%, transparent);
+  transition: color 0.16s ease;
+
+  svg {
+    width: 1em;
+    height: 1em;
+    display: block;
+  }
+
+  .feature:hover &,
+  .feature:focus-visible & {
+    color: v.$color-text;
+  }
+}
+
+.featureLabel {
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  line-height: 1.35;
+
+  .feature:hover &,
+  .feature:focus-visible & {
+    color: v.$color-primary;
+  }
+}
+
+.featureDescription {
+  margin-top: 0.15rem;
+  font-size: v.$font-size-sm;
+  line-height: 1.45;
+  color: v.$color-text-muted;
+}

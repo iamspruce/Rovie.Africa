@@ -21,6 +21,17 @@ const MESSAGES: Record<string, string> = {
   INVALID_EMAIL: 'Enter a valid email address.',
   INVALID_ORIGIN: 'This page isn’t allowed to sign in. Check PORTAL_WEB_ORIGIN on portal-api.',
   EMAIL_NOT_VERIFIED: 'Verify your email address first — check your inbox.',
+  // Reset links expire after an hour and work once. Both failures land here,
+  // and both have the same remedy, so the message gives it rather than
+  // distinguishing two cases the user can't act on differently.
+  INVALID_TOKEN: 'That reset link has expired or was already used. Request a new one.',
+  // Only reachable from the signed-in change-password form, where it means
+  // the current password was wrong - not the new one.
+  INVALID_PASSWORD: 'That current password isn’t right.',
+  CREDENTIAL_ACCOUNT_NOT_FOUND:
+    'This account signs in with Google or GitHub, so it has no password to change.',
+  RESET_PASSWORD_DISABLED:
+    'Password resets aren’t configured on this deployment. Sign in with a link instead.',
 };
 
 interface AuthErrorBody {

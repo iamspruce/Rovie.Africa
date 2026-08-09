@@ -1,6 +1,20 @@
-import { geoMercator, geoOrthographic, geoPath, geoGraticule10, geoCentroid } from 'd3-geo';
+import { geoMercator, geoOrthographic, geoPath, geoGraticule, geoCentroid } from 'd3-geo';
 import type { GeoProjection, GeoPath } from 'd3-geo';
 import type { FeatureCollection, Feature } from 'geojson';
+
+// Decimal places kept in generated path data.
+//
+// d3 emits full float precision by default - "M412.38472938471234,88.1..." -
+// and the globe rebuilds every path string on every frame of a drag. A tenth
+// of a pixel is already finer than any display resolves, and dropping the rest
+// cuts both the string building and the size of the attribute the browser then
+// has to parse.
+const PATH_DIGITS = 1;
+
+// One line every 20 degrees rather than d3's 10. On a sphere ~400px across,
+// a 10-degree grid is dense enough to read as texture rather than as a grid -
+// and it is four times the geometry to re-project on every frame.
+const GRATICULE = geoGraticule().step([20, 20]);
 
 export interface Size {
   width: number;
@@ -31,7 +45,7 @@ export function createProjection(
     ],
     featureCollection
   );
-  const pathGenerator = geoPath(projection);
+  const pathGenerator = geoPath(projection).digits(PATH_DIGITS);
   return { projection, pathGenerator };
 }
 
@@ -70,7 +84,7 @@ export function createGlobeProjection({
       ],
       SPHERE
     );
-  const pathGenerator = geoPath(projection);
+  const pathGenerator = geoPath(projection).digits(PATH_DIGITS);
   return { projection, pathGenerator };
 }
 
@@ -79,7 +93,7 @@ export function getSphereOutlinePath(pathGenerator: GeoPath): string {
 }
 
 export function getGraticulePath(pathGenerator: GeoPath): string {
-  return pathGenerator(geoGraticule10()) || '';
+  return pathGenerator(GRATICULE()) || '';
 }
 
 export function getFeatureCentroid(

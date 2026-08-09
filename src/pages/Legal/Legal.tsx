@@ -1,5 +1,7 @@
 import { useLocation } from 'react-router-dom';
 import { MarkdownRenderer } from '../../components/MarkdownRenderer/MarkdownRenderer';
+import { LEGAL_DOCS, findLegalDoc } from '../../content/legalDocs';
+import type { LegalDocMeta } from '../../content/legalDocs';
 import styles from './Legal.module.scss';
 
 // Imported as raw text and bundled at build time rather than fetched at
@@ -9,52 +11,17 @@ import privacyMd from './content/privacy.md?raw';
 import dataPolicyMd from './content/data-policy.md?raw';
 import termsMd from './content/terms.md?raw';
 
-export interface LegalDoc {
-  path: string;
-  title: string;
-  /** One line under the title saying what the reader is about to get. */
-  standfirst: string;
-  /** ISO date the wording last changed. Shown, so the page can be trusted. */
-  updated: string;
-  body: string;
-  /**
-   * True while the wording still contains items marked [To confirm]. Drives
-   * the banner - a policy with open questions in it must not look settled.
-   */
-  isDraft: boolean;
-}
+// The wording lives here, keyed by route, while the front matter lives in
+// content/legalDocs. Splitting them is what keeps react-markdown and these
+// three documents out of the entry bundle - see the note in that file.
+export const LEGAL_BODIES: Record<string, string> = {
+  '/privacy': privacyMd,
+  '/data-policy': dataPolicyMd,
+  '/terms': termsMd,
+};
 
-export const LEGAL_DOCS: readonly LegalDoc[] = [
-  {
-    path: '/privacy',
-    title: 'Privacy',
-    standfirst: 'What Rovie collects about you, why, and what you can ask us to do with it.',
-    updated: '2026-08-08',
-    body: privacyMd,
-    isDraft: true,
-  },
-  {
-    path: '/data-policy',
-    title: 'Data policy',
-    standfirst:
-      'What happens to prompts and completions passing through the gateway, and what the model providers receive.',
-    updated: '2026-08-08',
-    body: dataPolicyMd,
-    isDraft: true,
-  },
-  {
-    path: '/terms',
-    title: 'Terms of service',
-    standfirst: 'The agreement covering your account, your API key, your balance and your usage.',
-    updated: '2026-08-08',
-    body: termsMd,
-    isDraft: true,
-  },
-];
-
-export function findLegalDoc(path: string): LegalDoc | undefined {
-  return LEGAL_DOCS.find((doc) => doc.path === path);
-}
+export type { LegalDocMeta };
+export { LEGAL_DOCS, findLegalDoc };
 
 function formatDate(iso: string): string {
   return new Date(`${iso}T00:00:00`).toLocaleDateString(undefined, {
@@ -88,7 +55,7 @@ export function Legal() {
       )}
 
       <div className={styles.body}>
-        <MarkdownRenderer markdown={doc.body} />
+        <MarkdownRenderer markdown={LEGAL_BODIES[doc.path] ?? ''} />
       </div>
     </main>
   );

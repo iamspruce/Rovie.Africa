@@ -1,36 +1,21 @@
-import { geoMercator, geoPath, geoArea } from 'd3-geo';
-import { merge } from 'topojson-client';
-import type { Topology, GeometryObject } from 'topojson-specification';
-import worldTopology from '../../assets/geo/countries-50m.json';
-import { AFRICA_NUMERIC_IDS } from '../../lib/d3/africaCountries';
+import { LOGO_AFRICA_CENTER, LOGO_AFRICA_PATH, LOGO_SIZE } from '../../assets/geo/logo.generated';
 import styles from './LogoMap.module.scss';
 
-const SIZE = 400;
-
-const topology = worldTopology as unknown as Topology;
-const collection = topology.objects.countries as unknown as {
-  type: 'GeometryCollection';
-  geometries: (GeometryObject & { id?: string | number })[];
-};
-
-const african = collection.geometries.filter((g) =>
-  AFRICA_NUMERIC_IDS.has(String(g.id))
-);
-
-const merged = merge(topology, african);
-
-const polygons = (merged as { type: 'MultiPolygon'; coordinates: number[][][][] }).coordinates.map(
-  (coords) => ({ type: 'Polygon', coordinates: coords })
-);
-const areas = polygons.map((p) => geoArea(p as any));
-const mainland = polygons[areas.indexOf(Math.max(...areas))];
-
-const projection = geoMercator().fitSize([SIZE, SIZE], mainland as any);
-const pathGen = geoPath(projection);
-const AFRICA_PATH = pathGen(mainland as any) || '';
-const CENTER = pathGen.centroid(mainland as any) as [number, number];
+// Three concentric copies of the continent - the mark reads as a signal
+// radiating out from it.
 const RINGS = [1, 0.75, 0.5];
 
+const [CENTER_X, CENTER_Y] = LOGO_AFRICA_CENTER;
+
+/**
+ * The wordmark's Africa.
+ *
+ * The outline is a build-time constant (see scripts/build-geo.mjs). It used to
+ * be projected here at module load, which meant this component - which renders
+ * in the header and the footer of every single route - pulled d3-geo,
+ * topojson-client and a 739 KB world atlas into the entry bundle to compute
+ * one path string that is identical on every visit.
+ */
 interface LogoMapProps {
   size?: number;
 }
@@ -41,20 +26,20 @@ export function LogoMap({ size = 28 }: LogoMapProps) {
       className={styles.icon}
       width={size}
       height={size}
-      viewBox={`0 0 ${SIZE} ${SIZE}`}
+      viewBox={`0 0 ${LOGO_SIZE} ${LOGO_SIZE}`}
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      {RINGS.map((s) => (
+      {RINGS.map((scale) => (
         <path
-          key={s}
-          d={AFRICA_PATH}
+          key={scale}
+          d={LOGO_AFRICA_PATH}
           fill="none"
           strokeWidth={12}
           transform={
-            s === 1
+            scale === 1
               ? undefined
-              : `translate(${CENTER[0]},${CENTER[1]}) scale(${s}) translate(${-CENTER[0]},${-CENTER[1]})`
+              : `translate(${CENTER_X},${CENTER_Y}) scale(${scale}) translate(${-CENTER_X},${-CENTER_Y})`
           }
         />
       ))}

@@ -1,0 +1,27 @@
+# https://rovie.africa
+#
+# Everything public is crawlable. The two exclusions below are not secrets -
+# portal-api authorises every request itself - they are here because neither
+# path has anything a search result should ever point at.
+
+User-agent: *
+Allow: /
+
+# Session-only. A crawler reaches the shell and nothing else, and an indexed
+# dashboard URL is only ever a dead end for whoever clicks it.
+Disallow: /dashboard
+
+# A login page indexed under our own name is a phishing lure waiting to be
+# outranked. /signup is the page that should answer "rovie sign up".
+Disallow: /signin
+
+# Only reachable from an emailed link and useless without the token in its
+# query string. Nothing here is a search result.
+Disallow: /reset-password
+
+# Sorting and filtering the catalog produces the same page in a different
+# order. One /models is worth more than forty near-duplicates of it.
+Disallow: /*?sort=
+Disallow: /*?filter=
+
+Sitemap: https://rovie.africa/sitemap.xml

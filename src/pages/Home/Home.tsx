@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { AfricaMap } from '../../components/AfricaMap/AfricaMap';
+import { AfricaMapLazy } from '../../components/AfricaMap/AfricaMapLazy';
 import type { MapModelTag } from '../../components/AfricaMap/AfricaMapSvg';
 import { FeaturedModels } from '../../components/FeaturedModels/FeaturedModels';
 import { GetStartedSteps } from '../../components/GetStartedSteps/GetStartedSteps';
@@ -107,19 +107,22 @@ export function Home() {
     <main className={styles.page}>
       <section className={styles.hero}>
         <div className={styles.heroContent}>
+          {/* "Layer" is the load-bearing word: a tool has features, a layer has
+              things built on top of it. The accent lands on the second line
+              because "an AI layer" is a category and "for Africa" is the claim. */}
           <h1>
-            <span className={styles.heroAccent}>AI for Africa.</span>
+            The AI layer
             <br />
-            Built to move.
+            <span className={styles.heroAccent}>for Africa.</span>
           </h1>
           <p className={styles.heroSubtitle}>
-            Rovie makes the world&apos;s leading AI models affordable and available across the
-            continent — one account, live local pricing, and none of the friction in between.
+            Rovie is the infrastructure between African builders and the world&apos;s frontier
+            models — one account, every leading model, priced for where you are.
           </p>
         </div>
 
         <div className={styles.mapStage}>
-          <AfricaMap
+          <AfricaMapLazy
             highlightAlpha2={highlightAlpha2}
             onSelectCountry={setPickedAlpha2}
             priceFor={(alpha2) => priceTooltip(alpha2, fxRates)}

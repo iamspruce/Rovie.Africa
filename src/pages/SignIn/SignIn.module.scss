@@ -13,6 +13,16 @@
   gap: v.$space-4;
 }
 
+// Up to two of these sit under the button. Centred and stacked rather than
+// spread across a row: at 25rem "Forgot your password?" and "Sign in with a
+// link instead" side by side leaves neither enough room to stay one line.
+.alternatives {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: v.$space-1;
+}
+
 // A text button, not a second call to action. The primary action above it is
 // the one being offered; this only swaps how you prove who you are.
 .switch {

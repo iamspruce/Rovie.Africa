@@ -1,0 +1,49 @@
+# Host-level redirects. Read by Netlify and by Cloudflare Pages as-is; on
+# nginx or Caddy the same three rules have to be written in that server's own
+# syntax - see the note at the bottom.
+#
+# ---------------------------------------------------------------- the docs
+#
+# Documentation, the API reference and the SDK guide moved to their own site
+# (docs/ in this repository, deployed to docs.rovie.africa). These three paths
+# were linked from the header and the footer for months, so they have inbound
+# links and whatever ranking those earned.
+#
+# 301, not 302: a permanent redirect is what passes that ranking to the new
+# URL. A 302 tells a crawler to keep indexing the old one, which here is a page
+# that no longer exists.
+#
+# routes/router.tsx also redirects these client-side. That is a fallback for
+# hosts that ignore this file - it is a 200 with a JavaScript hop in it, which
+# is not what a crawler needs. These rules are the real mechanism.
+
+# Deep links first: /docs/quickstart has a real counterpart at the same slug,
+# and sending it to the front page instead would throw away the specificity
+# somebody's bookmark or blog post already had. The splat must precede the bare
+# /docs rule - these are matched in order.
+/docs/*             https://docs.rovie.africa/:splat   301!
+/docs               https://docs.rovie.africa/start/quickstart/   301!
+
+# These two had no sub-pages, so there is nothing to preserve. Each lands on
+# its section's own front page rather than the docs homepage.
+/api-reference      https://docs.rovie.africa/api/   301!
+/sdk                https://docs.rovie.africa/sdks/overview/   301!
+
+# ------------------------------------------------------------------- SPA
+#
+# Everything else is served by the app. This has to come LAST: it matches every
+# path, so any rule below it is dead.
+#
+# 200, not 301 - the URL stays what the visitor asked for and React Router
+# reads it. The prerendered per-route files written by vite/seo-plugin.js are
+# real files, so the host serves those before falling through to here, which is
+# what puts the right <title> in front of a crawler.
+/*                  /index.html   200
+
+# ------------------------------------------------------------------ nginx
+#
+#   location = /docs          { return 301 https://docs.rovie.africa/start/quickstart/; }
+#   location ^~ /docs/        { return 301 https://docs.rovie.africa$request_uri; }
+#   location = /api-reference { return 301 https://docs.rovie.africa/api/; }
+#   location = /sdk           { return 301 https://docs.rovie.africa/sdks/overview/; }
+#   location /                { try_files $uri $uri/index.html /index.html; }

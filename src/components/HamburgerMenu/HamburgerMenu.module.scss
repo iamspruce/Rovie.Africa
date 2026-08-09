@@ -16,6 +16,12 @@
   &:hover {
     background-color: v.$color-surface;
   }
+
+  // From 'lg' the navigation is in the bar itself, so the button that opens
+  // the sheet has nothing left to reveal.
+  @include m.respond-to('lg') {
+    display: none;
+  }
 }
 
 .bar {
@@ -38,31 +44,110 @@
   transform: translateY(-7px) rotate(-45deg);
 }
 
-.menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  left: 0;
-  background: v.$color-bg;
-  border-bottom: 1px solid v.$color-border;
-  z-index: v.$z-hamburger-menu;
+// ----------------------------------------------------------------- sheet
+//
+// Fixed and full-height rather than a dropdown that pushes the page down: the
+// list is now three groups long, and a dropdown that tall leaves the visitor
+// scrolling a menu and a page at the same time.
 
-  ul {
-    display: flex;
-    flex-direction: column;
+.sheet {
+  position: fixed;
+  inset: v.$header-height 0 0;
+  z-index: v.$z-hamburger-menu;
+  background: v.$color-bg;
+  border-top: 1px solid v.$color-border;
+  overflow-y: auto;
+  // Safe area, so the last row clears the home indicator on a phone.
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  animation: sheet-in 0.16s ease-out;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+
+  @include m.respond-to('lg') {
+    display: none;
   }
 }
 
-.link,
-.activeLink {
-  display: block;
-  padding: v.$space-4;
-  border-top: 1px solid v.$color-border;
-
-  @include m.focus-ring;
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
 }
 
-.activeLink {
-  font-weight: 700;
+.sheetInner {
+  @include m.container;
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-6;
+  padding-block: v.$space-5 v.$space-8;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+}
+
+// Same treatment as the footer's column headings and the mission eyebrow - a
+// label, not a heading.
+.groupTitle {
+  margin: 0;
+  color: v.$color-text-muted;
+  font: 700 0.68rem/1 v.$font-family-display;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.link {
+  display: block;
+  // Comfortably past the 44px touch target minimum even on the rows that
+  // carry no description.
+  padding: v.$space-3 v.$space-3;
+  margin-inline: calc(v.$space-3 * -1);
+  border-radius: v.$radius-md;
+
+  @include m.focus-ring;
+
+  &:hover {
+    background: v.$color-surface;
+  }
+}
+
+.linkActive .linkLabel {
   color: v.$color-primary;
+  font-weight: 700;
+}
+
+.linkLabel {
+  display: block;
+  font-size: v.$font-size-lg;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+
+.linkDescription {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: v.$font-size-sm;
+  line-height: 1.45;
+  color: v.$color-text-muted;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-3;
+  padding-top: v.$space-5;
+  border-top: 1px solid v.$color-border;
+
+  // Full-width targets: this is the bottom of a phone screen, where the thumb
+  // is, and these are the two things the sheet most wants you to do.
+  > * {
+    width: 100%;
+    justify-content: center;
+  }
 }

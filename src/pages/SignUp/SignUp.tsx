@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthLayout } from '../../components/AuthLayout/AuthLayout';
 import { Button } from '../../components/Button/Button';
-import { Divider, Field, FormError, FormNotice, GoogleButton } from '../../components/AuthForm/AuthForm';
+import { Field, FormError, FormNotice, SocialAuth } from '../../components/AuthForm/AuthForm';
 import { useAuth } from '../../context/AuthContext';
 import { useAuthMethods } from '../../hooks/useAuthMethods';
 import { useVisitorCountry } from '../../hooks/useVisitorCountry';
@@ -100,19 +100,11 @@ export function SignUp() {
       }
     >
       <div className={styles.stack}>
-        {methods.data?.google && (
-          <>
-            <GoogleButton
-              disabled={submitting}
-              onClick={() => {
-                window.location.href = rovie.portal.googleSignInUrl(
-                  `${window.location.origin}/dashboard`
-                );
-              }}
-            />
-            <Divider label="or" />
-          </>
-        )}
+        <SocialAuth
+          methods={methods.data}
+          callbackURL={`${window.location.origin}/dashboard`}
+          disabled={submitting}
+        />
 
         {linkSent ? (
           <FormNotice>

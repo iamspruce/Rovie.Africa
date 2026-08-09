@@ -5,8 +5,39 @@
   position: sticky;
   top: 0;
   z-index: v.$z-header;
-  background: v.$color-bg;
-  border-bottom: 1px solid v.$color-border;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+
+  // The rule only exists once there is something above it to divide from.
+  // At the top of a page it is a line drawn across the hero for no reason.
+  &[data-scrolled] {
+    border-bottom-color: v.$color-border;
+  }
+
+  // The bar's own background, drawn as a layer behind its contents rather than
+  // set on the element.
+  //
+  // This is not decoration for its own sake: backdrop-filter makes an element
+  // the containing block for every fixed-position descendant, and the mobile
+  // sheet is fixed to the viewport. Blurring .header directly would size the
+  // sheet against the 4rem bar instead of the screen, collapsing it to
+  // nothing. Behind a pseudo-element the effect is identical and .header stays
+  // an ordinary box.
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    // Translucent, so the page reads as passing underneath the bar rather than
+    // stopping at it. The solid colour is what browsers without
+    // backdrop-filter get, and what prints.
+    background: v.$color-bg;
+
+    @supports (backdrop-filter: blur(1px)) {
+      background: color-mix(in srgb, v.$color-bg 82%, transparent);
+      backdrop-filter: blur(12px) saturate(1.4);
+    }
+  }
 }
 
 // Off-screen until tabbed to. With real navigation in the bar there are now
@@ -38,7 +69,6 @@
   height: v.$header-height;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: v.$space-4;
 }
 
@@ -52,12 +82,80 @@
   font-weight: 800;
   font-size: v.$font-size-lg;
   letter-spacing: -0.03em;
+  // Never the thing that gives way when the bar runs out of room.
+  flex-shrink: 0;
 
   @include m.focus-ring;
 }
+
+// ---------------------------------------------------------------- nav
+//
+// Navigation sits next to the wordmark rather than centred in the bar: it
+// belongs to the brand, and a centred group drifts every time the actions on
+// the right change width - which they do, between signed out and signed in.
+
+.nav {
+  display: none;
+  // Takes the slack so the actions stay pinned right.
+  margin-right: auto;
+
+  @include m.respond-to('lg') {
+    display: block;
+  }
+
+  // DIRECT children only. As a plain descendant selector (`.nav ul`) this also
+  // caught the list inside the Developers panel - which is a <ul> nested in
+  // this one's <li> - and laid its rows out in a row instead of a column.
+  > ul {
+    display: flex;
+    align-items: center;
+    gap: v.$space-1;
+  }
+}
+
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  padding: v.$space-2 v.$space-3;
+  border-radius: v.$radius-md;
+  font-weight: 500;
+  color: v.$color-text-muted;
+  transition: color 0.15s ease, background-color 0.15s ease;
+
+  @include m.focus-ring;
+
+  &:hover {
+    color: v.$color-text;
+    background: v.$color-surface;
+  }
+}
+
+// Where you are, said in weight and colour rather than with an underline -
+// an underline in a bar of links reads as "this one is a link and the others
+// aren't".
+.navLinkActive {
+  color: v.$color-text;
+  font-weight: 700;
+}
+
+// -------------------------------------------------------------- actions
 
 .actions {
   display: flex;
   align-items: center;
   gap: v.$space-2;
+  // Only needed below 'lg', where .nav is display:none and there is no
+  // margin-right:auto pushing this over.
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+// Under 480px the bar is wordmark + primary action + menu button, and nothing
+// else fits. The sheet carries sign-in at that width.
+.signIn {
+  display: none;
+
+  @include m.respond-to('sm') {
+    display: inline-flex;
+  }
 }

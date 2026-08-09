@@ -21,6 +21,7 @@ export type {
   PortalUser,
   MeResponse,
   AuthMethods,
+  SocialProvider,
   ApiKeySummary,
   ApiKeyUsage,
   ApiKeyLimits,

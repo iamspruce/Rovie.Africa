@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { DOCS_URL } from '../../content/navLinks';
 import styles from './GetStartedSteps.module.scss';
 
 // A real sequence - you cannot spend credit you haven't bought, or buy credit
@@ -45,9 +45,11 @@ export function GetStartedSteps() {
         ))}
       </ol>
 
-      <Link className={styles.start} to="/docs">
+      {/* The quickstart, on the docs site - a real navigation off this origin,
+          so an <a> rather than a routed Link. */}
+      <a className={styles.start} href={`${DOCS_URL}/start/quickstart/`}>
         Read the setup guide
-      </Link>
+      </a>
     </section>
   );
 }

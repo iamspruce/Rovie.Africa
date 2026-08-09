@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+  <!--
+    Source for og.png, which is the file the meta tags actually point at - X,
+    Slack, LinkedIn and WhatsApp all refuse an SVG og:image.
+
+    Edit this, then regenerate the PNG. qlmanage only renders square, so the
+    card is padded to 1200x1200 and cropped back:
+
+      node -e 'const fs=require("fs");const s=fs.readFileSync("public/og.svg","utf8");
+        const i=s.replace(/^[\s\S]*?<svg[^>]*>/,"").replace(/<\/svg>\s*$/,"");
+        fs.writeFileSync("/tmp/og-square.svg",`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200" font-family="Helvetica Neue, Helvetica, Arial, sans-serif"><rect width="1200" height="1200" fill="#000000"/><g transform="translate(0,285)">${i}</g></svg>`)'
+      qlmanage -t -s 1200 -o /tmp /tmp/og-square.svg
+      sips -c 630 1200 /tmp/og-square.svg.png --out public/og.png
+
+    Type is set in a system grotesque, not Bricolage: the renderer only has
+    fonts the OS has installed, and a missing family silently becomes Times.
+  -->
+  <defs>
+    <linearGradient id="ground" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#05121d" />
+      <stop offset="0.55" stop-color="#000000" />
+      <stop offset="1" stop-color="#000000" />
+    </linearGradient>
+    <radialGradient id="glow" cx="0.82" cy="0.28" r="0.55">
+      <stop offset="0" stop-color="#3d9ae0" stop-opacity="0.34" />
+      <stop offset="1" stop-color="#3d9ae0" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#ground)" />
+  <rect width="1200" height="630" fill="url(#glow)" />
+
+  <!-- The routes the homepage globe draws, reduced to the gesture: lines
+       arriving from off-canvas and landing on one point. -->
+  <g stroke="#3d9ae0" fill="none" opacity="0.5">
+    <path d="M1200 120 C 1010 190, 960 250, 902 300" stroke-width="2" />
+    <path d="M1200 300 C 1060 300, 980 300, 902 300" stroke-width="2" stroke-dasharray="9 7" opacity="0.7" />
+    <path d="M1200 500 C 1020 430, 960 350, 902 300" stroke-width="2" />
+  </g>
+  <circle cx="902" cy="300" r="15" fill="#3d9ae0" opacity="0.18" />
+  <circle cx="902" cy="300" r="7" fill="#3d9ae0" />
+
+  <text x="90" y="150" fill="#5ea0cc" font-size="26" font-weight="700" letter-spacing="7">ROVIE.AFRICA</text>
+
+  <text x="88" y="310" fill="#ffffff" font-size="104" font-weight="700" letter-spacing="-4">The AI layer</text>
+  <text x="88" y="418" fill="#3d9ae0" font-size="104" font-weight="700" letter-spacing="-4">for Africa.</text>
+
+  <line x1="90" y1="482" x2="1110" y2="482" stroke="#272d34" stroke-width="1" />
+
+  <text x="90" y="536" fill="#8b949d" font-size="29" font-weight="500">One account&#160;&#160;·&#160;&#160;every frontier model&#160;&#160;·&#160;&#160;your currency</text>
+</svg>
