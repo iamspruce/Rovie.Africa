@@ -1,0 +1,68 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+.toggle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: v.$radius-sm;
+
+  @include m.focus-ring;
+
+  &:hover {
+    background-color: v.$color-surface;
+  }
+}
+
+.bar {
+  display: block;
+  width: 1.25rem;
+  height: 2px;
+  background-color: v.$color-text;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.barOpenTop {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.barOpenMiddle {
+  opacity: 0;
+}
+
+.barOpenBottom {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+.menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  background: v.$color-bg;
+  border-bottom: 1px solid v.$color-border;
+  z-index: v.$z-hamburger-menu;
+
+  ul {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.link,
+.activeLink {
+  display: block;
+  padding: v.$space-4;
+  border-top: 1px solid v.$color-border;
+
+  @include m.focus-ring;
+}
+
+.activeLink {
+  font-weight: 700;
+  color: v.$color-primary;
+}

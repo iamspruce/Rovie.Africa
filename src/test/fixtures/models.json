@@ -1,0 +1,399 @@
+{
+  "models": [
+    {
+      "litellmModelName": "gpt-5.6-sol",
+      "provider": "openai",
+      "name": "GPT-5.6 Sol",
+      "limit": {
+        "context": 1050000,
+        "input": 922000,
+        "output": 128000
+      },
+      "cost": {
+        "input": 5,
+        "output": 30
+      },
+      "release_date": "2026-07-09"
+    },
+    {
+      "litellmModelName": "gpt-5.6-terra",
+      "provider": "openai",
+      "name": "GPT-5.6 Terra",
+      "limit": {
+        "context": 1050000,
+        "input": 922000,
+        "output": 128000
+      },
+      "cost": {
+        "input": 2,
+        "output": 12
+      },
+      "release_date": "2026-07-09"
+    },
+    {
+      "litellmModelName": "gpt-5.6-luna",
+      "provider": "openai",
+      "name": "GPT-5.6 Luna",
+      "limit": {
+        "context": 1050000,
+        "input": 922000,
+        "output": 128000
+      },
+      "cost": {
+        "input": 0.2,
+        "output": 1.2
+      },
+      "release_date": "2026-07-09"
+    },
+    {
+      "litellmModelName": "gpt-4o",
+      "provider": "openai",
+      "name": "GPT-4o",
+      "limit": {
+        "context": 128000,
+        "output": 16384
+      },
+      "cost": {
+        "input": 2.5,
+        "output": 10
+      },
+      "release_date": "2024-05-13"
+    },
+    {
+      "litellmModelName": "gpt-4o-mini",
+      "provider": "openai",
+      "name": "GPT-4o mini",
+      "limit": {
+        "context": 128000,
+        "output": 16384
+      },
+      "cost": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "release_date": "2024-07-18"
+    },
+    {
+      "litellmModelName": "gpt-4.1",
+      "provider": "openai",
+      "name": "GPT-4.1",
+      "limit": {
+        "context": 1047576,
+        "output": 32768
+      },
+      "cost": {
+        "input": 2,
+        "output": 8
+      },
+      "release_date": "2025-04-14"
+    },
+    {
+      "litellmModelName": "gpt-4.1-mini",
+      "provider": "openai",
+      "name": "GPT-4.1 mini",
+      "limit": {
+        "context": 1047576,
+        "output": 32768
+      },
+      "cost": {
+        "input": 0.4,
+        "output": 1.6
+      },
+      "release_date": "2025-04-14"
+    },
+    {
+      "litellmModelName": "o1",
+      "provider": "openai",
+      "name": "o1",
+      "limit": {
+        "context": 200000,
+        "output": 100000
+      },
+      "cost": {
+        "input": 15,
+        "output": 60
+      },
+      "release_date": "2024-12-05"
+    },
+    {
+      "litellmModelName": "o3-mini",
+      "provider": "openai",
+      "name": "o3-mini",
+      "limit": {
+        "context": 200000,
+        "output": 100000
+      },
+      "cost": {
+        "input": 1.1,
+        "output": 4.4
+      },
+      "release_date": "2024-12-20"
+    },
+    {
+      "litellmModelName": "claude-fable-5",
+      "provider": "anthropic",
+      "name": "Claude Fable 5",
+      "limit": {
+        "context": 1000000,
+        "output": 128000
+      },
+      "cost": {
+        "input": 10,
+        "output": 50
+      },
+      "release_date": "2026-06-07"
+    },
+    {
+      "litellmModelName": "claude-sonnet-5",
+      "provider": "anthropic",
+      "name": "Claude Sonnet 5",
+      "limit": {
+        "context": 1000000,
+        "output": 128000
+      },
+      "cost": {
+        "input": 2,
+        "output": 10
+      },
+      "release_date": "2026-06-29"
+    },
+    {
+      "litellmModelName": "claude-sonnet-4-5",
+      "provider": "anthropic",
+      "name": "Claude Sonnet 4.5 (latest)",
+      "limit": {
+        "context": 1000000,
+        "output": 64000
+      },
+      "cost": {
+        "input": 3,
+        "output": 15
+      },
+      "release_date": "2025-09-29"
+    },
+    {
+      "litellmModelName": "claude-haiku-4-5",
+      "provider": "anthropic",
+      "name": "Claude Haiku 4.5 (latest)",
+      "limit": {
+        "context": 200000,
+        "output": 64000
+      },
+      "cost": {
+        "input": 1,
+        "output": 5
+      },
+      "release_date": "2025-10-15"
+    },
+    {
+      "litellmModelName": "claude-opus-4-5",
+      "provider": "anthropic",
+      "name": "Claude Opus 4.5 (latest)",
+      "limit": {
+        "context": 200000,
+        "output": 64000
+      },
+      "cost": {
+        "input": 5,
+        "output": 25
+      },
+      "release_date": "2025-11-24"
+    },
+    {
+      "litellmModelName": "kimi-k2.5",
+      "provider": "moonshotai",
+      "name": "Kimi K2.5",
+      "limit": {
+        "context": 262144,
+        "output": 262144
+      },
+      "cost": {
+        "input": 0.6,
+        "output": 3
+      },
+      "release_date": "2026-01"
+    },
+    {
+      "litellmModelName": "kimi-k3",
+      "provider": "moonshotai",
+      "name": "Kimi K3",
+      "limit": {
+        "context": 1048576,
+        "output": 131072
+      },
+      "cost": {
+        "input": 3,
+        "output": 15
+      },
+      "release_date": "2026-07-16"
+    },
+    {
+      "litellmModelName": "gemini-3.6-flash",
+      "provider": "google",
+      "name": "Gemini 3.6 Flash",
+      "limit": {
+        "context": 1048576,
+        "output": 65536
+      },
+      "cost": {
+        "input": 1.5,
+        "output": 7.5
+      },
+      "release_date": "2026-07-21"
+    },
+    {
+      "litellmModelName": "gemini-3.5-flash-lite",
+      "provider": "google",
+      "name": "Gemini 3.5 Flash Lite",
+      "limit": {
+        "context": 1048576,
+        "output": 65536
+      },
+      "cost": {
+        "input": 0.3,
+        "output": 2.5
+      },
+      "release_date": "2026-07-21"
+    },
+    {
+      "litellmModelName": "gemini-3.1-pro",
+      "provider": "google",
+      "name": "Gemini 3.1 Pro Preview",
+      "limit": {
+        "context": 1048576,
+        "output": 65536
+      },
+      "cost": {
+        "input": 2,
+        "output": 12
+      },
+      "release_date": "2026-02-19"
+    },
+    {
+      "litellmModelName": "grok-4.5",
+      "provider": "xai",
+      "name": "Grok 4.5",
+      "limit": {
+        "context": 500000,
+        "output": 500000
+      },
+      "cost": {
+        "input": 2,
+        "output": 6
+      },
+      "release_date": "2026-07-08"
+    },
+    {
+      "litellmModelName": "grok-4.3",
+      "provider": "xai",
+      "name": "Grok 4.3",
+      "limit": {
+        "context": 1000000,
+        "output": 30000
+      },
+      "cost": {
+        "input": 1.25,
+        "output": 2.5
+      },
+      "release_date": "2026-04-17"
+    },
+    {
+      "litellmModelName": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "name": "DeepSeek V4 Flash",
+      "limit": {
+        "context": 1000000,
+        "output": 384000
+      },
+      "cost": {
+        "input": 0.14,
+        "output": 0.28
+      },
+      "release_date": "2026-07-31"
+    },
+    {
+      "litellmModelName": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "name": "DeepSeek V4 Pro",
+      "limit": {
+        "context": 1000000,
+        "output": 384000
+      },
+      "cost": {
+        "input": 0.435,
+        "output": 0.87
+      },
+      "release_date": "2026-04-24"
+    },
+    {
+      "litellmModelName": "mistral-medium",
+      "provider": "mistral",
+      "name": "Mistral Medium (latest)",
+      "limit": {
+        "context": 262144,
+        "output": 262144
+      },
+      "cost": {
+        "input": 1.5,
+        "output": 7.5
+      },
+      "release_date": "2026-04-29"
+    },
+    {
+      "litellmModelName": "mistral-small",
+      "provider": "mistral",
+      "name": "Mistral Small (latest)",
+      "limit": {
+        "context": 256000,
+        "output": 256000
+      },
+      "cost": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "release_date": "2026-03-16"
+    },
+    {
+      "litellmModelName": "qwen3.8-max",
+      "provider": "alibaba",
+      "name": "Qwen3.8 Max",
+      "limit": {
+        "context": 1000000,
+        "output": 131072
+      },
+      "cost": {
+        "input": 2,
+        "output": 6
+      },
+      "release_date": "2026-08-03"
+    },
+    {
+      "litellmModelName": "qwen3.7-plus",
+      "provider": "alibaba",
+      "name": "Qwen3.7 Plus",
+      "limit": {
+        "context": 1000000,
+        "output": 65536
+      },
+      "cost": {
+        "input": 0.5,
+        "output": 3
+      },
+      "release_date": "2026-06-02"
+    },
+    {
+      "litellmModelName": "command-a-plus",
+      "provider": "cohere",
+      "name": "Command A Plus",
+      "limit": {
+        "context": 128000,
+        "output": 64000
+      },
+      "cost": {
+        "input": 2.5,
+        "output": 10
+      },
+      "release_date": "2026-05-20"
+    }
+  ]
+}

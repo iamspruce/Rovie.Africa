@@ -1,0 +1,186 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+// The blue used for rules and markers here is the same mix the mission rail
+// uses, so the page speaks one line language throughout.
+
+.featured {
+  @include m.container;
+  max-width: 860px;
+  padding-block: 1rem 6rem;
+}
+
+.head {
+  max-width: 54ch;
+  margin-bottom: 2.5rem;
+
+  h2 {
+    margin: 0.75rem 0 0.8rem;
+    font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+    font-weight: 600;
+    letter-spacing: -0.028em;
+    line-height: 1.12;
+    text-wrap: balance;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.98rem;
+    line-height: 1.7;
+    color: color-mix(in srgb, v.$color-text 70%, v.$color-text-muted);
+  }
+}
+
+.eyebrow {
+  color: v.$color-line;
+  font: 700 0.66rem/1 v.$font-family-display;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.row {
+  padding-block: 1.05rem;
+
+  & + & {
+    border-top: 1px solid color-mix(in srgb, v.$color-border 55%, transparent);
+  }
+}
+
+.line {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.5rem 0.9rem;
+
+  @include m.respond-to('sm') {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+}
+
+// Bigger than the old glyphs - the mark is how a developer scans this list,
+// so it gets to be the first thing the eye lands on.
+.logo {
+  font-size: 1.75rem;
+
+  @include m.respond-to('sm') {
+    font-size: 2rem;
+  }
+}
+
+.identity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.name {
+  font-family: v.$font-family-display;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: v.$color-text;
+}
+
+.released {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: v.$color-text-muted;
+  white-space: nowrap;
+}
+
+// On narrow screens the figures drop under the name and align to the row's
+// left edge rather than hanging off it.
+.figures {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.7rem;
+
+  @include m.respond-to('sm') {
+    grid-column: auto;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.15rem;
+  }
+}
+
+// What the top-up actually buys - the answer this whole product exists to
+// give, so it carries the strongest text on the row.
+.yield {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-size: 1rem;
+  font-weight: 700;
+  color: v.$color-text;
+  white-space: nowrap;
+}
+
+.rate {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-size: 0.76rem;
+  color: v.$color-text-muted;
+  white-space: nowrap;
+}
+
+.reach {
+  height: 1px;
+  margin-top: 0.85rem;
+  background: color-mix(in srgb, v.$color-border 45%, transparent);
+}
+
+.reachFill {
+  display: block;
+  height: 100%;
+  min-width: 2px;
+  background: v.$color-line;
+}
+
+.caption {
+  margin: 1.5rem 0 0;
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: v.$color-text-muted;
+}
+
+.catalogLink {
+  display: inline-block;
+  margin-top: 1.6rem;
+  color: v.$color-line;
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-decoration: none;
+
+  &::after {
+    content: ' →';
+  }
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  @include m.focus-ring;
+}
+
+.state {
+  margin: 0;
+  padding-block: 1.5rem;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: v.$color-text-muted;
+
+  a {
+    color: v.$color-line;
+
+    @include m.focus-ring;
+  }
+}

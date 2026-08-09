@@ -1,0 +1,96 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+.dashboard {
+  padding-block: v.$space-6 v.$space-10;
+}
+
+.inner {
+  @include m.container;
+  // Narrower than the marketing pages. These are records to read and act on,
+  // not a landing page, and a 1200px-wide table of key prefixes is a scan
+  // across empty space.
+  max-width: 60rem;
+}
+
+.header {
+  margin-bottom: v.$space-5;
+}
+
+.eyebrow {
+  margin: 0 0 v.$space-2;
+  font-size: v.$font-size-sm;
+  color: v.$color-text-muted;
+}
+
+.title {
+  margin: 0;
+  font-family: v.$font-family-display;
+  font-variation-settings: 'opsz' 28;
+  font-size: v.$font-size-xl;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: v.$color-text;
+}
+
+.banner {
+  margin: 0 0 v.$space-5;
+  padding: v.$space-3 v.$space-4;
+  border: 1px solid color-mix(in srgb, v.$color-accent 45%, transparent);
+  border-radius: v.$radius-md;
+  background-color: color-mix(in srgb, v.$color-accent 10%, transparent);
+  color: v.$color-text;
+  font-size: v.$font-size-sm;
+  line-height: 1.6;
+
+  a {
+    color: v.$color-primary;
+    font-weight: 600;
+  }
+}
+
+.tabs {
+  display: flex;
+  gap: v.$space-1;
+  margin-bottom: v.$space-6;
+  border-bottom: 1px solid v.$color-border;
+  overflow-x: auto;
+  // Four short labels shouldn't need a scrollbar drawn under them at any
+  // width; they just need to be reachable if they ever do overflow.
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.tab {
+  flex: none;
+  padding: v.$space-3 v.$space-4;
+  // The active marker sits on the container's border line, so the tab
+  // carries a transparent one of equal weight to stop a 2px jump on select.
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  color: v.$color-text-muted;
+  font-size: v.$font-size-sm;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+
+  @include m.focus-ring;
+
+  &:hover {
+    color: v.$color-text;
+  }
+}
+
+.tabActive {
+  border-bottom-color: v.$color-primary;
+  color: v.$color-text;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-5;
+}

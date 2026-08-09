@@ -1,0 +1,79 @@
+@use '../../styles/abstracts/variables' as v;
+
+.markdown {
+  h1,
+  h2,
+  h3 {
+    margin-top: v.$space-6;
+    margin-bottom: v.$space-3;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  p,
+  ul,
+  ol {
+    margin-bottom: v.$space-3;
+  }
+
+  ul,
+  ol {
+    padding-left: v.$space-5;
+    list-style: initial;
+  }
+
+  ol {
+    list-style: decimal;
+  }
+
+  a {
+    color: v.$color-primary;
+    text-decoration: underline;
+  }
+
+  code {
+    background: v.$color-surface;
+    padding: 0.15em 0.4em;
+    border-radius: v.$radius-sm;
+  }
+
+  pre {
+    background: v.$color-surface;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    padding: v.$space-4;
+    overflow-x: auto;
+    margin-bottom: v.$space-4;
+
+    code {
+      background: none;
+      padding: 0;
+    }
+  }
+
+  blockquote {
+    border-left: 3px solid v.$color-primary;
+    padding-left: v.$space-4;
+    margin-bottom: v.$space-4;
+    color: v.$color-text-muted;
+  }
+
+  table {
+    width: 100%;
+    margin-bottom: v.$space-4;
+    font-size: v.$font-size-sm;
+  }
+
+  th,
+  td {
+    text-align: left;
+    padding: v.$space-2 v.$space-3;
+    border-bottom: 1px solid v.$color-border;
+  }
+
+  th {
+    color: v.$color-text-muted;
+  }
+}

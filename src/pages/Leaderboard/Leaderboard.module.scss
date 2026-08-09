@@ -1,0 +1,14 @@
+@use '../../styles/abstracts/variables' as v;
+
+.page {
+  padding-block: v.$space-8;
+}
+
+.intro {
+  max-width: 40rem;
+  margin-block: v.$space-3 v.$space-6;
+}
+
+.error {
+  color: v.$color-danger;
+}

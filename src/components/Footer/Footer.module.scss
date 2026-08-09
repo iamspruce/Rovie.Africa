@@ -1,0 +1,310 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+// The page's line colour - the mission rail, the step connector. Anything in
+// here that marks or divides is drawn in it or in the border.
+$line: v.$color-line;
+$muted-text: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
+
+.footer {
+  position: relative;
+  border-top: 1px solid v.$color-border;
+  // Light gathers at the top edge where the footer meets the page, then falls
+  // away - the seam is lit, not the whole slab.
+  background:
+    radial-gradient(140% 90% at 50% 0%, color-mix(in srgb, v.$color-primary 13%, transparent), transparent 62%),
+    v.$color-bg;
+  margin-top: auto;
+}
+
+// ----------------------------------------------------------- newsletter
+
+.newsletter {
+  @include m.container;
+  padding-block: 4rem;
+  text-align: center;
+}
+
+.newsletterCopy {
+  max-width: 46ch;
+  margin-inline: auto;
+
+  h2 {
+    font-size: clamp(1.35rem, 2.6vw, 1.9rem);
+    letter-spacing: -0.03em;
+    margin: 0 0 0.6rem;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: color-mix(in srgb, v.$color-text 70%, v.$color-text-muted);
+  }
+}
+
+.newsletterForm {
+  width: 100%;
+  max-width: 480px;
+  margin: 1.75rem auto 0;
+}
+
+.newsletterLabel {
+  @include m.visually-hidden;
+}
+
+// One pill holding the field and its button, so the pair reads as a single
+// control rather than two loose boxes.
+.newsletterField {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.3rem 0.3rem 1.1rem;
+  border: 1px solid v.$color-border;
+  border-radius: 100px;
+  background: color-mix(in srgb, v.$color-surface 50%, v.$color-bg);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    border-color: color-mix(in srgb, v.$color-border 60%, v.$color-text-muted);
+  }
+
+  &:focus-within {
+    border-color: color-mix(in srgb, v.$color-primary 75%, v.$color-border);
+    box-shadow: 0 0 0 3px color-mix(in srgb, v.$color-primary 20%, transparent);
+  }
+
+  input {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0.62rem 0;
+    border: 0;
+    background: none;
+    color: v.$color-text;
+    font: inherit;
+    font-size: 0.9rem;
+
+    &::placeholder {
+      color: v.$color-text-muted;
+    }
+
+    // The ring belongs to the pill, so the input itself stays quiet.
+    &:focus,
+    &:focus-visible {
+      outline: none;
+    }
+  }
+}
+
+.newsletterFieldInvalid {
+  border-color: v.$color-danger;
+
+  &:focus-within {
+    border-color: v.$color-danger;
+    box-shadow: 0 0 0 3px color-mix(in srgb, v.$color-danger 30%, transparent);
+  }
+}
+
+.newsletterSubmit {
+  flex: 0 0 auto;
+}
+
+// Height is reserved whatever the state, so confirming a subscription never
+// nudges the footer.
+.newsletterStatus {
+  min-height: 1.4rem;
+  margin: 0.65rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: v.$color-text-muted;
+}
+
+.newsletterError {
+  color: v.$color-danger-text;
+}
+
+.newsletterSuccess {
+  color: v.$color-success-text;
+}
+
+// -------------------------------------------------------------- sitemap
+
+.sitemap {
+  @include m.container;
+  display: grid;
+  gap: 3rem;
+  padding-block: 3.5rem 4rem;
+  border-top: 1px solid v.$color-border;
+
+  @include m.respond-to('md') {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr);
+    gap: 3.5rem;
+  }
+
+  // Four link columns need real room before they get it; below this they sit
+  // two-up beside the brand instead of four-up.
+  @include m.respond-to('lg') {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2.7fr);
+    gap: 4rem;
+  }
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.1rem;
+  max-width: 34ch;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: v.$color-text;
+  font-family: v.$font-family-display;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+
+  svg {
+    stroke: v.$color-accent;
+  }
+
+  @include m.focus-ring;
+}
+
+.blurb {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: $muted-text;
+}
+
+// The mission, hung off the same rail the homepage uses for it. Set in the
+// display face so it reads as a statement rather than as more body copy.
+.creed {
+  position: relative;
+  margin: 0.4rem 0 0;
+  padding-left: 1.1rem;
+  font-family: v.$font-family-display;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.4;
+  color: v.$color-text;
+  text-wrap: balance;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0.15em;
+    bottom: 0.15em;
+    left: 0;
+    width: 1px;
+    background: $line;
+  }
+}
+
+// -------------------------------------------------------------- columns
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2.5rem 1.75rem;
+
+  @include m.respond-to('lg') {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.column {
+  // A short rule over each heading - the same hairline that divides the
+  // footer's bands, repeated at column scale so the grid reads as structure
+  // rather than as four floating lists.
+  h2 {
+    margin: 0 0 1rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid v.$color-border;
+    font: 700 0.66rem/1 v.$font-family-display;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: v.$color-text-muted;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  a {
+    display: inline-block;
+    font-size: 0.85rem;
+    line-height: 1.35;
+    color: $muted-text;
+    text-decoration: none;
+    transition: color 0.18s ease, transform 0.18s ease;
+
+    &:hover {
+      color: v.$color-text;
+      // A nudge along the reading direction, so the whole column doesn't have
+      // to repaint to show which row the pointer is on.
+      transform: translateX(2px);
+    }
+
+    @include m.focus-ring;
+  }
+}
+
+// --------------------------------------------------------------- bottom
+
+.bottom {
+  @include m.container;
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-block: 1.4rem 1.6rem;
+  border-top: 1px solid v.$color-border;
+  // Keeps the oversized mark from spilling past the footer's edges.
+  overflow: hidden;
+}
+
+// Drawn large and almost out. It sits behind the last line on the page, is
+// clipped by .bottom, and never takes a click.
+.watermark {
+  position: absolute;
+  right: -2.5rem;
+  bottom: -8rem;
+  z-index: 0;
+  opacity: 0.14;
+  pointer-events: none;
+  --logo-color: #{v.$color-primary};
+
+  // No room for it beside the text until there's room for the text to sit on
+  // one line.
+  display: none;
+
+  @include m.respond-to('lg') {
+    display: block;
+  }
+}
+
+.copyright,
+.disclaimer {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: 0.72rem;
+  color: v.$color-text-muted;
+}
+
+.disclaimer {
+  max-width: 460px;
+}

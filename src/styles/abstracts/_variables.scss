@@ -1,0 +1,159 @@
+// -----------------------------------------------------------------------
+// Design tokens.
+//
+// Every component should reach for these variables instead of hardcoding
+// values, so a visual pass only has to change one place.
+//
+// COLOUR TOKENS HOLD NO VALUES. Each one names a custom property declared in
+// `base/_theme.scss`, where the light and dark themes live. That indirection
+// is what lets the palette follow the visitor's system preference: a Sass
+// variable is resolved at build time and can't change afterwards, a custom
+// property can.
+//
+// The consequence to know about: these are opaque to Sass. `darken()`,
+// `rgba($colour, .5)` and friends will not work on them. Use CSS `color-mix()`
+// instead, which resolves in the browser and therefore respects the theme -
+// e.g. `color-mix(in srgb, v.$color-primary 20%, transparent)`.
+// -----------------------------------------------------------------------
+
+// Colour - see base/_theme.scss for the actual values and their contrast.
+$color-bg: var(--rv-bg);
+$color-surface: var(--rv-surface);
+$color-border: var(--rv-border);
+$color-text: var(--rv-text);
+$color-text-muted: var(--rv-text-muted);
+$color-primary: var(--rv-primary);
+$color-primary-contrast: var(--rv-primary-contrast);
+$color-accent: var(--rv-accent); // "your country" on the map, and nothing else
+$color-danger: var(--rv-danger);
+$color-success: var(--rv-success);
+
+// Status prose, as opposed to status fills. These sit on the page background
+// and are tuned for reading rather than for carrying contrast text.
+$color-danger-text: var(--rv-danger-text);
+$color-success-text: var(--rv-success-text);
+
+// The line that means something - the mission rail, the step connector, the
+// eyebrow markers. Named here because every page was recomputing the same
+// mix, which only had a sensible answer on a dark ground.
+$color-line: var(--rv-line);
+
+// Behind a modal.
+$color-scrim: var(--rv-scrim);
+
+// The sign-in / sign-up plate. These do NOT flip with the theme - see the
+// note in base/_theme.scss for why.
+$color-plate: var(--rv-plate);
+$color-plate-text: var(--rv-plate-text);
+$color-plate-muted: var(--rv-plate-muted);
+$color-plate-land: var(--rv-plate-land);
+$color-plate-stroke: var(--rv-plate-stroke);
+$color-plate-rule: var(--rv-plate-rule);
+
+// The homepage globe.
+$color-map-land: var(--rv-map-land);
+$color-map-land-stroke: var(--rv-map-land-stroke);
+$color-map-highlight-stroke: var(--rv-map-highlight-stroke);
+$color-map-route: var(--rv-map-route);
+
+// Spacing scale
+$space-1: 0.25rem;
+$space-2: 0.5rem;
+$space-3: 0.75rem;
+$space-4: 1rem;
+$space-5: 1.5rem;
+$space-6: 2rem;
+$space-8: 3rem;
+$space-10: 4rem;
+
+// Typography
+//
+// Three roles, each chosen for this product rather than for looking like a
+// developer tool in general.
+//
+// Display - Bricolage Grotesque. A grotesque deliberately assembled from
+// parts that don't quite agree, which is the shape of what Rovie does: many
+// providers' models, none of them designed together, consolidated behind one
+// account. Variable, so weight and optical size are tuned per headline size.
+$font-family-display: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+// Body - Atkinson Hyperlegible, drawn by the Braille Institute so characters
+// cannot be mistaken for one another. This site's entire job is quoting a
+// price in someone's own currency and being believed; digits that can't be
+// misread are a functional requirement here, not a stylistic one.
+$font-family-base: 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+// Code - the reader's own system mono, on purpose. Docs should look like the
+// terminal they'll paste into, and it costs no bytes.
+$font-family-mono: ui-monospace, 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+$font-size-sm: 0.875rem;
+$font-size-base: 1rem;
+$font-size-lg: 1.25rem;
+$font-size-xl: 1.75rem;
+$font-size-2xl: 2.5rem;
+$line-height-base: 1.5;
+
+// Layout
+$container-max-width: 1200px;
+$header-height: 4rem;
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 16px;
+
+// Breakpoints (used via the respond-to mixin)
+$breakpoint-sm: 480px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+
+// -----------------------------------------------------------------------
+// Data visualisation
+//
+// These are NOT interchangeable with the UI colours above. Each has one job
+// and swapping them breaks the chart's meaning:
+//
+// - Categorical: telling distinct series apart (provider market share).
+//   Assign in FIXED ORDER, never cycled, and never by rank - a colour
+//   follows a provider, so filtering the list must not repaint the
+//   survivors. Eight is the ceiling; a ninth folds into "Other".
+// - Sequential: magnitude (the choropleth, any more-is-more encoding). One
+//   hue, dark-near-surface to light. Never a rainbow.
+//
+// The ordering below is the colourblind-safety mechanism, not taste: it was
+// validated against $color-surface for lightness band, chroma floor,
+// adjacent-pair CVD separation (worst 8.4), normal-vision separation (worst
+// 19.3), and 3:1 contrast. Re-run that validation before changing any value
+// or their order.
+// -----------------------------------------------------------------------
+$viz-categorical: (
+    #3987e5,
+    #d95926,
+    #199e70,
+    #c98500,
+    #d55181,
+    #008300,
+    #9085e9,
+    #e66767
+);
+
+// Single-hue ramp for magnitude, lowest first. On this dark surface the
+// lightest step is the largest value - the reverse of a light-mode ramp.
+$viz-sequential: (
+    #1c5cab,
+    #256abf,
+    #3987e5,
+    #6da7ec,
+    #b7d3f6
+);
+
+// The lead series colour, for a chart with only one thing in it.
+$viz-primary: var(--rv-viz-primary);
+// Chart chrome, as opposed to chart data. These have to flip with the theme -
+// a near-black "no data" fill reads as the largest value on a white page.
+// Countries with no traffic. Reads as "nothing here", not as a low value.
+$viz-empty: var(--rv-viz-empty);
+$viz-grid: var(--rv-viz-grid);
+$viz-axis: var(--rv-viz-axis);
+
+// Z-index scale
+$z-header: 100;
+$z-modal: 1000;
+$z-hamburger-menu: 90;

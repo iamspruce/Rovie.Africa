@@ -1,0 +1,188 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+.page {
+  background: v.$color-bg;
+  overflow-x: hidden;
+}
+
+// ---------------------------------------------------------------- hero
+
+.hero {
+  position: relative;
+  padding: 3rem 1rem 4rem;
+  overflow: hidden;
+
+  @include m.respond-to('md') {
+    padding: 4rem 2.5rem 5rem;
+  }
+}
+
+.heroContent {
+  position: relative;
+  z-index: 3;
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+// Bricolage already sets tight, so the tracking that suited system-ui here
+// would collide. Weight comes down as size goes up - large display type needs
+// less of it - which is what the variable weight axis is for.
+.hero h1 {
+  font-size: clamp(3.25rem, 8vw, 7rem);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 0.92;
+  margin: 0 0 1.4rem;
+}
+
+.heroAccent {
+  color: v.$color-primary;
+}
+
+.heroSubtitle {
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  line-height: 1.55;
+  max-width: 620px;
+  margin: 0 auto;
+  color: color-mix(in srgb, v.$color-text 82%, v.$color-text-muted);
+}
+
+// The globe sits right under the copy - no glow behind it, and only enough
+// gap to keep the tags off the subtitle.
+.mapStage {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 1180px);
+  margin: 0.75rem auto 0;
+  display: grid;
+  place-items: center;
+}
+
+.heroMap {
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+// ------------------------------------------------------------- mission
+//
+// Left-aligned under a centred hero, so the change of alignment marks the
+// change of voice. Every block carries its own class - no element selectors -
+// so nothing here cancels anything else out.
+
+$rail-solid: v.$color-line;
+$rail-gutter: 1.75rem;
+
+.mission {
+  @include m.container;
+  max-width: 700px;
+  padding-block: 4.5rem 6rem;
+}
+
+.missionThesis {
+  margin: 0 0 2.1rem;
+  font-size: clamp(1.8rem, 3.6vw, 2.75rem);
+  font-weight: 600;
+  letter-spacing: -0.028em;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.missionArgument {
+  padding-left: 1.25rem;
+
+  @include m.respond-to('sm') {
+    padding-left: $rail-gutter;
+  }
+}
+
+// Each block hangs its own segment of the rail. Spacing is padding rather
+// than margin so the segments butt together into one continuous line.
+.missionBelief,
+.missionFriction,
+.missionTurn,
+.missionPledge {
+  position: relative;
+  margin: 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -1.25rem;
+    width: 1px;
+    background: $rail-solid;
+
+    @include m.respond-to('sm') {
+      left: -$rail-gutter;
+    }
+  }
+}
+
+.missionBelief,
+.missionFriction,
+.missionTurn {
+  font-size: 1.02rem;
+  line-height: 1.75;
+  color: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
+}
+
+.missionBelief {
+  padding-bottom: 1.15rem;
+}
+
+// The break in the argument, drawn as a break in the line: the 3/4 dash the
+// globe uses for a model it hasn't routed to yet.
+.missionFriction {
+  padding-bottom: 1.5rem;
+
+  &::before {
+    background: repeating-linear-gradient(
+      to bottom,
+      v.$color-text-muted 0 3px,
+      transparent 3px 7px
+    );
+  }
+}
+
+.missionTurn {
+  padding-bottom: 1.75rem;
+  color: v.$color-text;
+  font-weight: 600;
+}
+
+.missionPledge {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.7rem;
+}
+
+// Markers and headlines share the display face; the body face is kept for
+// things that are actually read as prose.
+.missionLabel {
+  color: $rail-solid;
+  font: 700 0.66rem/1 v.$font-family-display;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.missionStatement {
+  font-family: v.$font-family-display;
+  font-size: clamp(1.25rem, 2.6vw, 1.75rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+  color: v.$color-text;
+  text-wrap: balance;
+}
+
+// Amber is what the map marks your own country with; it means the same thing
+// here.
+.missionHere {
+  color: v.$color-accent;
+}

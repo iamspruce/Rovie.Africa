@@ -1,0 +1,36 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Secrets. `*.local` above already covers .env.local, but only by accident of
+# its name — these make the rule explicit and cover any other variant. The
+# example file is the one that is meant to be public.
+.env
+.env.*
+!.env.example
+
+# Local agent config. Machine-specific, and settings.json accumulates the
+# literal commands that were approved on this machine — including ones with
+# a live API key in the argument list.
+.claude/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

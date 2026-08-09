@@ -1,0 +1,63 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: v.$z-header;
+  background: v.$color-bg;
+  border-bottom: 1px solid v.$color-border;
+}
+
+// Off-screen until tabbed to. With real navigation in the bar there are now
+// links to skip past.
+.skipLink {
+  position: absolute;
+  top: 0;
+  left: v.$space-4;
+  z-index: 1;
+  padding: v.$space-2 v.$space-3;
+  border-radius: 0 0 v.$radius-md v.$radius-md;
+  background: v.$color-primary;
+  color: v.$color-primary-contrast;
+  font-size: v.$font-size-sm;
+  font-weight: 700;
+  transform: translateY(-120%);
+  transition: transform 0.15s ease;
+
+  &:focus-visible {
+    transform: translateY(0);
+    outline: 2px solid v.$color-text;
+    outline-offset: 2px;
+  }
+}
+
+.bar {
+  @include m.container;
+  position: relative;
+  height: v.$header-height;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: v.$space-4;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: v.$space-1;
+  // The wordmark is the display face at its widest weight - the one place
+  // Bricolage is allowed to be loud.
+  font-family: v.$font-family-display;
+  font-weight: 800;
+  font-size: v.$font-size-lg;
+  letter-spacing: -0.03em;
+
+  @include m.focus-ring;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: v.$space-2;
+}

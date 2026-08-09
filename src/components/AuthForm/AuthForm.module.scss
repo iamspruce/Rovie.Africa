@@ -1,0 +1,134 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+}
+
+.label {
+  font-size: v.$font-size-sm;
+  font-weight: 600;
+  color: v.$color-text;
+}
+
+.input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  background-color: v.$color-bg;
+  color: v.$color-text;
+  font-family: inherit;
+  font-size: v.$font-size-base;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &::placeholder {
+    color: v.$color-text-muted;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: v.$color-primary;
+    box-shadow: 0 0 0 3px color-mix(in srgb, v.$color-primary 18%, transparent);
+  }
+
+  &[aria-invalid='true'] {
+    border-color: v.$color-danger;
+
+    &:focus {
+      box-shadow: 0 0 0 3px color-mix(in srgb, v.$color-danger 18%, transparent);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.hint,
+.fieldError {
+  margin: 0;
+  font-size: v.$font-size-sm;
+  line-height: 1.5;
+}
+
+.hint {
+  color: v.$color-text-muted;
+}
+
+.fieldError {
+  color: v.$color-danger-text;
+}
+
+.formError,
+.formNotice {
+  margin: 0;
+  padding: v.$space-3 v.$space-4;
+  border-radius: v.$radius-md;
+  border: 1px solid;
+  font-size: v.$font-size-sm;
+  line-height: 1.5;
+}
+
+.formError {
+  border-color: color-mix(in srgb, v.$color-danger 40%, transparent);
+  background-color: color-mix(in srgb, v.$color-danger 8%, transparent);
+  color: v.$color-danger-text;
+}
+
+.formNotice {
+  border-color: color-mix(in srgb, v.$color-success 40%, transparent);
+  background-color: color-mix(in srgb, v.$color-success 8%, transparent);
+  color: v.$color-success-text;
+}
+
+// A rule with the label sitting in a gap in it, rather than a label with two
+// lines drawn beside it - the grid keeps the two segments equal at any width.
+.divider {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: v.$space-3;
+  color: v.$color-text-muted;
+  font-size: v.$font-size-sm;
+
+  &::before,
+  &::after {
+    content: '';
+    height: 1px;
+    background-color: v.$color-border;
+  }
+}
+
+.google {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: v.$space-3;
+  width: 100%;
+  padding: 11px 18px;
+  border: 1px solid v.$color-border;
+  border-radius: 100px;
+  background-color: v.$color-bg;
+  color: v.$color-text;
+  font-family: inherit;
+  font-size: v.$font-size-sm;
+  font-weight: 600;
+  letter-spacing: 0.32px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  @include m.focus-ring;
+
+  &:hover:not(:disabled) {
+    background-color: v.$color-surface;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}

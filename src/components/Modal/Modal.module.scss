@@ -1,0 +1,46 @@
+@use '../../styles/abstracts/variables' as v;
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: v.$color-scrim;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: v.$space-4;
+  z-index: v.$z-modal;
+}
+
+.dialog {
+  background: v.$color-bg;
+  border-radius: v.$radius-md;
+  width: 100%;
+  max-width: 28rem;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: v.$space-5;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: v.$space-4;
+}
+
+.closeButton {
+  font-size: v.$font-size-lg;
+  line-height: 1;
+  padding: v.$space-1 v.$space-2;
+  border-radius: v.$radius-sm;
+
+  &:hover {
+    background-color: v.$color-surface;
+  }
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-3;
+}

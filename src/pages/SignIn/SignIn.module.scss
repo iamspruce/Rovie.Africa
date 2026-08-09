@@ -1,0 +1,35 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-4;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-4;
+}
+
+// A text button, not a second call to action. The primary action above it is
+// the one being offered; this only swaps how you prove who you are.
+.switch {
+  align-self: center;
+  padding: v.$space-1 v.$space-2;
+  border: none;
+  border-radius: v.$radius-sm;
+  background: none;
+  color: v.$color-primary;
+  font-family: inherit;
+  font-size: v.$font-size-sm;
+  font-weight: 600;
+  cursor: pointer;
+
+  @include m.focus-ring;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

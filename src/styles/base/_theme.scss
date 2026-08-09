@@ -1,0 +1,171 @@
+// -----------------------------------------------------------------------
+// Theme tokens.
+//
+// Every colour on the site resolves through a custom property declared here.
+// Sass variables can't follow a preference that changes after build, so the
+// values live in CSS and `abstracts/_variables.scss` only names them - which
+// means components keep writing `v.$color-bg` and get the right one for free.
+//
+// :root carries the light theme. The dark theme is an override, applied only
+// when the visitor's operating system asks for one. There is no toggle and no
+// stored choice: the OS already knows, and honouring it is both less code and
+// the answer people expect.
+//
+// Contrast figures below are against that theme's own background, measured as
+// WCAG 2.1 contrast ratio. Anything carrying small text is kept at 4.5:1 or
+// better; anything that is only ever a border or a large mark is allowed to
+// sit lower, and is marked as such.
+// -----------------------------------------------------------------------
+
+:root {
+  // Tells the browser to render its own furniture - scrollbars, form
+  // controls, the canvas behind the page - in the matching scheme. Without
+  // this a dark page gets light scrollbars and white input interiors.
+  color-scheme: light dark;
+
+  // ------------------------------------------------------------ surfaces
+  --rv-bg: #ffffff;
+  // Warm off-white for hover states and raised panels. Far enough from the
+  // page to be visible, which #fffdf9 was not - a 1% step reads as a
+  // rendering artefact rather than as a surface.
+  --rv-surface: #f5f3ee;
+  --rv-border: #e2ded6;
+
+  // ---------------------------------------------------------------- text
+  --rv-text: #000000;
+  // 5.6:1. The previous #333 sat at 12.6:1 - indistinguishable from body
+  // text, so "muted" meant nothing.
+  --rv-text-muted: #6b675e;
+
+  // --------------------------------------------------------------- brand
+  // 5.0:1 on white as text, and carries white at 5.0:1 as a fill.
+  --rv-primary: #076db0;
+  --rv-primary-contrast: #ffffff;
+  // The rail, the eyebrows, the step markers - the site's "line that means
+  // something". On a light ground it has to go darker than the brand blue,
+  // not lighter. 7.4:1.
+  --rv-line: #05578d;
+
+  // Amber means "your country" on the map and nothing else. #d97706 is only
+  // 3.0:1 on white, so the light theme uses a deeper burnt tone at 4.7:1 and
+  // keeps the brighter one for dark.
+  --rv-accent: #b45309;
+
+  --rv-danger: #b32d1f; // 5.9:1
+  --rv-success: #0c6b42; // 5.4:1
+
+  // ------------------------------------------------------------ feedback
+  // Status text sits on the page background, so it needs the readable tone
+  // rather than the fill tone.
+  --rv-danger-text: #96271b;
+  --rv-success-text: #0a5a38;
+
+  // --------------------------------------------------------------- misc
+  // Behind a modal. Warm near-black rather than pure, so it reads as shade
+  // over a warm page instead of as a hole in it.
+  --rv-scrim: rgba(26, 23, 18, 0.45);
+
+  // The primary button. A gradient in both themes, but the light one is
+  // brand blue - the dark theme's silver reads as a dead control on white.
+  --rv-btn-primary-from: #05639f;
+  --rv-btn-primary-to: #2b8fd0;
+  --rv-btn-primary-text: #ffffff;
+
+  // ---------------------------------------------------------------- map
+  // The homepage globe. Land is a tint of the page, not a darkening of it.
+  --rv-map-land: #eae7df;
+  --rv-map-land-stroke: #d8d4ca;
+  // Keyline around the country you're in. It has to separate amber from the
+  // ocean behind it, so it goes dark here and white on the dark theme -
+  // white-on-amber over a pale ocean would erase the edge it exists to draw.
+  --rv-map-highlight-stroke: #7a3705;
+  // The dashed routes cross the lit face of Africa, which is a mid-blue in
+  // both themes. Reading over that means going the opposite way from the
+  // page: deep here, pale there.
+  --rv-map-route: #06304f;
+
+  // ----------------------------------------------------- visualisation
+  // Chart chrome only - the data colours are in _variables.scss and in
+  // lib/viz/palette.ts, and are shared by both themes.
+  --rv-viz-empty: #e6e2da;
+  --rv-viz-grid: #ebe8e1;
+  --rv-viz-axis: #c7c2b8;
+  --rv-viz-primary: #1a6cb4;
+
+  // --------------------------------------------------------------- plate
+  // The sign-in / sign-up panel that carries the Africa map.
+  //
+  // These are the ONE set of tokens on the site that do not flip with the
+  // theme - they are repeated verbatim in the dark block below, and that
+  // repetition is deliberate rather than an oversight. The panel is meant to
+  // read as a printed plate laid on the page: an object with its own ink,
+  // not a region of the page that happens to be dark. Flipping it to white
+  // in light mode would leave the amber "your country" mark with nothing to
+  // sit against, which is the one thing the panel exists to show.
+  //
+  // Contrast is measured against --rv-plate, not the page.
+  --rv-plate: #071b2b;
+  --rv-plate-text: #f3f1ec; // 14.9:1
+  --rv-plate-muted: #93aec4; // 7.2:1
+  --rv-plate-land: #0f3149;
+  --rv-plate-stroke: #1e4a6d; // border weight only, never carries text
+  --rv-plate-rule: #14384f; // the latitude rule behind the marker
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --rv-bg: #000000;
+    --rv-surface: #16191d;
+    --rv-border: #272d34;
+
+    --rv-text: #ffffff;
+    // 8.0:1. The previous #5b6670 was 4.06:1 on pure black, which fails AA
+    // for the small text it was mostly used on.
+    --rv-text-muted: #8b949d;
+
+    // The brand blue is 2.6:1 on black - too dark to be a link or an active
+    // state there. Dark gets a lifted version at 7.3:1, and the fill carries
+    // dark text rather than white.
+    --rv-primary: #3d9ae0;
+    --rv-primary-contrast: #041d2e;
+    // What `color-mix(in srgb, #076db0 65%, #fff)` used to resolve to, now
+    // named instead of recomputed in fifteen files.
+    --rv-line: #5ea0cc;
+
+    --rv-accent: #e08c1f;
+
+    --rv-danger: #d9503f;
+    --rv-success: #2f9e6a;
+    --rv-danger-text: #f08b7d;
+    --rv-success-text: #63c79b;
+
+    --rv-scrim: rgba(0, 0, 0, 0.66);
+
+    // Unchanged: the silver gradient was drawn for a black page and still
+    // belongs here.
+    --rv-btn-primary-from: rgb(110, 113, 128);
+    --rv-btn-primary-to: rgb(237, 242, 242);
+    --rv-btn-primary-text: rgb(29, 35, 40);
+
+    --rv-map-land: #12161a;
+    --rv-map-land-stroke: #232a31;
+    --rv-map-highlight-stroke: #ffffff;
+    --rv-map-route: #9cc5df;
+
+    --rv-viz-empty: #262d33;
+    --rv-viz-grid: #2c2c2a;
+    --rv-viz-axis: #383835;
+    --rv-viz-primary: #3987e5;
+
+    // Identical to the light block on purpose - see the note there. The
+    // plate is an object with fixed ink, so it does not flip. Repeated
+    // rather than omitted so that anyone reading only this block sees the
+    // real values instead of assuming they were forgotten.
+    --rv-plate: #071b2b;
+    --rv-plate-text: #f3f1ec;
+    --rv-plate-muted: #93aec4;
+    --rv-plate-land: #0f3149;
+    --rv-plate-stroke: #1e4a6d;
+    --rv-plate-rule: #14384f;
+  }
+}

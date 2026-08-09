@@ -1,0 +1,220 @@
+@use '../../styles/abstracts/variables' as v;
+
+.wrapper {
+  width: 100%;
+  margin-inline: auto;
+  position: relative;
+}
+
+.svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-inline: auto;
+  cursor: grab;
+  touch-action: none; // let us handle pan/drag ourselves on touch devices
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+// --- sphere shading -----------------------------------------------------
+// Gradient stops live here rather than inline so the globe's lighting stays
+// with the rest of the palette.
+
+.stopOceanLit {
+  stop-color: color-mix(in srgb, v.$color-surface 62%, v.$color-primary);
+}
+
+.stopOceanMid {
+  stop-color: v.$color-surface;
+}
+
+.stopOceanDark {
+  stop-color: v.$color-map-land;
+}
+
+.stopAtmosphereInner {
+  stop-color: color-mix(in srgb, v.$color-primary 0%, transparent);
+}
+
+.stopAtmosphereMid {
+  stop-color: color-mix(in srgb, v.$color-primary 22%, transparent);
+}
+
+.stopAtmosphereOuter {
+  stop-color: color-mix(in srgb, v.$color-primary 0%, transparent);
+}
+
+.sphere {
+  stroke: none;
+}
+
+.sphereStroke {
+  stroke: v.$color-line;
+  stroke-width: 1;
+  stroke-opacity: 0.55;
+  pointer-events: none;
+}
+
+.graticule {
+  fill: none;
+  stroke: color-mix(in srgb, v.$color-primary 40%, v.$color-border);
+  stroke-width: 0.5;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.countryWorld {
+  fill: v.$color-map-land;
+  stroke: v.$color-map-land-stroke;
+  stroke-width: 0.4;
+  pointer-events: none;
+}
+
+.countryAfrica {
+  fill: v.$color-primary;
+  fill-opacity: 0.55;
+  stroke: v.$color-line;
+  stroke-width: 0.5;
+  cursor: pointer;
+  transition: fill-opacity 0.15s ease;
+}
+
+// The amber fill needs a keyline that separates it from whatever is behind:
+// white against the dark ocean, and against the light one it has to go the
+// other way or the marked country loses its edge entirely.
+.countryHighlighted {
+  fill: v.$color-accent;
+  fill-opacity: 0.95;
+  stroke: v.$color-map-highlight-stroke;
+  stroke-width: 1.2;
+  cursor: pointer;
+}
+
+.countryHovered {
+  fill-opacity: 0.9;
+  stroke-width: 1;
+}
+
+// These routes run straight over the lit face of Africa, which is filled with
+// $color-primary - a primary-blue line on it is invisible. The fix is
+// lightness separation, not just more opacity, and which way to separate
+// depends on the theme: $color-map-route is pale on the dark globe and deep
+// on the light one.
+.connections {
+  stroke: v.$color-map-route;
+  stroke-width: 1.4;
+  stroke-opacity: 0.95;
+  stroke-dasharray: 4 5;
+  stroke-linecap: round;
+  pointer-events: none;
+  animation: routeFlow 3.5s linear infinite;
+}
+
+// A route that drifts reads as a live connection rather than a drawn line.
+// The globe already animates (the visitor marker pulses), so this speaks the
+// language that's here rather than importing a new one.
+@keyframes routeFlow {
+  to {
+    stroke-dashoffset: -18;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .connections {
+    animation: none;
+  }
+
+  .markerPulse {
+    animation: none;
+  }
+}
+
+.markerGroup {
+  pointer-events: none;
+}
+
+.marker {
+  fill: v.$color-accent;
+  stroke: v.$color-bg;
+  stroke-width: 2;
+}
+
+.markerPulse {
+  fill: none;
+  stroke: v.$color-accent;
+  stroke-width: 1.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: markerPulse 2.4s ease-out infinite;
+}
+
+@keyframes markerPulse {
+  0% { transform: scale(0.55); opacity: 0.9; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+
+// --- model price tags ---------------------------------------------------
+
+.modelTags {
+  pointer-events: none;
+
+  rect {
+    fill: color-mix(in srgb, v.$color-bg 72%, v.$color-surface);
+    stroke: color-mix(in srgb, v.$color-primary 45%, v.$color-border);
+    stroke-width: 1;
+  }
+}
+
+// The provider's own mark, nested from @lobehub/icons-static-svg. The source
+// art has no fill of its own, so it takes the tag's text colour from here.
+.tagLogo {
+  fill: v.$color-text;
+}
+
+.tagName {
+  fill: v.$color-text;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.tagPrice {
+  fill: v.$color-accent;
+  font-size: 10.5px;
+  font-weight: 600;
+  // Five tags stacked around the globe, all quoting the same budget - the
+  // figures only compare cleanly if the digits share a width.
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+// --- hover tooltip ------------------------------------------------------
+
+.tooltip {
+  pointer-events: none;
+
+  rect {
+    fill: color-mix(in srgb, v.$color-bg 82%, v.$color-surface);
+    stroke: color-mix(in srgb, v.$color-primary 60%, v.$color-border);
+    stroke-width: 1;
+  }
+}
+
+.tooltipLeader {
+  stroke: color-mix(in srgb, v.$color-primary 70%, v.$color-border);
+  stroke-width: 1;
+}
+
+.tooltipName {
+  fill: v.$color-text;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.tooltipPrice {
+  fill: v.$color-accent;
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums lining-nums;
+}

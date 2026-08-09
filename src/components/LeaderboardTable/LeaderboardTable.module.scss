@@ -1,0 +1,33 @@
+@use '../../styles/abstracts/variables' as v;
+
+.table {
+  width: 100%;
+  font-size: v.$font-size-sm;
+
+  th,
+  td {
+    text-align: left;
+    padding: v.$space-3;
+    border-bottom: 1px solid v.$color-border;
+  }
+
+  thead th {
+    color: v.$color-text-muted;
+    font-weight: 600;
+  }
+
+  tbody th {
+    font-weight: 600;
+  }
+}
+
+.rank {
+  font-weight: 800;
+  color: v.$color-primary;
+}
+
+.empty {
+  padding: v.$space-6;
+  text-align: center;
+  color: v.$color-text-muted;
+}

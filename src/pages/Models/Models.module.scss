@@ -1,0 +1,111 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+.page {
+  padding-block: v.$space-8;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-3;
+  margin-bottom: v.$space-6;
+}
+
+.intro {
+  max-width: 40rem;
+  margin: 0;
+}
+
+.country {
+  padding-top: v.$space-2;
+}
+
+.error {
+  color: v.$color-danger;
+}
+
+// One column on phones, filter rail beside the table from lg up. The rail
+// comes first in source order so it's reachable before a 30-row table on a
+// screen reader or a keyboard.
+.layout {
+  display: grid;
+  gap: v.$space-5;
+  align-items: start;
+
+  @include m.respond-to('lg') {
+    grid-template-columns: 16rem minmax(0, 1fr);
+  }
+}
+
+.results {
+  min-width: 0;
+}
+
+.resultsBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: v.$space-3;
+  margin-bottom: v.$space-3;
+}
+
+.count {
+  margin: 0;
+  font-size: v.$font-size-sm;
+  color: v.$color-text-muted;
+  font-variant-numeric: tabular-nums;
+}
+
+.sortField {
+  display: flex;
+  align-items: center;
+  gap: v.$space-2;
+  font-size: v.$font-size-sm;
+  color: v.$color-text-muted;
+}
+
+.sortSelect {
+  padding: v.$space-1 v.$space-2;
+  font-family: inherit;
+  font-size: v.$font-size-sm;
+  color: v.$color-text;
+  background: v.$color-surface;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-sm;
+  @include m.focus-ring;
+}
+
+// The table has six columns and can't usefully reflow below about 40rem, so
+// it scrolls inside this wrapper instead of pushing the page sideways.
+.tableScroll {
+  overflow-x: auto;
+}
+
+.noMatches {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: v.$space-3;
+  padding: v.$space-8 v.$space-4;
+  color: v.$color-text-muted;
+  border: 1px dashed v.$color-border;
+  border-radius: v.$radius-md;
+
+  p {
+    margin: 0;
+  }
+
+  button {
+    padding: v.$space-2 v.$space-3;
+    font-family: inherit;
+    font-size: v.$font-size-sm;
+    color: v.$color-text;
+    background: none;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-sm;
+    cursor: pointer;
+    @include m.focus-ring;
+  }
+}

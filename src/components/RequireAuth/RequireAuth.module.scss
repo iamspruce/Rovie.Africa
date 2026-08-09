@@ -1,0 +1,35 @@
+@use '../../styles/abstracts/variables' as v;
+
+.pending {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: v.$space-3;
+  min-height: 60vh;
+  color: v.$color-text-muted;
+  font-size: v.$font-size-sm;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid v.$color-border;
+  border-top-color: v.$color-primary;
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+    // Without the spin the ring alone reads as a static decoration, so make
+    // the coloured arc a full ring instead of a partial one.
+    border-top-color: v.$color-border;
+  }
+}

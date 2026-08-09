@@ -1,0 +1,57 @@
+@use 'variables' as v;
+
+// Responsive breakpoint mixin: @include respond-to('md') { ... }
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == 'sm' {
+    @media (min-width: v.$breakpoint-sm) {
+      @content;
+    }
+  } @else if $breakpoint == 'md' {
+    @media (min-width: v.$breakpoint-md) {
+      @content;
+    }
+  } @else if $breakpoint == 'lg' {
+    @media (min-width: v.$breakpoint-lg) {
+      @content;
+    }
+  } @else if $breakpoint == 'xl' {
+    @media (min-width: v.$breakpoint-xl) {
+      @content;
+    }
+  } @else {
+    @warn "Unknown breakpoint: #{$breakpoint}";
+  }
+}
+
+// Consistent focus ring for keyboard accessibility across every interactive element.
+@mixin focus-ring {
+  &:focus-visible {
+    outline: 2px solid v.$color-primary;
+    outline-offset: 2px;
+  }
+}
+
+// A horizontally-centered, max-width content container.
+@mixin container {
+  width: 100%;
+  max-width: v.$container-max-width;
+  margin-inline: auto;
+  padding-inline: v.$space-4;
+
+  @include respond-to('md') {
+    padding-inline: v.$space-6;
+  }
+}
+
+// Visually hide an element while keeping it accessible to screen readers.
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -1,0 +1,207 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+.createForm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: v.$space-3;
+}
+
+.labelField {
+  flex: 1 1 16rem;
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+  min-width: 0;
+}
+
+.labelText {
+  font-size: v.$font-size-sm;
+  font-weight: 600;
+  color: v.$color-text;
+}
+
+.input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  background-color: v.$color-bg;
+  color: v.$color-text;
+  font-family: inherit;
+  font-size: v.$font-size-base;
+
+  &::placeholder {
+    color: v.$color-text-muted;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: v.$color-primary;
+    box-shadow: 0 0 0 3px color-mix(in srgb, v.$color-primary 18%, transparent);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.blocked {
+  margin: v.$space-4 0 0;
+  font-size: v.$font-size-sm;
+  line-height: 1.6;
+  color: v.$color-text-muted;
+
+  a {
+    color: v.$color-primary;
+    font-weight: 600;
+  }
+}
+
+
+.keyList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-3;
+}
+
+// A key is a small record now, not a line item: identity, what it has cost,
+// what can be done to it. Stacked rather than one wide row so it survives a
+// phone without the figures being the first thing cut.
+.key {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-3;
+  padding: v.$space-4;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  background-color: v.$color-surface;
+}
+
+.keyRevoked {
+  composes: key;
+  // Not hidden: a revoked key is part of the account's history, and someone
+  // debugging a 401 needs to see that the key they're using was revoked.
+  opacity: 0.62;
+}
+
+.keyMain {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: v.$space-3;
+  min-width: 0;
+}
+
+.keyIdentity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: v.$space-3;
+  min-width: 0;
+}
+
+.keyPrefix {
+  font-family: v.$font-family-mono;
+  font-size: v.$font-size-sm;
+  color: v.$color-text;
+}
+
+.keyLabel {
+  font-size: v.$font-size-sm;
+  font-weight: 600;
+  color: v.$color-text;
+}
+
+.keyTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: v.$space-2;
+}
+
+// Four figures across, collapsing to two on a narrow screen rather than
+// stacking into a column that pushes the actions off the fold.
+.keyStats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: v.$space-3;
+  margin: 0;
+  padding: v.$space-3 0;
+  border-block: 1px solid v.$color-border;
+
+  @include m.respond-to('sm') {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  dt {
+    font-size: 0.75rem;
+    color: v.$color-text-muted;
+  }
+
+  dd {
+    margin: 2px 0 0;
+    font-size: v.$font-size-sm;
+    font-weight: 600;
+    color: v.$color-text;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.keyActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: v.$space-3;
+}
+
+.created {
+  font-size: v.$font-size-sm;
+  color: v.$color-text-muted;
+  white-space: nowrap;
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  gap: v.$space-2;
+}
+
+.action,
+.revoke {
+  padding: v.$space-1 v.$space-2;
+  border: none;
+  border-radius: v.$radius-sm;
+  background: none;
+  font-family: inherit;
+  font-size: v.$font-size-sm;
+  font-weight: 600;
+  cursor: pointer;
+
+  @include m.focus-ring;
+
+  &:hover:not(:disabled) {
+    text-decoration: underline;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.action {
+  color: v.$color-primary;
+}
+
+// Destructive, and last in the row. Colour is a reinforcement - the word
+// "Revoke" and the confirmation dialog are what actually communicate it.
+.revoke {
+  color: v.$color-danger-text;
+}

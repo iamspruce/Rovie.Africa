@@ -1,0 +1,71 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+.layout {
+  min-height: 100vh;
+  min-height: 100dvh; // dvh so a mobile browser's collapsing toolbar doesn't clip the form
+  display: grid;
+  grid-template-rows: auto 1fr;
+  background-color: v.$color-bg;
+
+  @include m.respond-to('lg') {
+    // The plate is the smaller column: the form is the thing being used, and
+    // a 50/50 split makes the map read as competing with it.
+    grid-template-rows: none;
+    grid-template-columns: minmax(360px, 0.8fr) 1fr;
+  }
+}
+
+.panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: v.$space-6 v.$space-4;
+
+  @include m.respond-to('md') {
+    padding: v.$space-8 v.$space-6;
+  }
+}
+
+.column {
+  width: 100%;
+  max-width: 25rem;
+}
+
+.heading {
+  margin-bottom: v.$space-6;
+}
+
+.title {
+  margin: 0 0 v.$space-2;
+  font-family: v.$font-family-display;
+  // Bricolage is variable, so the display size gets its own optical size and
+  // a tighter track than the body face - the point of carrying a variable
+  // display face at all.
+  font-variation-settings: 'opsz' 32;
+  font-size: v.$font-size-2xl;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: v.$color-text;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: v.$font-size-sm;
+  line-height: 1.6;
+  color: v.$color-text-muted;
+}
+
+.footer {
+  margin: v.$space-6 0 0;
+  padding-top: v.$space-5;
+  border-top: 1px solid v.$color-border;
+  font-size: v.$font-size-sm;
+  color: v.$color-text-muted;
+
+  a {
+    color: v.$color-primary;
+    font-weight: 600;
+  }
+}

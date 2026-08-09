@@ -1,0 +1,304 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+.card {
+  padding: v.$space-5;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-lg;
+  background-color: v.$color-bg;
+}
+
+.cardHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: v.$space-3;
+  margin-bottom: v.$space-4;
+}
+
+.cardTitle {
+  margin: 0;
+  font-family: v.$font-family-display;
+  font-size: v.$font-size-lg;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: v.$color-text;
+}
+
+.cardDescription {
+  margin: v.$space-2 0 0;
+  max-width: 60ch;
+  font-size: v.$font-size-sm;
+  line-height: 1.6;
+  color: v.$color-text-muted;
+}
+
+.cardAction {
+  flex: none;
+}
+
+.empty,
+.pending {
+  margin: 0;
+  padding: v.$space-5;
+  border: 1px dashed v.$color-border;
+  border-radius: v.$radius-md;
+  color: v.$color-text-muted;
+  font-size: v.$font-size-sm;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.error {
+  margin: 0;
+  padding: v.$space-3 v.$space-4;
+  border: 1px solid color-mix(in srgb, v.$color-danger 40%, transparent);
+  border-radius: v.$radius-md;
+  background-color: color-mix(in srgb, v.$color-danger 8%, transparent);
+  color: v.$color-danger-text;
+  font-size: v.$font-size-sm;
+  line-height: 1.5;
+}
+
+.statRow {
+  display: grid;
+  gap: v.$space-4;
+  grid-template-columns: 1fr;
+
+  @include m.respond-to('sm') {
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  }
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-1;
+  padding: v.$space-4;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  background-color: v.$color-surface;
+}
+
+.statLabel {
+  font-size: v.$font-size-sm;
+  color: v.$color-text-muted;
+}
+
+.statValue {
+  font-family: v.$font-family-display;
+  font-size: v.$font-size-xl;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: v.$color-text;
+  // Atkinson was picked so digits can't be misread; tabular figures are the
+  // other half of that - amounts in a row have to align to compare.
+  font-variant-numeric: tabular-nums;
+}
+
+.statNote {
+  font-size: v.$font-size-sm;
+  color: v.$color-text-muted;
+}
+
+.notice {
+  margin: 0;
+  padding: v.$space-3 v.$space-4;
+  border: 1px solid color-mix(in srgb, v.$color-primary 35%, transparent);
+  border-radius: v.$radius-md;
+  background-color: color-mix(in srgb, v.$color-primary 7%, transparent);
+  color: v.$color-text;
+  font-size: v.$font-size-sm;
+  line-height: 1.5;
+}
+
+// -----------------------------------------------------------------------
+// Meter
+// -----------------------------------------------------------------------
+
+.meter {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+}
+
+.meterHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: v.$space-3;
+}
+
+.meterLabel {
+  font-size: v.$font-size-sm;
+  color: v.$color-text-muted;
+}
+
+.meterValue {
+  font-size: v.$font-size-sm;
+  font-weight: 600;
+  color: v.$color-text;
+  font-variant-numeric: tabular-nums;
+}
+
+.meterTrack {
+  display: block;
+  height: 4px;
+  border-radius: 999px;
+  background-color: color-mix(in srgb, v.$color-text 12%, transparent);
+  overflow: hidden;
+}
+
+.meterFill {
+  display: block;
+  height: 100%;
+  // Rounded only at the leading end: the bar grows from a fixed baseline,
+  // and rounding the start would float it off its own zero.
+  border-radius: 0 999px 999px 0;
+  background-color: v.$color-primary;
+  transition: width 240ms ease;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+.meterWarning {
+  background-color: v.$color-accent;
+}
+
+.meterDanger {
+  background-color: v.$color-danger;
+}
+
+// -----------------------------------------------------------------------
+// Copy field
+// -----------------------------------------------------------------------
+
+.copyField {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+}
+
+.copyLabel {
+  font-size: v.$font-size-sm;
+  color: v.$color-text-muted;
+}
+
+.copyBody {
+  display: flex;
+  align-items: stretch;
+  gap: v.$space-2;
+  min-width: 0;
+}
+
+.copyValue {
+  flex: 1;
+  min-width: 0;
+  padding: v.$space-2 v.$space-3;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-sm;
+  background-color: v.$color-surface;
+  font-family: v.$font-family-mono;
+  font-size: v.$font-size-sm;
+  color: v.$color-text;
+  overflow-wrap: anywhere;
+}
+
+.copyBlock {
+  .copyValue {
+    white-space: pre;
+    overflow-x: auto;
+    // A config block is read line by line; wrapping it would break the
+    // indentation that makes it legible.
+    overflow-wrap: normal;
+    max-height: 20rem;
+  }
+
+  .copyBody {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+}
+
+.copyButton {
+  flex: none;
+  padding: v.$space-2 v.$space-3;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-sm;
+  background-color: v.$color-bg;
+  color: v.$color-text;
+  font-family: inherit;
+  font-size: v.$font-size-sm;
+  cursor: pointer;
+  @include m.focus-ring;
+
+  &:hover {
+    border-color: v.$color-primary;
+  }
+}
+
+// -----------------------------------------------------------------------
+// Tag
+// -----------------------------------------------------------------------
+
+.tag {
+  display: inline-block;
+  padding: 2px v.$space-2;
+  border-radius: v.$radius-sm;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tag-neutral {
+  background-color: color-mix(in srgb, v.$color-primary 12%, transparent);
+  color: v.$color-text;
+}
+
+.tag-success {
+  background-color: color-mix(in srgb, v.$color-success 14%, transparent);
+  color: v.$color-success-text;
+}
+
+.tag-danger {
+  background-color: color-mix(in srgb, v.$color-danger 12%, transparent);
+  color: v.$color-danger-text;
+}
+
+.tag-muted {
+  background-color: color-mix(in srgb, v.$color-text 8%, transparent);
+  color: v.$color-text-muted;
+}
+
+// -----------------------------------------------------------------------
+// Table & controls
+// -----------------------------------------------------------------------
+
+// Wide tables scroll inside their own card. The page body never does.
+.tableWrap {
+  overflow-x: auto;
+  margin-inline: calc(-1 * #{v.$space-2});
+  padding-inline: v.$space-2;
+}
+
+.windowPicker {
+  display: flex;
+  align-items: center;
+  gap: v.$space-2;
+  font-size: v.$font-size-sm;
+  color: v.$color-text-muted;
+
+  select {
+    padding: v.$space-2 v.$space-3;
+    font-family: inherit;
+    font-size: v.$font-size-sm;
+    color: v.$color-text;
+    background: v.$color-surface;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-sm;
+    @include m.focus-ring;
+  }
+}

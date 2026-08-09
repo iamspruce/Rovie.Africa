@@ -1,0 +1,81 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+$line: v.$color-line;
+
+.page {
+  max-width: 640px;
+  padding-block: 5rem 7rem;
+}
+
+.eyebrow {
+  display: block;
+  color: $line;
+  font: 700 0.66rem/1 v.$font-family-display;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 0.9rem;
+}
+
+.page h1 {
+  margin: 0 0 1.1rem;
+  font-size: clamp(1.9rem, 4vw, 2.9rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+}
+
+.summary {
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.7;
+  color: color-mix(in srgb, v.$color-text 75%, v.$color-text-muted);
+}
+
+// Hangs off the same rail the homepage's mission uses, dashed - the page is a
+// gap in the argument, and the site already has a mark for that.
+.note {
+  position: relative;
+  margin: 2rem 0 0;
+  padding-left: 1.25rem;
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: v.$color-text-muted;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 1px;
+    background: repeating-linear-gradient(
+      to bottom,
+      v.$color-text-muted 0 3px,
+      transparent 3px 7px
+    );
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.75rem;
+  margin-top: 2.5rem;
+}
+
+.back {
+  color: $line;
+  font-size: 0.86rem;
+  font-weight: 700;
+
+  &::after {
+    content: ' →';
+  }
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  @include m.focus-ring;
+}

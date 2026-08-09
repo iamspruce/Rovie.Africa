@@ -1,0 +1,122 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+// Sits inside the key it belongs to, indented by a rule rather than boxed
+// again - a card inside a card inside a card reads as three unrelated things.
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-4;
+  padding-top: v.$space-4;
+  border-top: 1px solid v.$color-border;
+}
+
+.group {
+  margin: 0;
+  padding: 0;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+}
+
+.legend {
+  padding: 0;
+  font-size: v.$font-size-sm;
+  font-weight: 600;
+  color: v.$color-text;
+}
+
+.toggle,
+.model {
+  display: flex;
+  align-items: center;
+  gap: v.$space-2;
+  font-size: v.$font-size-sm;
+  color: v.$color-text;
+  cursor: pointer;
+
+  input {
+    accent-color: v.$color-primary;
+    @include m.focus-ring;
+  }
+}
+
+.capRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: v.$space-2;
+}
+
+.prefix {
+  font-size: v.$font-size-sm;
+  color: v.$color-text-muted;
+}
+
+.capInput {
+  width: 8rem;
+  padding: v.$space-2 v.$space-3;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-sm;
+  background-color: v.$color-bg;
+  color: v.$color-text;
+  font-family: inherit;
+  font-size: v.$font-size-sm;
+  font-variant-numeric: tabular-nums;
+
+  &:focus {
+    outline: none;
+    border-color: v.$color-primary;
+    box-shadow: 0 0 0 3px color-mix(in srgb, v.$color-primary 18%, transparent);
+  }
+}
+
+.note {
+  margin: 0;
+  font-size: v.$font-size-sm;
+  color: v.$color-text-muted;
+}
+
+// Scrolls at around eight rows: the served list runs to two dozen models and
+// this panel is nested inside a list item already.
+.models {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: v.$space-2;
+  max-height: 14rem;
+  overflow-y: auto;
+  padding: v.$space-2;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-sm;
+  background-color: v.$color-bg;
+
+  @include m.respond-to('sm') {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.model span {
+  font-family: v.$font-family-mono;
+  font-size: 0.8125rem;
+  overflow-wrap: anywhere;
+}
+
+.clear {
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: none;
+  color: v.$color-primary;
+  font-family: inherit;
+  font-size: v.$font-size-sm;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  @include m.focus-ring;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}

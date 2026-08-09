@@ -1,0 +1,224 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+$line: v.$color-line;
+$muted-text: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
+
+// Matches the status page's states - the same colours have to mean the same
+// things on the page that links to it.
+$state-ok: #2f9e6a;
+$state-slow: #d99013;
+$state-down: #d24b3c;
+
+.page {
+  max-width: 860px;
+  padding-block: 4rem 6rem;
+}
+
+// ------------------------------------------------------------------ head
+
+.head {
+  margin-bottom: 3.5rem;
+
+  h1 {
+    margin: 0.9rem 0 0;
+    font-size: clamp(2rem, 4.4vw, 3rem);
+    font-weight: 600;
+    letter-spacing: -0.032em;
+    line-height: 1.06;
+  }
+}
+
+.eyebrow {
+  display: block;
+  color: $line;
+  font: 700 0.66rem/1 v.$font-family-display;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.intro {
+  margin: 1.1rem 0 0;
+  max-width: 62ch;
+  font-size: 0.98rem;
+  line-height: 1.7;
+  color: $muted-text;
+}
+
+// A live reading, not a badge. It sits above the contact routes because "is it
+// down?" is the question that decides whether writing an email is worth it.
+.systems {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 1.75rem 0 0;
+  padding: 0.85rem 1.1rem;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  font-size: 0.85rem;
+  color: $muted-text;
+
+  a {
+    color: $line;
+    font-weight: 700;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    @include m.focus-ring;
+  }
+}
+
+.dot {
+  flex: 0 0 auto;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: v.$color-text-muted;
+
+  .systems[data-state='operational'] & {
+    background: $state-ok;
+    box-shadow: 0 0 0 3px color-mix(in srgb, #{$state-ok} 22%, transparent);
+  }
+
+  .systems[data-state='degraded'] & {
+    background: $state-slow;
+    box-shadow: 0 0 0 3px color-mix(in srgb, #{$state-slow} 22%, transparent);
+  }
+
+  .systems[data-state='down'] & {
+    background: $state-down;
+    box-shadow: 0 0 0 3px color-mix(in srgb, #{$state-down} 22%, transparent);
+  }
+}
+
+// --------------------------------------------------------------- sections
+
+.sectionHeading {
+  margin: 0 0 1.75rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid v.$color-border;
+  font: 700 0.66rem/1 v.$font-family-display;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: v.$color-text-muted;
+}
+
+.routes {
+  margin-bottom: 4rem;
+}
+
+.routeList {
+  display: grid;
+  gap: 1px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: v.$color-border;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-lg;
+  overflow: hidden;
+
+  @include m.respond-to('md') {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+// The gap is the border showing through, so each cell paints its own ground.
+.route {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 1.6rem 1.5rem;
+  background: v.$color-bg;
+
+  h3 {
+    margin: 0;
+    font-family: v.$font-family-display;
+    font-size: 1.02rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.86rem;
+    line-height: 1.6;
+    color: v.$color-text-muted;
+  }
+}
+
+.action {
+  margin-top: auto;
+  padding-top: 0.7rem;
+  color: $line;
+  font-size: 0.84rem;
+  font-weight: 700;
+
+  &::after {
+    content: ' →';
+  }
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  @include m.focus-ring;
+}
+
+// --------------------------------------------------------------- answers
+
+.answerList {
+  border-top: 1px solid v.$color-border;
+}
+
+.answer {
+  border-bottom: 1px solid v.$color-border;
+
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.1rem 0;
+    cursor: pointer;
+    font-size: 0.93rem;
+    font-weight: 700;
+    list-style: none;
+
+    // Replaced by the chevron below, which can show the open state on every
+    // engine rather than just the ones with a default marker.
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &::after {
+      content: '';
+      flex: 0 0 auto;
+      width: 0.5rem;
+      height: 0.5rem;
+      border-right: 1.5px solid v.$color-text-muted;
+      border-bottom: 1.5px solid v.$color-text-muted;
+      transform: rotate(45deg) translate(-2px, -2px);
+      transition: transform 0.2s ease;
+    }
+
+    @include m.focus-ring;
+  }
+
+  &[open] summary::after {
+    transform: rotate(225deg) translate(-2px, -2px);
+  }
+
+  p {
+    margin: 0;
+    padding: 0 0 1.3rem;
+    max-width: 62ch;
+    font-size: 0.88rem;
+    line-height: 1.7;
+    color: $muted-text;
+  }
+}

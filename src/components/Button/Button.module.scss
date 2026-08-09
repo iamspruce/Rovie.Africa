@@ -1,0 +1,69 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: v.$space-2;
+  padding: 10px 18px;
+  min-width: 80px;
+  border-radius: 100px;
+  font-size: v.$font-size-sm;
+  font-weight: 600;
+  letter-spacing: 0.32px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: box-shadow 0.15s ease;
+
+  @include m.focus-ring;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// The gradient is themed rather than fixed: the silver that reads as a raised
+// control on black reads as a disabled one on white, so the light theme
+// substitutes brand blue. Both ends come from base/_theme.scss.
+.primary {
+  --btn-color: var(--rv-btn-primary-from);
+  --btn-color-light: var(--rv-btn-primary-to);
+  --btn-text: var(--rv-btn-primary-text);
+
+  background: linear-gradient(90deg, var(--btn-color) 0%, var(--btn-color-light) 70%);
+  box-shadow: var(--btn-color-light) 1px 1px 2px 0px inset;
+  color: var(--btn-text);
+
+  // Darkening both stops is the press cue in either theme - it deepens the
+  // blue and dulls the silver, which is what "pushed in" looks like on each.
+  &:hover:not(:disabled) {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--btn-color) 88%, black) 0%, color-mix(in srgb, var(--btn-color-light) 88%, black) 70%);
+    box-shadow: color-mix(in srgb, var(--btn-color-light) 88%, black) 1px 1px 2px 0px inset;
+  }
+}
+
+.secondary {
+  background-color: transparent;
+  color: v.$color-text;
+  border-color: v.$color-border;
+
+  &:hover:not(:disabled) {
+    background-color: v.$color-surface;
+  }
+}
+
+.ghost {
+  background-color: transparent;
+  color: v.$color-text;
+
+  &:hover:not(:disabled) {
+    background-color: v.$color-surface;
+  }
+}
+
+.danger {
+  background-color: v.$color-danger;
+  color: v.$color-primary-contrast;
+}

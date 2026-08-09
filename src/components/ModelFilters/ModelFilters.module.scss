@@ -1,0 +1,127 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-5;
+  padding: v.$space-4;
+  background: v.$color-surface;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  align-self: start;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+.legend {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: v.$space-2;
+  padding: 0;
+  font-size: v.$font-size-sm;
+  font-weight: 600;
+  color: v.$color-text-muted;
+}
+
+.legendValue {
+  font-weight: 400;
+  color: v.$color-text;
+  font-variant-numeric: tabular-nums;
+}
+
+.search,
+.select {
+  width: 100%;
+  padding: v.$space-2 v.$space-3;
+  font-family: inherit;
+  font-size: v.$font-size-base;
+  color: v.$color-text;
+  background: v.$color-bg;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-sm;
+  @include m.focus-ring;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: v.$space-2;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: v.$space-1;
+  padding: v.$space-1 v.$space-3;
+  font-size: v.$font-size-sm;
+  color: v.$color-text-muted;
+  background: v.$color-bg;
+  border: 1px solid v.$color-border;
+  border-radius: 999px;
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    color: v.$color-text;
+  }
+
+  // The checkbox drives state and focus; the chip is its visible form. Kept
+  // in the layout (not display:none) so it stays focusable and announced.
+  &:focus-within {
+    outline: 2px solid v.$color-primary;
+    outline-offset: 1px;
+  }
+}
+
+.chipOn {
+  color: v.$color-primary-contrast;
+  background: v.$color-primary;
+  border-color: v.$color-primary;
+}
+
+.chipInput {
+  @include m.visually-hidden;
+}
+
+.chipCount {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+}
+
+.range {
+  width: 100%;
+  accent-color: v.$color-primary;
+}
+
+.note {
+  margin: 0;
+  font-size: 0.75rem;
+  color: v.$color-text-muted;
+}
+
+.clear {
+  padding: v.$space-2;
+  font-family: inherit;
+  font-size: v.$font-size-sm;
+  color: v.$color-text;
+  background: none;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-sm;
+  cursor: pointer;
+
+  &:hover {
+    border-color: v.$color-text-muted;
+  }
+  @include m.focus-ring;
+}

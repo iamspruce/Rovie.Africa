@@ -1,0 +1,5 @@
+@use '../../styles/abstracts/variables' as v;
+
+.icon {
+  stroke: var(--logo-color, v.$color-primary);
+}

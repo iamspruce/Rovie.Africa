@@ -1,0 +1,41 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+// The layout's own column gap applies to a page's direct children, and this
+// page wraps everything in one element to dim it as a whole on a window
+// change - so it has to restate the spacing its cards would otherwise get.
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-5;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: v.$space-3;
+}
+
+.export {
+  font-size: v.$font-size-sm;
+  font-weight: 600;
+  color: v.$color-primary;
+  @include m.focus-ring;
+}
+
+.chart {
+  margin-top: v.$space-5;
+}
+
+// A window change holds the previous slice at reduced opacity rather than
+// collapsing to a skeleton, so the page doesn't jump under the reader.
+.stale {
+  opacity: 0.55;
+  transition: opacity 120ms ease;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}

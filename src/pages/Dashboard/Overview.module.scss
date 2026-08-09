@@ -1,0 +1,61 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+// Two states, two weights. Empty is a stop - requests are failing right now.
+// Low is a heads-up with runway left, so it reads quieter on purpose.
+.alert,
+.warn {
+  margin: 0;
+  padding: v.$space-3 v.$space-4;
+  border-radius: v.$radius-md;
+  font-size: v.$font-size-sm;
+  line-height: 1.5;
+
+  a {
+    font-weight: 600;
+    text-decoration: underline;
+  }
+}
+
+.alert {
+  border: 1px solid color-mix(in srgb, v.$color-danger 40%, transparent);
+  background-color: color-mix(in srgb, v.$color-danger 8%, transparent);
+  color: v.$color-danger-text;
+
+  a {
+    color: v.$color-danger-text;
+  }
+}
+
+.warn {
+  border: 1px solid color-mix(in srgb, v.$color-accent 40%, transparent);
+  background-color: color-mix(in srgb, v.$color-accent 8%, transparent);
+  color: v.$color-text;
+
+  a {
+    color: v.$color-primary;
+  }
+}
+
+.meter {
+  margin-top: v.$space-5;
+}
+
+.connect {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-4;
+}
+
+.hint {
+  margin: v.$space-4 0 0;
+  font-size: v.$font-size-sm;
+  line-height: 1.6;
+  color: v.$color-text-muted;
+
+  a {
+    color: v.$color-primary;
+    font-weight: 600;
+    @include m.focus-ring;
+  }
+}

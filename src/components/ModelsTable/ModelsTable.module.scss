@@ -1,0 +1,189 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+.table {
+  width: 100%;
+  font-size: v.$font-size-sm;
+  border-collapse: collapse;
+
+  th,
+  td {
+    text-align: left;
+    padding: v.$space-3;
+    border-bottom: 1px solid v.$color-border;
+    vertical-align: middle;
+  }
+
+  thead th {
+    color: v.$color-text-muted;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  tbody th {
+    font-weight: 600;
+  }
+}
+
+// Prices and token counts are the point of this table, so they line up as
+// columns of digits rather than ragged text.
+.numeric {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.sortButton {
+  display: inline-flex;
+  align-items: center;
+  gap: v.$space-1;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+
+  &:hover {
+    color: v.$color-text;
+  }
+  @include m.focus-ring;
+}
+
+.sortActive {
+  color: v.$color-text;
+}
+
+.sortArrow {
+  opacity: 0.6;
+  font-size: 0.75em;
+}
+
+.modelCell {
+  display: flex;
+  align-items: center;
+  gap: v.$space-3;
+}
+
+.logo {
+  flex: 0 0 auto;
+  font-size: 1.25rem;
+}
+
+.modelText {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-1;
+  min-width: 0;
+}
+
+.modelName {
+  font-weight: 600;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: v.$space-1;
+}
+
+.badge {
+  padding: 0 v.$space-2;
+  font-size: 0.6875rem;
+  font-weight: 400;
+  color: v.$color-text-muted;
+  border: 1px solid v.$color-border;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.provider {
+  color: v.$color-text-muted;
+}
+
+.unpriced {
+  color: v.$color-text-muted;
+}
+
+.expandCell {
+  text-align: right;
+  width: 1%;
+}
+
+.expand {
+  padding: v.$space-1 v.$space-3;
+  font-family: inherit;
+  font-size: v.$font-size-sm;
+  color: v.$color-text-muted;
+  background: none;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-sm;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    color: v.$color-text;
+    border-color: v.$color-text-muted;
+  }
+  @include m.focus-ring;
+}
+
+.openRow > * {
+  border-bottom-color: transparent;
+}
+
+.detailRow > td {
+  padding-top: 0;
+  background: v.$color-surface;
+}
+
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-3;
+  padding: v.$space-3 0;
+}
+
+.description {
+  margin: 0;
+  max-width: 60ch;
+  color: v.$color-text-muted;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: v.$space-3;
+  margin: 0;
+}
+
+.fact {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-1;
+  min-width: 0;
+
+  dt {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: v.$color-text-muted;
+  }
+
+  dd {
+    margin: 0;
+    font-family: v.$font-family-mono;
+    font-size: v.$font-size-sm;
+    overflow-wrap: anywhere;
+  }
+}
+
+.empty {
+  padding: v.$space-6;
+  text-align: center;
+  color: v.$color-text-muted;
+}
+
+.srOnly {
+  @include m.visually-hidden;
+}

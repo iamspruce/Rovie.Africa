@@ -1,0 +1,33 @@
+@use '../../styles/abstracts/variables' as v;
+
+// The marks are authored at 1em, so size is set by font-size and colour by
+// `color` - callers change those two and nothing else.
+.logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: v.$color-text;
+
+  svg {
+    display: block;
+    width: 1em;
+    height: 1em;
+  }
+}
+
+// Stand-in for a provider whose mark we don't carry: their initial, set in
+// the display face so it reads as a deliberate monogram rather than a
+// missing image.
+.fallback {
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, v.$color-border 80%, v.$color-text-muted);
+  font-family: v.$font-family-display;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: v.$color-text-muted;
+}

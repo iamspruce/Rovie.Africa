@@ -1,0 +1,24 @@
+@use '../abstracts/mixins' as m;
+
+.container {
+  @include m.container;
+}
+
+// Keeps the global footer pinned to the bottom on short pages.
+.appShell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+// The skip-link wrapper. It takes the growth the page's <main> used to take,
+// so short routes still push the footer to the bottom, and it never draws a
+// focus ring of its own - it's only focusable so the skip link can land.
+.appMain {
+  flex: 1 0 auto;
+  min-width: 0;
+
+  &:focus {
+    outline: none;
+  }
+}

@@ -1,0 +1,59 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+  min-width: 0;
+}
+
+.label {
+  font-size: v.$font-size-sm;
+  color: v.$color-text-muted;
+  font-weight: 600;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: v.$space-2;
+}
+
+.select {
+  flex: 1 1 14rem;
+  min-width: 0;
+  padding: v.$space-2 v.$space-3;
+  font-family: inherit;
+  font-size: v.$font-size-base;
+  color: v.$color-text;
+  background: v.$color-surface;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-sm;
+  @include m.focus-ring;
+}
+
+.reset {
+  padding: v.$space-2 v.$space-3;
+  font-family: inherit;
+  font-size: v.$font-size-sm;
+  color: v.$color-text-muted;
+  background: none;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-sm;
+  cursor: pointer;
+
+  &:hover {
+    color: v.$color-text;
+    border-color: v.$color-text-muted;
+  }
+  @include m.focus-ring;
+}
+
+.hint {
+  margin: 0;
+  font-size: v.$font-size-sm;
+  color: v.$color-text-muted;
+  max-width: 34rem;
+}

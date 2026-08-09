@@ -1,0 +1,204 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+// The plate keeps its own ink in both themes - see base/_theme.scss. Every
+// colour in this file resolves to a --rv-plate-* token for that reason; none
+// of them should be swapped for a page token.
+.plate {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-5;
+  overflow: hidden;
+  padding: v.$space-6 v.$space-5;
+  background-color: v.$color-plate;
+  color: v.$color-plate-text;
+
+  // A single warm lift from the lower left, roughly where the marked country
+  // tends to sit. Keeps a large flat field from reading as dead ink.
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      120% 80% at 22% 78%,
+      color-mix(in srgb, v.$color-accent 12%, transparent) 0%,
+      transparent 62%
+    );
+    pointer-events: none;
+  }
+
+  > * {
+    position: relative; // above the gradient
+  }
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: v.$space-2;
+  align-self: flex-start;
+  font-family: v.$font-family-display;
+  font-size: v.$font-size-lg;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: v.$color-plate-text;
+  text-decoration: none;
+
+  @include m.focus-ring;
+
+  svg path {
+    stroke: v.$color-plate-text;
+  }
+}
+
+.figure {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0; // lets the map shrink inside a flex column instead of overflowing
+}
+
+.map {
+  width: 100%;
+  height: 100%;
+  max-height: 62vh;
+  object-fit: contain;
+}
+
+.landmass {
+  fill: color-mix(in srgb, v.$color-plate-land 55%, transparent);
+  stroke: none;
+}
+
+.country {
+  fill: v.$color-plate-land;
+  stroke: v.$color-plate-stroke;
+  stroke-width: 0.6;
+  // vector-effect keeps the hairline a hairline at every panel width, rather
+  // than fattening as the viewBox scales up.
+  vector-effect: non-scaling-stroke;
+}
+
+.countryMarked {
+  fill: v.$color-accent;
+  stroke: color-mix(in srgb, v.$color-accent 60%, #fff);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  animation: settle 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.parallel {
+  stroke: v.$color-plate-rule;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  animation: draw 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.halo {
+  fill: none;
+  stroke: color-mix(in srgb, v.$color-accent 55%, transparent);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  animation: settle 620ms 80ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.dot {
+  fill: v.$color-plate-text;
+  animation: settle 620ms 80ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+// The one orchestrated moment on these pages: when the country resolves, the
+// parallel draws across and the mark settles onto it. Nothing else animates.
+@keyframes draw {
+  from {
+    opacity: 0;
+    transform: scaleX(0.2);
+    transform-origin: left center;
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: scale(0.82);
+    transform-origin: center;
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .countryMarked,
+  .parallel,
+  .halo,
+  .dot {
+    animation: none;
+  }
+}
+
+.caption {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+  max-width: 42ch;
+}
+
+.captionLead {
+  display: flex;
+  align-items: center;
+  gap: v.$space-2;
+  margin: 0;
+  font-family: v.$font-family-display;
+  font-size: v.$font-size-lg;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: v.$color-plate-text;
+}
+
+.pin {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background-color: v.$color-accent;
+  box-shadow: 0 0 0 4px color-mix(in srgb, v.$color-accent 22%, transparent);
+  flex: none;
+}
+
+.captionBody {
+  margin: 0;
+  font-size: v.$font-size-sm;
+  line-height: 1.6;
+  color: v.$color-plate-muted;
+}
+
+.code {
+  font-family: v.$font-family-mono;
+  font-size: 0.95em;
+  color: v.$color-plate-text;
+}
+
+// Below the two-column breakpoint the plate becomes a short banner: the map
+// is the wrong shape for a wide, shallow strip, so it steps aside and the
+// caption carries the panel on its own.
+@media (max-width: (v.$breakpoint-lg - 1px)) {
+  .plate {
+    gap: v.$space-4;
+    padding: v.$space-5 v.$space-4;
+  }
+
+  .figure {
+    display: none;
+  }
+
+  .caption {
+    max-width: none;
+  }
+}

@@ -1,0 +1,97 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-4;
+  max-width: 24rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+}
+
+.label {
+  font-size: v.$font-size-sm;
+  font-weight: 600;
+  color: v.$color-text;
+}
+
+.input,
+.select {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  background-color: v.$color-bg;
+  color: v.$color-text;
+  font-family: inherit;
+  font-size: v.$font-size-base;
+
+  &:focus {
+    outline: none;
+    border-color: v.$color-primary;
+    box-shadow: 0 0 0 3px color-mix(in srgb, v.$color-primary 18%, transparent);
+  }
+}
+
+.select {
+  padding-right: 38px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%23888' stroke-width='1.6' d='M1 1.5 6 6.5l5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 12px 8px;
+}
+
+.hint {
+  margin: 0;
+  font-size: v.$font-size-sm;
+  color: v.$color-text-muted;
+}
+
+.details {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.detailRow {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: v.$space-1;
+  padding: v.$space-3 0;
+  border-bottom: 1px solid v.$color-border;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  @include m.respond-to('sm') {
+    grid-template-columns: 10rem 1fr;
+    gap: v.$space-4;
+    align-items: baseline;
+  }
+}
+
+.term {
+  margin: 0;
+  font-size: v.$font-size-sm;
+  font-weight: 600;
+  color: v.$color-text-muted;
+}
+
+.value {
+  margin: 0;
+  min-width: 0;
+  font-size: v.$font-size-sm;
+  color: v.$color-text;
+
+  code {
+    font-family: v.$font-family-mono;
+    overflow-wrap: anywhere;
+  }
+}

@@ -1,0 +1,52 @@
+@use '../../styles/abstracts/variables' as v;
+
+.wrap {
+  width: 100%;
+  min-width: 0;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+}
+
+.active {
+  cursor: default;
+
+  &:hover {
+    // Lifts the shape without changing its fill — the fill is the data.
+    stroke: v.$color-text;
+    stroke-width: 1.25;
+  }
+}
+
+.inactive {
+  pointer-events: all;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: v.$space-1;
+  margin-top: v.$space-3;
+}
+
+.legendLabel {
+  font-size: 0.6875rem;
+  color: v.$color-text-muted;
+  margin-inline: v.$space-1;
+}
+
+.swatch {
+  width: 20px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.readout {
+  margin: v.$space-2 0 0;
+  font-size: v.$font-size-sm;
+  color: v.$color-text-muted;
+  min-height: 2.5rem;
+}

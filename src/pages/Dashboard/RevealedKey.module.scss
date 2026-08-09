@@ -1,0 +1,59 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+// Amber, matching the "pay attention to this one thing" weight it carries on
+// the map. It's the only element on the dashboard allowed to use it.
+.panel {
+  padding: v.$space-5;
+  border: 1px solid color-mix(in srgb, v.$color-accent 55%, transparent);
+  border-radius: v.$radius-lg;
+  background-color: color-mix(in srgb, v.$color-accent 9%, transparent);
+}
+
+.heading {
+  margin: 0 0 v.$space-2;
+  font-family: v.$font-family-display;
+  font-size: v.$font-size-lg;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: v.$color-text;
+
+  &:focus-visible {
+    outline: 2px solid v.$color-primary;
+    outline-offset: 4px;
+  }
+}
+
+.body {
+  margin: 0 0 v.$space-4;
+  max-width: 60ch;
+  font-size: v.$font-size-sm;
+  line-height: 1.6;
+  color: v.$color-text-muted;
+}
+
+.keyRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: v.$space-3;
+  margin-bottom: v.$space-4;
+}
+
+.keyInput {
+  flex: 1 1 18rem;
+  min-width: 0; // lets the input shrink inside the flex row instead of forcing overflow
+  padding: 11px 14px;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  background-color: v.$color-bg;
+  color: v.$color-text;
+  font-family: v.$font-family-mono;
+  font-size: v.$font-size-sm;
+
+  @include m.focus-ring;
+}
+
+.actions {
+  display: flex;
+  gap: v.$space-3;
+}

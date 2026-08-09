@@ -1,0 +1,19 @@
+// -----------------------------------------------------------------------
+// Global Sass entry point.
+//
+// Architecture (loosely 7-1 style, trimmed to what this app needs):
+//   abstracts/  -> variables + mixins, no CSS output on their own
+//   base/       -> reset + global typography
+//   layout/     -> reusable structural classes (container, grid, etc.)
+//
+// Component-level styles are NOT imported here - each component owns a
+// co-located `*.module.scss` file (CSS Modules) so styles stay scoped and
+// reusable without ever leaking or colliding globally. This file only
+// carries the truly global concerns.
+// -----------------------------------------------------------------------
+// theme first: it declares the custom properties everything else resolves
+// through, so it has to be in the cascade before anything reads one.
+@use 'base/theme';
+@use 'base/reset';
+@use 'base/typography';
+@use 'layout/container';

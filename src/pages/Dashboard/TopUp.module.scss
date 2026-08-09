@@ -1,0 +1,201 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-4;
+}
+
+.amountRow {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: v.$space-3;
+
+  @include m.respond-to('sm') {
+    // Currency is a fixed short token; the amount takes the rest.
+    grid-template-columns: 8rem 1fr;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+  min-width: 0;
+}
+
+.label {
+  font-size: v.$font-size-sm;
+  font-weight: 600;
+  color: v.$color-text;
+}
+
+.input,
+.select {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  background-color: v.$color-bg;
+  color: v.$color-text;
+  font-family: inherit;
+  font-size: v.$font-size-base;
+
+  &:focus {
+    outline: none;
+    border-color: v.$color-primary;
+    box-shadow: 0 0 0 3px color-mix(in srgb, v.$color-primary 18%, transparent);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.input {
+  // An amount is a figure to check, so it gets the same tabular treatment as
+  // the balance it will become.
+  font-variant-numeric: tabular-nums;
+}
+
+.select {
+  padding-right: 38px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%23888' stroke-width='1.6' d='M1 1.5 6 6.5l5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 12px 8px;
+}
+
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: v.$space-2;
+}
+
+.preset {
+  padding: 7px 14px;
+  border: 1px solid v.$color-border;
+  border-radius: 100px;
+  background-color: v.$color-bg;
+  color: v.$color-text;
+  font-family: inherit;
+  font-size: v.$font-size-sm;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+
+  @include m.focus-ring;
+
+  &:hover:not(:disabled) {
+    background-color: v.$color-surface;
+    border-color: v.$color-primary;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.quote {
+  margin: 0;
+  padding: v.$space-3 v.$space-4;
+  border: 1px solid color-mix(in srgb, v.$color-success 35%, transparent);
+  border-radius: v.$radius-md;
+  background-color: color-mix(in srgb, v.$color-success 7%, transparent);
+  font-size: v.$font-size-sm;
+  line-height: 1.5;
+  color: v.$color-text;
+
+  strong {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.quoteNote {
+  display: block;
+  margin-top: v.$space-1;
+  color: v.$color-text-muted;
+}
+
+.quoteError {
+  margin: 0;
+  font-size: v.$font-size-sm;
+  color: v.$color-danger-text;
+}
+
+.note,
+.rail,
+.blocked {
+  margin: 0;
+  font-size: v.$font-size-sm;
+  line-height: 1.6;
+  color: v.$color-text-muted;
+
+  a {
+    color: v.$color-primary;
+    font-weight: 600;
+  }
+}
+
+// Two radio cards rather than a select: there are exactly two options, the
+// difference between them matters, and each needs a line of explanation that
+// a <select> has nowhere to put.
+.methods {
+  margin: 0;
+  padding: 0;
+  border: none;
+  display: grid;
+  gap: v.$space-2;
+
+  @include m.respond-to('sm') {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.method {
+  display: flex;
+  align-items: flex-start;
+  gap: v.$space-3;
+  padding: v.$space-3 v.$space-4;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  cursor: pointer;
+
+  &:hover {
+    background-color: v.$color-surface;
+  }
+
+  input {
+    margin-top: 3px;
+    flex: none;
+    accent-color: v.$color-primary;
+  }
+
+  strong {
+    display: block;
+    font-size: v.$font-size-sm;
+    color: v.$color-text;
+  }
+
+  // Focus lands on the input, so the ring goes on the card around it.
+  &:has(input:focus-visible) {
+    outline: 2px solid v.$color-primary;
+    outline-offset: 2px;
+  }
+}
+
+.methodActive {
+  composes: method;
+  border-color: v.$color-primary;
+  background-color: color-mix(in srgb, v.$color-primary 7%, transparent);
+}
+
+.methodNote {
+  display: block;
+  margin-top: 2px;
+  font-size: v.$font-size-sm;
+  color: v.$color-text-muted;
+}

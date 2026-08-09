@@ -1,0 +1,56 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: v.$space-4;
+  margin: 0;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-1;
+  padding: v.$space-4;
+  background: v.$color-surface;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  min-width: 0;
+}
+
+.label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: v.$color-text-muted;
+}
+
+.value {
+  margin: 0;
+  font-family: v.$font-family-display;
+  font-size: v.$font-size-xl;
+  line-height: 1.1;
+  // Proportional figures on purpose: tabular-nums makes a large standalone
+  // number read loose. Columns that align vertically use tabular; this doesn't.
+  font-variant-numeric: proportional-nums;
+  overflow-wrap: anywhere;
+}
+
+.note {
+  margin: 0;
+  font-size: 0.75rem;
+  color: v.$color-text-muted;
+}
+
+.withLead .leadTile {
+  grid-column: 1 / -1;
+
+  @include m.respond-to('md') {
+    grid-column: span 2;
+  }
+
+  .value {
+    font-size: v.$font-size-2xl;
+  }
+}

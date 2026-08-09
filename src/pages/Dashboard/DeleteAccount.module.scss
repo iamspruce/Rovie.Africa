@@ -1,0 +1,82 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-4;
+}
+
+.checking {
+  margin: 0;
+  font-size: v.$font-size-sm;
+  color: v.$color-text-muted;
+}
+
+.consequences {
+  margin: 0;
+  padding-left: v.$space-5;
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-3;
+  max-width: 64ch;
+  font-size: v.$font-size-sm;
+  line-height: 1.6;
+  color: v.$color-text;
+
+  strong {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+// The one line that costs money. It gets the danger colour; the other
+// consequences are just facts and stay in body text, so the emphasis means
+// something instead of the whole list shouting.
+.warn {
+  color: v.$color-danger-text;
+}
+
+.confirmField {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+  max-width: 22rem;
+}
+
+.confirmLabel {
+  font-size: v.$font-size-sm;
+  color: v.$color-text;
+
+  code {
+    font-family: v.$font-family-mono;
+    font-weight: 600;
+  }
+}
+
+.input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  background-color: v.$color-bg;
+  color: v.$color-text;
+  font-family: inherit;
+  font-size: v.$font-size-base;
+
+  &:focus {
+    outline: none;
+    border-color: v.$color-danger;
+    box-shadow: 0 0 0 3px color-mix(in srgb, v.$color-danger 18%, transparent);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: v.$space-3;
+}

@@ -1,0 +1,58 @@
+@use '../abstracts/variables' as v;
+
+body {
+  font-family: v.$font-family-base;
+  font-size: v.$font-size-base;
+  color: v.$color-text;
+  background-color: v.$color-bg;
+  // No smoothing or text-rendering hacks: Atkinson is drawn open enough to
+  // hold up on black on its own, and optimizeLegibility carries real costs.
+}
+
+// Headings carry the display face. Bricolage sets tighter than a system
+// grotesque, so tracking is pulled back here rather than per-component.
+h1,
+h2,
+h3,
+h4 {
+  font-family: v.$font-family-display;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: v.$font-size-2xl;
+  letter-spacing: -0.035em;
+}
+
+h2 {
+  font-size: v.$font-size-xl;
+  letter-spacing: -0.03em;
+}
+
+h3 {
+  font-size: v.$font-size-lg;
+}
+
+p {
+  color: v.$color-text-muted;
+}
+
+// Every figure on this site is money or a token count, and both are read by
+// comparison down a column. Lining tabular digits by default is the point of
+// the body face.
+table,
+input,
+output,
+time,
+data {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+code,
+pre {
+  font-family: v.$font-family-mono;
+  font-size: 0.9em;
+}
