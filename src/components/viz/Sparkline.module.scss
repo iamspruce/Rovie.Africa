@@ -1,0 +1,20 @@
+@use '../../styles/abstracts/variables' as v;
+
+.svg {
+  display: block;
+  overflow: visible;
+}
+
+// A failed check. Filled in the danger tone with a ring in the page colour, so
+// two adjacent failures read as two marks rather than one blob - the ring is
+// the 2px surface gap, drawn as a stroke because the marks overlap.
+.failure {
+  fill: v.$color-danger;
+  stroke: v.$color-bg;
+}
+
+.tooShort {
+  font-size: 0.6875rem;
+  color: v.$color-text-muted;
+  white-space: nowrap;
+}

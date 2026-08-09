@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -6,17 +6,25 @@ const healthCheck = vi.fn();
 const getModels = vi.fn();
 const getFxRates = vi.fn();
 
-vi.mock('../../sdk', () => ({
-  rovie: {
-    litellm: { healthCheck: (...args: unknown[]) => healthCheck(...args) },
-    account: {
-      getModels: (...args: unknown[]) => getModels(...args),
-      getFxRates: (...args: unknown[]) => getFxRates(...args),
+// importOriginal rather than a bare object: useServiceHealth classifies a
+// failure with `error instanceof RovieApiError`, so the real class has to come
+// through the mock.
+vi.mock('../../sdk', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../sdk')>();
+  return {
+    ...actual,
+    rovie: {
+      litellm: { healthCheck: (...args: unknown[]) => healthCheck(...args) },
+      account: {
+        getModels: (...args: unknown[]) => getModels(...args),
+        getFxRates: (...args: unknown[]) => getFxRates(...args),
+      },
     },
-  },
-}));
+  };
+});
 
 import { Support } from '../Support/Support';
+import { stubImageLoader } from '../../test/stubImageLoader';
 
 function renderSupport() {
   return render(
@@ -29,10 +37,15 @@ function renderSupport() {
 describe('Support page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // This page reads the same live checks the status page does, and one of
+    // them loads an image from the docs site - which jsdom will never do.
+    stubImageLoader('load');
     healthCheck.mockResolvedValue({ status: 'healthy', db: 'connected' });
     getModels.mockResolvedValue({ models: [{ litellmModelName: 'a' }] });
     getFxRates.mockResolvedValue({ supported: ['NGN'], currencies: {}, fetchedAt: 1 });
   });
+
+  afterEach(() => vi.unstubAllGlobals());
 
   it('offers a route for each kind of problem', () => {
     renderSupport();

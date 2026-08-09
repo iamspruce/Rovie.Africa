@@ -1,0 +1,136 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+// The status tones. Declared here rather than pulled from the UI palette
+// because green and amber carry meaning on this page that they carry nowhere
+// else on the site - $color-accent means "your country" on the map, and a
+// status colour must never drift toward a series colour.
+//
+// See the note in StatusTimeline.tsx for why state is also encoded as height:
+// these three do not separate far enough under colour-vision deficiency to
+// carry the distinction on their own.
+$state-ok: #2f9e6a;
+$state-slow: #d99013;
+$state-down: #d24b3c;
+
+.wrap {
+  min-width: 0;
+}
+
+.strip {
+  display: flex;
+  align-items: flex-end;
+  // The 2px surface gap, so adjacent cells read as separate checks rather than
+  // as one continuous band.
+  gap: 2px;
+  height: 34px;
+}
+
+.pad {
+  flex: 1 1 0;
+  min-width: 2px;
+}
+
+// A break in checking - the page was closed or the tab was hidden, so the two
+// cells either side are not a minute apart. Drawn as a rule rather than as an
+// empty cell: a blank would read as a check with no result, which is the one
+// thing it is not.
+.gap {
+  flex: 0 0 auto;
+  align-self: stretch;
+  width: 1px;
+  margin-inline: 3px;
+  background: repeating-linear-gradient(
+    to bottom,
+    v.$color-text-muted 0 3px,
+    transparent 3px 6px
+  );
+  opacity: 0.65;
+}
+
+.cell {
+  flex: 1 1 0;
+  min-width: 2px;
+  // The hit area is the full height of the strip even where the mark inside is
+  // a third of it - a 10px-tall "operational" tick is not something to ask
+  // anyone to land on.
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+
+  @include m.focus-ring;
+}
+
+.mark {
+  width: 100%;
+  border-radius: 1px;
+  transition: opacity 120ms ease;
+
+  .cell[data-state='operational'] & {
+    background: $state-ok;
+  }
+
+  .cell[data-state='degraded'] & {
+    background: $state-slow;
+  }
+
+  .cell[data-state='down'] & {
+    background: $state-down;
+  }
+
+  .cell[data-active] & {
+    // Lifted rather than recoloured: changing the colour on hover would mean
+    // the one cell being read is the one cell not showing its true state.
+    opacity: 0.7;
+  }
+}
+
+.summary {
+  margin: v.$space-2 0 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: v.$color-text-muted;
+  font-variant-numeric: tabular-nums;
+  // Reserved, so the row does not jump as the pointer crosses the strip.
+  min-height: 1.6rem;
+}
+
+.summaryState {
+  font-weight: 700;
+
+  &[data-state='operational'] {
+    color: v.$color-success-text;
+  }
+
+  &[data-state='degraded'] {
+    color: v.$color-accent;
+  }
+
+  &[data-state='down'] {
+    color: v.$color-danger-text;
+  }
+}
+
+.empty {
+  margin: 0;
+  font-size: 0.75rem;
+  color: v.$color-text-muted;
+}
+
+// Colour is unavailable here by definition, so lean entirely on the height
+// encoding and give the marks a border the forced palette will honour.
+@media (forced-colors: active) {
+  .mark {
+    border: 1px solid CanvasText;
+    background: Canvas !important;
+  }
+
+  .cell[data-state='down'] .mark,
+  .cell[data-state='degraded'] .mark {
+    background: CanvasText !important;
+  }
+}

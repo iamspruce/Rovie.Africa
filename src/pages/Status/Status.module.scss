@@ -105,8 +105,21 @@ $state-down: #d24b3c;
   border-bottom: 1px solid v.$color-border;
 
   @include m.respond-to('md') {
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    // dot · identity · sparkline · reading
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
     align-items: center;
+  }
+}
+
+// The per-row sparkline. Hidden on narrow screens rather than shrunk: below
+// about 96px it stops showing a shape and becomes a smear, and the same
+// information is in the timeline section further down.
+.trend {
+  display: none;
+
+  @include m.respond-to('md') {
+    display: block;
+    grid-column: 3;
   }
 }
 
@@ -168,7 +181,7 @@ $state-down: #d24b3c;
   gap: 0.5rem 0.75rem;
 
   @include m.respond-to('md') {
-    grid-column: 3;
+    grid-column: 4;
     justify-content: flex-end;
     text-align: right;
   }
@@ -208,6 +221,268 @@ $state-down: #d24b3c;
   @include m.respond-to('md') {
     flex-basis: auto;
   }
+}
+
+// --------------------------------------------------------------- failure
+//
+// The explanation under a failed row. Indented under the identity column and
+// spanning the full width, because it is prose about the row rather than
+// another reading in it.
+
+.failure {
+  grid-column: 1 / -1;
+  margin-top: 0.9rem;
+  padding: 0.85rem 1rem;
+  border-left: 2px solid $state-down;
+  background: color-mix(in srgb, #{$state-down} 7%, transparent);
+  border-radius: 0 v.$radius-sm v.$radius-sm 0;
+
+  p {
+    margin: 0;
+    max-width: 68ch;
+    font-size: 0.82rem;
+    line-height: 1.65;
+    color: $muted-text;
+
+    + p {
+      margin-top: 0.5rem;
+    }
+  }
+}
+
+.failureLabel {
+  font-weight: 700;
+  color: $state-down !important;
+}
+
+.failureAdvice {
+  color: v.$color-text-muted !important;
+}
+
+// -------------------------------------------------------- local network
+//
+// Fires only when every service is unhappy AND every failure is a kind that a
+// network problem could also produce. Deliberately hard to trigger: telling
+// someone to check their router during a real outage is the worst thing this
+// page could do.
+
+.localNetwork {
+  margin-bottom: 2.5rem;
+  padding: 1.25rem 1.4rem;
+  border: 1px solid color-mix(in srgb, v.$color-accent 45%, v.$color-border);
+  border-radius: v.$radius-md;
+  background: color-mix(in srgb, v.$color-accent 8%, transparent);
+
+  h2 {
+    margin: 0 0 0.6rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: v.$color-accent;
+  }
+
+  p {
+    margin: 0;
+    max-width: 68ch;
+    font-size: 0.86rem;
+    line-height: 1.7;
+    color: $muted-text;
+
+    + p {
+      margin-top: 0.6rem;
+    }
+  }
+}
+
+// ------------------------------------------------------------- sections
+
+.summary {
+  margin-bottom: 3rem;
+}
+
+.sectionHeading {
+  margin: 0 0 0.5rem;
+  font-family: v.$font-family-display;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.024em;
+}
+
+.sectionNote {
+  margin: 0 0 1.4rem;
+  max-width: 68ch;
+  font-size: 0.84rem;
+  line-height: 1.7;
+  color: v.$color-text-muted;
+}
+
+.chart {
+  margin-top: 3.25rem;
+}
+
+// A round in flight holds the previous render rather than swapping it for a
+// skeleton. The last reading is still true, and a chart that blanks itself
+// every sixty seconds is far more disruptive than one that dims briefly.
+.live {
+  transition: opacity 180ms ease;
+
+  &[data-refreshing] {
+    opacity: 0.62;
+  }
+}
+
+// ------------------------------------------------------------- timelines
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.4rem;
+  margin: 0 0 1.4rem;
+  padding: 0;
+  list-style: none;
+  font-size: 0.75rem;
+  color: v.$color-text-muted;
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+}
+
+// The legend marks repeat the timeline's height encoding, not just its colour -
+// otherwise the legend would be teaching the one channel the strip
+// deliberately does not rely on.
+.legendMark {
+  width: 6px;
+  border-radius: 1px;
+  flex: none;
+
+  &[data-state='operational'] {
+    height: 5px;
+    background: $state-ok;
+  }
+
+  &[data-state='degraded'] {
+    height: 10px;
+    background: $state-slow;
+  }
+
+  &[data-state='down'] {
+    height: 16px;
+    background: $state-down;
+  }
+}
+
+.timelines {
+  display: grid;
+  gap: 1.6rem;
+}
+
+.timelineRow {
+  h3 {
+    margin: 0 0 0.5rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: $muted-text;
+  }
+}
+
+// ------------------------------------------------------------- incidents
+
+.incidents {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid v.$color-border;
+
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 1rem;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid v.$color-border;
+    font-size: 0.82rem;
+  }
+}
+
+.incidentService {
+  font-weight: 700;
+  min-width: 10rem;
+}
+
+.incidentWhen {
+  color: v.$color-text-muted;
+  font-variant-numeric: tabular-nums;
+}
+
+.incidentLength {
+  margin-left: auto;
+  color: $state-down;
+  font-variant-numeric: tabular-nums;
+}
+
+// ----------------------------------------------------------------- table
+
+.tableHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+// The table is wide by nature. Scroll the table, never the page.
+.tableScroll {
+  overflow-x: auto;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+
+  caption {
+    padding: 0.9rem 1rem;
+    text-align: left;
+    font-size: 0.78rem;
+    color: v.$color-text-muted;
+  }
+
+  th,
+  td {
+    padding: 0.6rem 1rem;
+    text-align: right;
+    white-space: nowrap;
+    border-top: 1px solid v.$color-border;
+    // Figures are read by comparison down a column here, unlike the stat
+    // tiles above, so these get equal-width digits and those do not.
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  thead th {
+    color: v.$color-text-muted;
+    font-weight: 700;
+  }
+
+  th:first-child,
+  td:first-child,
+  tbody th {
+    text-align: left;
+  }
+
+  tbody th {
+    font-weight: 700;
+  }
+}
+
+.privacy {
+  margin-top: 1.5rem !important;
+  font-size: 0.78rem !important;
+  color: v.$color-text-muted !important;
 }
 
 // ------------------------------------------------------------------ note

@@ -1,0 +1,101 @@
+@use '../../styles/abstracts/variables' as v;
+
+.wrap {
+  width: 100%;
+  min-width: 0;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  touch-action: pan-y;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: v.$space-2 v.$space-4;
+  margin: 0 0 v.$space-3;
+  padding: 0;
+  list-style: none;
+  font-size: 0.75rem;
+  // Legend text wears text ink, never the series colour. The swatch beside it
+  // carries the identity.
+  color: v.$color-text-muted;
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+}
+
+.swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex: none;
+}
+
+.tick {
+  fill: v.$color-text-muted;
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+// The one series label that does wear its series colour: it is standing in for
+// a legend swatch at the end of the line, not describing a value.
+.seriesLabel {
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+.threshold {
+  stroke: v.$color-accent;
+  stroke-width: 1;
+  // Dashed on purpose, and the only dash on the chart. This is a threshold
+  // rather than a reading, which is exactly what a dash should mean.
+  stroke-dasharray: 4 4;
+  opacity: 0.8;
+}
+
+.thresholdLabel {
+  fill: v.$color-accent;
+  font-size: 0.625rem;
+}
+
+.crosshair {
+  stroke: v.$color-text-muted;
+  stroke-width: 1;
+  opacity: 0.45;
+}
+
+.marker {
+  // The 2px surface ring, so a marker sitting on top of another series' line
+  // stays legible as a separate mark.
+  stroke: v.$color-bg;
+}
+
+.failure {
+  fill: v.$color-danger;
+  stroke: v.$color-bg;
+  stroke-width: 1.5;
+}
+
+.readout {
+  margin: v.$space-2 0 0;
+  font-size: v.$font-size-sm;
+  line-height: 1.5;
+  color: v.$color-text-muted;
+  font-variant-numeric: tabular-nums;
+  min-height: 2.6rem;
+}
+
+.empty {
+  padding: v.$space-6 v.$space-4;
+  margin: 0;
+  color: v.$color-text-muted;
+  text-align: center;
+  border: 1px dashed v.$color-border;
+  border-radius: v.$radius-md;
+}

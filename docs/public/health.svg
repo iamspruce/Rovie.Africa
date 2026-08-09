@@ -1,0 +1,21 @@
+<!--
+  Exists to be fetched, not looked at.
+
+  The status page on rovie.africa checks whether this site is reachable, and it
+  has to do that from a visitor's browser across an origin boundary. A normal
+  fetch would need a CORS header, which is host configuration this repository
+  cannot guarantee is applied - and a status check that goes red because a
+  header is missing is worse than no check at all.
+
+  An <img> load needs no CORS, so the probe loads this file and reports whether
+  it arrived. That is a real signal: it succeeds only if DNS resolved, TLS
+  completed, the host answered, and it served this path.
+
+  Purpose-built rather than reusing favicon.svg, for two reasons. It is 1/50th
+  the bytes, and it is fetched roughly once a minute by every open status page.
+  And a favicon is a thing someone might reasonably delete or rename one day,
+  which would take the docs "down" on a page nobody would think to check.
+
+  Do not delete. See src/hooks/useServiceHealth.ts in the app.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1" viewBox="0 0 1 1"><rect width="1" height="1" fill="#076db0"/></svg>
