@@ -213,17 +213,17 @@ $muted-text: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
 }
 
 .column {
+
   // A short rule over each heading - the same hairline that divides the
   // footer's bands, repeated at column scale so the grid reads as structure
   // rather than as four floating lists.
   h2 {
     margin: 0 0 1rem;
     padding-top: 0.85rem;
-    border-top: 1px solid v.$color-border;
     font-family: v.$font-family-base;
-  font-size: v.$font-size-xs;
-  font-weight: v.$font-weight-bold;
-  line-height: v.$line-height-tight;
+    font-size: v.$font-size-xs;
+    font-weight: v.$font-weight-bold;
+    line-height: v.$line-height-tight;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: v.$color-text-muted;
