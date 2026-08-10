@@ -45,7 +45,7 @@ export function Models() {
   const filtered = isFilterActive(filters);
 
   return (
-    <main className={`container ${styles.page}`}>
+    <main className={`containerWide ${styles.page}`}>
       <header className={styles.head}>
         <h1>Models &amp; pricing</h1>
         <p className={styles.intro}>

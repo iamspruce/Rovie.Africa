@@ -21,8 +21,7 @@
   margin: 0;
   font-family: v.$font-family-display;
   font-size: v.$font-size-lg;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-weight: v.$font-weight-medium;
   color: v.$color-text;
 }
 
@@ -90,10 +89,10 @@
   font-family: v.$font-family-display;
   font-size: v.$font-size-xl;
   font-weight: 700;
-  letter-spacing: -0.02em;
   color: v.$color-text;
-  // Atkinson was picked so digits can't be misread; tabular figures are the
-  // other half of that - amounts in a row have to align to compare.
+  // The mono face already advances every glyph equally, so this is belt and
+  // braces - but it also asks for LINING figures, and amounts in a row have to
+  // sit on one baseline to be compared down a column.
   font-variant-numeric: tabular-nums;
 }
 
@@ -137,7 +136,7 @@
 
 .meterValue {
   font-size: v.$font-size-sm;
-  font-weight: 600;
+  font-weight: v.$font-weight-medium;
   color: v.$color-text;
   font-variant-numeric: tabular-nums;
 }
@@ -145,7 +144,7 @@
 .meterTrack {
   display: block;
   height: 4px;
-  border-radius: 999px;
+  border-radius: v.$radius-pill;
   background-color: color-mix(in srgb, v.$color-text 12%, transparent);
   overflow: hidden;
 }
@@ -155,7 +154,7 @@
   height: 100%;
   // Rounded only at the leading end: the bar grows from a fixed baseline,
   // and rounding the start would float it off its own zero.
-  border-radius: 0 999px 999px 0;
+  border-radius: 0 v.$radius-pill v.$radius-pill 0;
   background-color: v.$color-primary;
   transition: width 240ms ease;
 
@@ -248,8 +247,8 @@
   display: inline-block;
   padding: 2px v.$space-2;
   border-radius: v.$radius-sm;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-medium;
   white-space: nowrap;
 }
 

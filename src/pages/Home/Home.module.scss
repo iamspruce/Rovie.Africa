@@ -26,13 +26,12 @@
   text-align: center;
 }
 
-// Bricolage already sets tight, so the tracking that suited system-ui here
-// would collide. Weight comes down as size goes up - large display type needs
-// less of it - which is what the variable weight axis is for.
+// Weight comes down as size goes up: at 38-48px the mono face has enough
+// presence on its own, and 700 at this size reads as shouting rather than as a
+// heading. Tracking stays at 0 - the face is already on a fixed pitch.
 .hero h1 {
-  font-size: clamp(3.25rem, 8vw, 7rem);
-  font-weight: 600;
-  letter-spacing: -0.045em;
+  font-size: clamp(v.$font-size-3xl, 8vw, v.$font-size-4xl);
+  font-weight: v.$font-weight-medium;
   line-height: 0.92;
   margin: 0 0 1.4rem;
 }
@@ -42,7 +41,7 @@
 }
 
 .heroSubtitle {
-  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  font-size: clamp(v.$font-size-base, 2vw, v.$font-size-lg);
   line-height: 1.55;
   max-width: 620px;
   margin: 0 auto;
@@ -84,9 +83,8 @@ $rail-gutter: 1.75rem;
 
 .missionThesis {
   margin: 0 0 2.1rem;
-  font-size: clamp(1.8rem, 3.6vw, 2.75rem);
-  font-weight: 600;
-  letter-spacing: -0.028em;
+  font-size: clamp(v.$font-size-2xl, 3.6vw, v.$font-size-3xl);
+  font-weight: v.$font-weight-medium;
   line-height: 1.1;
   text-wrap: balance;
 }
@@ -126,7 +124,7 @@ $rail-gutter: 1.75rem;
 .missionBelief,
 .missionFriction,
 .missionTurn {
-  font-size: 1.02rem;
+  font-size: v.$font-size-base;
   line-height: 1.75;
   color: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
 }
@@ -152,7 +150,7 @@ $rail-gutter: 1.75rem;
 .missionTurn {
   padding-bottom: 1.75rem;
   color: v.$color-text;
-  font-weight: 600;
+  font-weight: v.$font-weight-medium;
 }
 
 .missionPledge {
@@ -166,16 +164,18 @@ $rail-gutter: 1.75rem;
 // things that are actually read as prose.
 .missionLabel {
   color: $rail-solid;
-  font: 700 0.66rem/1 v.$font-family-display;
-  letter-spacing: 0.2em;
+  font-family: v.$font-family-base;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-bold;
+  line-height: v.$line-height-tight;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
 .missionStatement {
   font-family: v.$font-family-display;
-  font-size: clamp(1.25rem, 2.6vw, 1.75rem);
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-size: clamp(v.$font-size-lg, 2.6vw, v.$font-size-xl);
+  font-weight: v.$font-weight-medium;
   line-height: 1.35;
   color: v.$color-text;
   text-wrap: balance;

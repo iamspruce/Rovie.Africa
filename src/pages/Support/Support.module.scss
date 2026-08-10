@@ -6,9 +6,6 @@ $muted-text: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
 
 // Matches the status page's states - the same colours have to mean the same
 // things on the page that links to it.
-$state-ok: #2f9e6a;
-$state-slow: #d99013;
-$state-down: #d24b3c;
 
 .page {
   max-width: 860px;
@@ -22,9 +19,8 @@ $state-down: #d24b3c;
 
   h1 {
     margin: 0.9rem 0 0;
-    font-size: clamp(2rem, 4.4vw, 3rem);
-    font-weight: 600;
-    letter-spacing: -0.032em;
+    font-size: clamp(v.$font-size-2xl, 4.4vw, v.$font-size-3xl);
+    font-weight: v.$font-weight-medium;
     line-height: 1.06;
   }
 }
@@ -32,15 +28,18 @@ $state-down: #d24b3c;
 .eyebrow {
   display: block;
   color: $line;
-  font: 700 0.66rem/1 v.$font-family-display;
-  letter-spacing: 0.2em;
+  font-family: v.$font-family-base;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-bold;
+  line-height: v.$line-height-tight;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
 .intro {
   margin: 1.1rem 0 0;
   max-width: 62ch;
-  font-size: 0.98rem;
+  font-size: v.$font-size-base;
   line-height: 1.7;
   color: $muted-text;
 }
@@ -56,7 +55,7 @@ $state-down: #d24b3c;
   padding: 0.85rem 1.1rem;
   border: 1px solid v.$color-border;
   border-radius: v.$radius-md;
-  font-size: 0.85rem;
+  font-size: v.$font-size-sm;
   color: $muted-text;
 
   a {
@@ -79,18 +78,18 @@ $state-down: #d24b3c;
   background: v.$color-text-muted;
 
   .systems[data-state='operational'] & {
-    background: $state-ok;
-    box-shadow: 0 0 0 3px color-mix(in srgb, #{$state-ok} 22%, transparent);
+    background: v.$color-state-ok;
+    box-shadow: 0 0 0 3px color-mix(in srgb, v.$color-state-ok 22%, transparent);
   }
 
   .systems[data-state='degraded'] & {
-    background: $state-slow;
-    box-shadow: 0 0 0 3px color-mix(in srgb, #{$state-slow} 22%, transparent);
+    background: v.$color-state-slow;
+    box-shadow: 0 0 0 3px color-mix(in srgb, v.$color-state-slow 22%, transparent);
   }
 
   .systems[data-state='down'] & {
-    background: $state-down;
-    box-shadow: 0 0 0 3px color-mix(in srgb, #{$state-down} 22%, transparent);
+    background: v.$color-state-down;
+    box-shadow: 0 0 0 3px color-mix(in srgb, v.$color-state-down 22%, transparent);
   }
 }
 
@@ -100,8 +99,11 @@ $state-down: #d24b3c;
   margin: 0 0 1.75rem;
   padding-top: 0.9rem;
   border-top: 1px solid v.$color-border;
-  font: 700 0.66rem/1 v.$font-family-display;
-  letter-spacing: 0.18em;
+  font-family: v.$font-family-base;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-bold;
+  line-height: v.$line-height-tight;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: v.$color-text-muted;
 }
@@ -138,14 +140,13 @@ $state-down: #d24b3c;
   h3 {
     margin: 0;
     font-family: v.$font-family-display;
-    font-size: 1.02rem;
+    font-size: v.$font-size-base;
     font-weight: 700;
-    letter-spacing: -0.02em;
   }
 
   p {
     margin: 0;
-    font-size: 0.86rem;
+    font-size: v.$font-size-sm;
     line-height: 1.6;
     color: v.$color-text-muted;
   }
@@ -155,7 +156,7 @@ $state-down: #d24b3c;
   margin-top: auto;
   padding-top: 0.7rem;
   color: $line;
-  font-size: 0.84rem;
+  font-size: v.$font-size-sm;
   font-weight: 700;
 
   &::after {
@@ -185,7 +186,7 @@ $state-down: #d24b3c;
     gap: 1rem;
     padding: 1.1rem 0;
     cursor: pointer;
-    font-size: 0.93rem;
+    font-size: v.$font-size-sm;
     font-weight: 700;
     list-style: none;
 
@@ -217,7 +218,7 @@ $state-down: #d24b3c;
     margin: 0;
     padding: 0 0 1.3rem;
     max-width: 62ch;
-    font-size: 0.88rem;
+    font-size: v.$font-size-sm;
     line-height: 1.7;
     color: $muted-text;
   }

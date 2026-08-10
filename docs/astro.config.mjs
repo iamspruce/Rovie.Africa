@@ -23,11 +23,12 @@ import starlightLinksValidator from 'starlight-links-validator';
 // would additionally break the /llms-*.txt build, which renders every page to
 // text without a framework renderer registered.
 //
-// What IS shared with the app: the palette and the two typefaces
+// What IS shared with the app: the palette and the typeface
 // (src/styles/rovie.css, which restates ../src/styles/base/_theme.scss in
-// Starlight's token names), the wordmark geometry (scripts/build-logo.mjs),
-// and the header links back into the product. A docs domain that looks like a
-// different company loses the reader at the boundary.
+// Starlight's token names), the mark artwork (scripts/build-logo.mjs, baked
+// from the same ../src/assets/logo.generated.ts the app's header inlines), the
+// favicon and OG card, and the header links back into the product. A docs
+// domain that looks like a different company loses the reader at the boundary.
 // -----------------------------------------------------------------------
 
 // `astro dev` sets NODE_ENV to development; `astro build` sets it to
@@ -71,9 +72,11 @@ export default defineConfig({
       tagline: 'One key. Every model. Priced where you are.',
 
       // The mark only - the "Rovie docs" beside it is Starlight's own title
-      // text, so it picks up the display face from rovie.css. Baking the
-      // wordmark into the SVG would render it in whatever the reader's system
-      // font is, since Starlight puts the logo in an <img>.
+      // text, so it picks up the face from rovie.css. Using the horizontal
+      // lockup here would draw the wordmark twice.
+      //
+      // Two files because Starlight puts the logo in an <img>, which inherits
+      // none of the page's colour. See scripts/build-logo.mjs.
       logo: {
         light: './src/assets/logo-light.svg',
         dark: './src/assets/logo-dark.svg',
@@ -82,14 +85,16 @@ export default defineConfig({
 
       customCss: ['./src/styles/rovie.css', './src/styles/model-table.css'],
 
-      // The app's own OG card. Docs pages that get shared are shared into the
-      // same conversations product pages are.
+      // The app's own OG card and page colours, so a docs link and a product
+      // link unfurl identically - they get shared into the same conversations.
+      // The theme-colors are --rv-bg from each half of the app's _theme.scss,
+      // and they are warm rather than pure: see the note at the top of it.
       head: [
-        { tag: 'meta', attrs: { property: 'og:image', content: `${APP}/og.png` } },
+        { tag: 'meta', attrs: { property: 'og:image', content: `${APP}/favicons/og-image.png` } },
         { tag: 'meta', attrs: { name: 'twitter:card', content: 'summary_large_image' } },
-        { tag: 'meta', attrs: { name: 'twitter:image', content: `${APP}/og.png` } },
-        { tag: 'meta', attrs: { name: 'theme-color', content: '#ffffff', media: '(prefers-color-scheme: light)' } },
-        { tag: 'meta', attrs: { name: 'theme-color', content: '#000000', media: '(prefers-color-scheme: dark)' } },
+        { tag: 'meta', attrs: { name: 'twitter:image', content: `${APP}/favicons/og-image.png` } },
+        { tag: 'meta', attrs: { name: 'theme-color', content: '#fdfcfc', media: '(prefers-color-scheme: light)' } },
+        { tag: 'meta', attrs: { name: 'theme-color', content: '#201d1d', media: '(prefers-color-scheme: dark)' } },
       ],
 
       social: [{ icon: 'email', label: 'Email Rovie', href: 'mailto:hello@rovie.africa' }],

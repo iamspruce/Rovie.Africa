@@ -33,23 +33,18 @@
   }
 }
 
+// The plate keeps its own ink regardless of theme, so the logo is told to use
+// the plate's text colour rather than inheriting the page's. This is exactly
+// what --logo-color exists for: the SVG needs no variant file, and the
+// `svg path { stroke: ... }` reach-in this used to need is gone.
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: v.$space-2;
   align-self: flex-start;
-  font-family: v.$font-family-display;
-  font-size: v.$font-size-lg;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: v.$color-plate-text;
+  --logo-color: #{v.$color-plate-text};
   text-decoration: none;
 
   @include m.focus-ring;
-
-  svg path {
-    stroke: v.$color-plate-text;
-  }
 }
 
 .figure {
@@ -158,8 +153,7 @@
   margin: 0;
   font-family: v.$font-family-display;
   font-size: v.$font-size-lg;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-weight: v.$font-weight-medium;
   color: v.$color-plate-text;
 }
 

@@ -53,19 +53,19 @@
   z-index: v.$z-hamburger-menu;
   padding: v.$space-2;
   border: 1px solid v.$color-border;
-  // Square-ish on purpose. At this size a 16px radius reads as a bubble; the
-  // panel should read as a sheet of the page, so it takes the smaller token.
+  // The panel should read as a sheet of the page, not a bubble floating over
+  // it, so it takes the small radius.
   border-radius: v.$radius-md;
+  // Opaque, and it has to stay opaque: this is the one surface that overlaps
+  // running text, and the system has no shadow to separate the two.
   background: v.$color-bg;
-  // Three layers rather than one big blur: a hairline that seats the panel on
-  // the surface, a short shadow for the near edge, and a wide soft one for the
-  // cast. One 34px blur reads as fog under a floating rectangle.
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, #000 3%, transparent),
-    0 2px 4px color-mix(in srgb, #000 5%, transparent),
-    0 8px 16px color-mix(in srgb, #000 8%, transparent),
-    0 24px 44px color-mix(in srgb, #000 16%, transparent);
-  animation: panel-in 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+  // A ring, not a cast shadow. The system communicates elevation with borders
+  // and colour alone - the four-layer drop shadow this used to carry was the
+  // single loudest thing on the page once everything around it went flat.
+  // Doubling the border into a 2px ring is the system's "raised" treatment,
+  // and against a flat page it separates the panel just as clearly.
+  box-shadow: v.$ring-strong;
+  animation: panel-in v.$duration-base v.$ease-standard;
 
   @media (prefers-reduced-motion: reduce) {
     animation: none;
@@ -142,8 +142,7 @@
   display: flex;
   align-items: center;
   gap: 0.3rem;
-  font-weight: 600;
-  letter-spacing: -0.012em;
+  font-weight: v.$font-weight-medium;
   line-height: 1.35;
 }
 
@@ -215,7 +214,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
+  font-size: v.$font-size-lg;
   line-height: 1;
   color: color-mix(in srgb, v.$color-text 55%, transparent);
   transition: color 0.16s ease;
@@ -233,8 +232,7 @@
 }
 
 .featureLabel {
-  font-weight: 600;
-  letter-spacing: -0.012em;
+  font-weight: v.$font-weight-medium;
   line-height: 1.35;
 
   .feature:hover &,

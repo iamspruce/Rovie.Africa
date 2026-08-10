@@ -6,7 +6,7 @@ export function Leaderboard() {
   const { data, error, isLoading } = useModels();
 
   return (
-    <main className={`container ${styles.page}`}>
+    <main className={`containerWide ${styles.page}`}>
       <h1>Affordability leaderboard</h1>
       <p className={styles.intro}>
         The same live model catalog as the Models page, ranked cheapest-first by blended cost per

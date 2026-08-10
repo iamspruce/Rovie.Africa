@@ -1,21 +1,22 @@
 // -----------------------------------------------------------------------
-// Turns the `world-atlas` TopoJSON into exactly the three things this app
-// actually draws, and nothing else. Run it with `npm run geo:build`.
+// Turns the `world-atlas` TopoJSON into exactly the two things this app
+// actually draws from it, and nothing else. Run it with `npm run geo:build`.
 //
 // Why this exists: the app used to import countries-50m.json (739 KB, 80,617
-// coordinates) directly, and every page paid for it because LogoMap - which is
-// in the header and footer of every route - projected the continent at module
-// load. Two of the three consumers were computing a fixed result at runtime,
-// on every visit, from data that never changes.
+// coordinates) directly, and every page paid for it, because two of the three
+// consumers were computing a fixed result at runtime, on every visit, from
+// data that never changes.
 //
-//   1. The wordmark's Africa outline. One path string. Fixed size, fixed
-//      projection - there was never a reason to compute it in a browser.
-//   2. The sign-in plate. 50-odd country paths in a fixed 520x560 Mercator.
-//      Also fixed, also computed per visit.
-//   3. The homepage globe. The one real runtime consumer: it re-projects on
+//   1. The sign-in plate. 50-odd country paths in a fixed 520x560 Mercator.
+//      Fixed, and it was being computed per visit.
+//   2. The homepage globe. The one real runtime consumer: it re-projects on
 //      every drag frame, so it needs coordinates rather than paths.
 //
-// So 1 and 2 are baked to strings here, and 3 gets a purpose-built GeoJSON.
+// So 1 is baked to strings here and 2 gets a purpose-built GeoJSON.
+//
+// There used to be a third output: an Africa silhouette for the wordmark,
+// back when the logo was drawn from map data. The logo is real brand artwork
+// now - see scripts/build-logo.mjs - so that section is gone.
 //
 // RESOLUTION, and the one place it matters: 110m is ample for a 400px globe
 // and costs a tenth of what 50m does per frame - but 110m omits five African
@@ -179,50 +180,6 @@ function buildGlobe() {
   return { detailed, coarse };
 }
 
-// -------------------------------------------------------------------- logo
-
-const LOGO_SIZE = 400;
-
-function buildLogo(coarse) {
-  const africanGeometries = coarse.objects.countries.geometries.filter((g) =>
-    AFRICA_NUMERIC_IDS.has(String(g.id))
-  );
-
-  // Merged into one shape, then reduced to its largest polygon: the wordmark
-  // is the mainland silhouette, not the continent plus every offshore island.
-  const merged = merge(coarse, africanGeometries);
-  const polygons = merged.coordinates.map((coordinates) => ({ type: 'Polygon', coordinates }));
-  const mainland = polygons.reduce((largest, polygon) =>
-    geoArea(polygon) > geoArea(largest) ? polygon : largest
-  );
-
-  const projection = geoMercator().fitSize([LOGO_SIZE, LOGO_SIZE], mainland);
-  const pathGenerator = geoPath(projection).digits(PATH_DIGITS);
-  const path = pathGenerator(mainland);
-  const center = pathGenerator.centroid(mainland);
-
-  if (!path) throw new Error('Failed to project the logo outline');
-
-  const size = write(
-    'logo.generated.ts',
-    `${BANNER}
-/** The viewBox the outline below is drawn in. */
-export const LOGO_SIZE = ${LOGO_SIZE};
-
-/** Africa's mainland silhouette, Mercator, fitted to a ${LOGO_SIZE}x${LOGO_SIZE} box. */
-export const LOGO_AFRICA_PATH =
-  '${path}';
-
-/** Centre of that silhouette, so the concentric rings scale about the landmass. */
-export const LOGO_AFRICA_CENTER: readonly [number, number] = [
-  ${center[0].toFixed(2)}, ${center[1].toFixed(2)},
-];
-`
-  );
-
-  console.log(`  logo.generated.ts       ${kb(size).padStart(9)}  1 path`);
-}
-
 // ------------------------------------------------------------------- plate
 
 const PLATE_WIDTH = 520;
@@ -323,6 +280,5 @@ export const PLATE_BOUNDS: readonly [readonly [number, number], readonly [number
 
 console.log('Building map geometry from world-atlas:');
 const { detailed, coarse } = buildGlobe();
-buildLogo(coarse);
 buildPlate(detailed);
 console.log('Done.');

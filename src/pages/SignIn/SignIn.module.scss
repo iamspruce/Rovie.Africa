@@ -34,7 +34,7 @@
   color: v.$color-primary;
   font-family: inherit;
   font-size: v.$font-size-sm;
-  font-weight: 600;
+  font-weight: v.$font-weight-medium;
   cursor: pointer;
 
   @include m.focus-ring;

@@ -146,7 +146,7 @@ export function Status() {
   );
 
   return (
-    <main className={`container ${styles.page}`}>
+    <main className={`containerWide ${styles.page}`}>
       <header className={styles.head}>
         <span className={styles.eyebrow}>Status</span>
         <h1>{HEADLINE[overall]}</h1>

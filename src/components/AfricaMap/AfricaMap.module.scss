@@ -221,14 +221,14 @@
 
 .tagName {
   fill: v.$color-text;
-  font-size: 12px;
+  font-size: v.$font-size-xs;
   font-weight: 700;
 }
 
 .tagPrice {
   fill: v.$color-accent;
-  font-size: 10.5px;
-  font-weight: 600;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-medium;
   // Five tags stacked around the globe, all quoting the same budget - the
   // figures only compare cleanly if the digits share a width.
   font-variant-numeric: tabular-nums lining-nums;
@@ -253,13 +253,13 @@
 
 .tooltipName {
   fill: v.$color-text;
-  font-size: 11px;
+  font-size: v.$font-size-xs;
   font-weight: 700;
 }
 
 .tooltipPrice {
   fill: v.$color-accent;
-  font-size: 11px;
-  font-weight: 600;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-medium;
   font-variant-numeric: tabular-nums lining-nums;
 }

@@ -9,9 +9,6 @@
 // See the note in StatusTimeline.tsx for why state is also encoded as height:
 // these three do not separate far enough under colour-vision deficiency to
 // carry the distinction on their own.
-$state-ok: #2f9e6a;
-$state-slow: #d99013;
-$state-down: #d24b3c;
 
 .wrap {
   min-width: 0;
@@ -71,15 +68,15 @@ $state-down: #d24b3c;
   transition: opacity 120ms ease;
 
   .cell[data-state='operational'] & {
-    background: $state-ok;
+    background: v.$color-state-ok;
   }
 
   .cell[data-state='degraded'] & {
-    background: $state-slow;
+    background: v.$color-state-slow;
   }
 
   .cell[data-state='down'] & {
-    background: $state-down;
+    background: v.$color-state-down;
   }
 
   .cell[data-active] & {
@@ -91,7 +88,7 @@ $state-down: #d24b3c;
 
 .summary {
   margin: v.$space-2 0 0;
-  font-size: 0.75rem;
+  font-size: v.$font-size-xs;
   line-height: 1.5;
   color: v.$color-text-muted;
   font-variant-numeric: tabular-nums;
@@ -117,7 +114,7 @@ $state-down: #d24b3c;
 
 .empty {
   margin: 0;
-  font-size: 0.75rem;
+  font-size: v.$font-size-xs;
   color: v.$color-text-muted;
 }
 

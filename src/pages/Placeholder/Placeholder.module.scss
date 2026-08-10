@@ -11,23 +11,25 @@ $line: v.$color-line;
 .eyebrow {
   display: block;
   color: $line;
-  font: 700 0.66rem/1 v.$font-family-display;
-  letter-spacing: 0.2em;
+  font-family: v.$font-family-base;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-bold;
+  line-height: v.$line-height-tight;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   margin-bottom: 0.9rem;
 }
 
 .page h1 {
   margin: 0 0 1.1rem;
-  font-size: clamp(1.9rem, 4vw, 2.9rem);
-  font-weight: 600;
-  letter-spacing: -0.03em;
+  font-size: clamp(v.$font-size-2xl, 4vw, v.$font-size-3xl);
+  font-weight: v.$font-weight-medium;
   line-height: 1.08;
 }
 
 .summary {
   margin: 0;
-  font-size: 1.02rem;
+  font-size: v.$font-size-base;
   line-height: 1.7;
   color: color-mix(in srgb, v.$color-text 75%, v.$color-text-muted);
 }
@@ -38,7 +40,7 @@ $line: v.$color-line;
   position: relative;
   margin: 2rem 0 0;
   padding-left: 1.25rem;
-  font-size: 0.88rem;
+  font-size: v.$font-size-sm;
   line-height: 1.65;
   color: v.$color-text-muted;
 
@@ -66,7 +68,7 @@ $line: v.$color-line;
 
 .back {
   color: $line;
-  font-size: 0.86rem;
+  font-size: v.$font-size-sm;
   font-weight: 700;
 
   &::after {

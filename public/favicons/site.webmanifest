@@ -1,0 +1,19 @@
+{
+  "name": "Rovie — the AI layer for Africa",
+  "short_name": "Rovie",
+  "description": "One account and one API key for GPT, Claude, Gemini, Llama and every leading AI model — priced in your own currency, paid for the way Africa pays.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#201d1d",
+  "theme_color": "#201d1d",
+  "icons": [
+    { "src": "/favicons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/favicons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    {
+      "src": "/favicons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

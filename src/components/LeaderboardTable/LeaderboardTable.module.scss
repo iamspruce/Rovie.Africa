@@ -13,16 +13,16 @@
 
   thead th {
     color: v.$color-text-muted;
-    font-weight: 600;
+    font-weight: v.$font-weight-medium;
   }
 
   tbody th {
-    font-weight: 600;
+    font-weight: v.$font-weight-medium;
   }
 }
 
 .rank {
-  font-weight: 800;
+  font-weight: v.$font-weight-bold;
   color: v.$color-primary;
 }
 

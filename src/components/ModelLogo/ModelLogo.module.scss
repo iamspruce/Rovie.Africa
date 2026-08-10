@@ -7,7 +7,7 @@
   align-items: center;
   justify-content: center;
   flex: none;
-  font-size: 1.5rem;
+  font-size: v.$font-size-xl;
   line-height: 1;
   color: v.$color-text;
 
@@ -27,7 +27,7 @@
   border-radius: 50%;
   border: 1px solid color-mix(in srgb, v.$color-border 80%, v.$color-text-muted);
   font-family: v.$font-family-display;
-  font-size: 1.1rem;
+  font-size: v.$font-size-lg;
   font-weight: 700;
   color: v.$color-text-muted;
 }

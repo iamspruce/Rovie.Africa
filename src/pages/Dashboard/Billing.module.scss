@@ -14,7 +14,7 @@
 
   a {
     color: v.$color-primary;
-    font-weight: 600;
+    font-weight: v.$font-weight-medium;
   }
 }
 
@@ -37,7 +37,7 @@
   }
 
   th {
-    font-weight: 600;
+    font-weight: v.$font-weight-medium;
     color: v.$color-text-muted;
   }
 
@@ -65,7 +65,7 @@
   color: v.$color-primary;
   font-family: inherit;
   font-size: inherit;
-  font-weight: 600;
+  font-weight: v.$font-weight-medium;
   cursor: pointer;
   text-decoration: underline;
 }
@@ -74,7 +74,7 @@
 // reinforces it, so a colourblind reader loses nothing.
 .status-success {
   color: v.$color-success-text;
-  font-weight: 600;
+  font-weight: v.$font-weight-medium;
 }
 
 .status-pending {

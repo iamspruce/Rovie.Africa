@@ -1,0 +1,10 @@
+// The artwork is authored in `currentColor`, so this is the one place that
+// decides what "current" means. `--logo-color` lets a container override it -
+// the sign-in plate and the footer watermark both do - without any consumer
+// having to reach inside the SVG.
+.logo {
+  color: var(--logo-color, currentColor);
+  // Never squashed by a flex parent. Both lockups are wide relative to their
+  // height, and the header bar is the exact place that would happen.
+  flex-shrink: 0;
+}

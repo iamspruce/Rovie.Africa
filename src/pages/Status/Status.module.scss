@@ -7,9 +7,6 @@ $muted-text: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
 // State colours. Green and amber carry meaning here that they carry nowhere
 // else on the site, so they're declared locally rather than pulled from the
 // UI palette - $color-accent means "your country" on the map.
-$state-ok: #2f9e6a;
-$state-slow: #d99013;
-$state-down: #d24b3c;
 
 .page {
   max-width: 860px;
@@ -23,9 +20,8 @@ $state-down: #d24b3c;
 
   h1 {
     margin: 0.9rem 0 0;
-    font-size: clamp(1.9rem, 4.2vw, 3rem);
-    font-weight: 600;
-    letter-spacing: -0.032em;
+    font-size: clamp(v.$font-size-2xl, 4.2vw, v.$font-size-3xl);
+    font-weight: v.$font-weight-medium;
     line-height: 1.06;
     text-wrap: balance;
   }
@@ -34,15 +30,18 @@ $state-down: #d24b3c;
 .eyebrow {
   display: block;
   color: $line;
-  font: 700 0.66rem/1 v.$font-family-display;
-  letter-spacing: 0.2em;
+  font-family: v.$font-family-base;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-bold;
+  line-height: v.$line-height-tight;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
 .intro {
   margin: 1.1rem 0 0;
   max-width: 62ch;
-  font-size: 0.95rem;
+  font-size: v.$font-size-base;
   line-height: 1.7;
   color: $muted-text;
 }
@@ -60,7 +59,7 @@ $state-down: #d24b3c;
 
 .checked {
   margin: 0;
-  font-size: 0.8rem;
+  font-size: v.$font-size-xs;
   color: v.$color-text-muted;
   font-variant-numeric: tabular-nums;
 }
@@ -68,8 +67,8 @@ $state-down: #d24b3c;
 .refresh {
   padding: 0.5rem 0.95rem;
   border: 1px solid v.$color-border;
-  border-radius: 99px;
-  font-size: 0.78rem;
+  border-radius: v.$radius-sm;
+  font-size: v.$font-size-xs;
   font-weight: 700;
   color: $muted-text;
   transition: border-color 0.18s ease, color 0.18s ease;
@@ -137,18 +136,18 @@ $state-down: #d24b3c;
   }
 
   .row[data-state='operational'] & {
-    background: $state-ok;
-    box-shadow: 0 0 0 3px color-mix(in srgb, #{$state-ok} 22%, transparent);
+    background: v.$color-state-ok;
+    box-shadow: 0 0 0 3px color-mix(in srgb, v.$color-state-ok 22%, transparent);
   }
 
   .row[data-state='degraded'] & {
-    background: $state-slow;
-    box-shadow: 0 0 0 3px color-mix(in srgb, #{$state-slow} 22%, transparent);
+    background: v.$color-state-slow;
+    box-shadow: 0 0 0 3px color-mix(in srgb, v.$color-state-slow 22%, transparent);
   }
 
   .row[data-state='down'] & {
-    background: $state-down;
-    box-shadow: 0 0 0 3px color-mix(in srgb, #{$state-down} 22%, transparent);
+    background: v.$color-state-down;
+    box-shadow: 0 0 0 3px color-mix(in srgb, v.$color-state-down 22%, transparent);
   }
 
   .row[data-state='checking'] & {
@@ -160,14 +159,13 @@ $state-down: #d24b3c;
   h2 {
     margin: 0 0 0.25rem;
     font-family: v.$font-family-display;
-    font-size: 1rem;
+    font-size: v.$font-size-base;
     font-weight: 700;
-    letter-spacing: -0.02em;
   }
 
   p {
     margin: 0;
-    font-size: 0.82rem;
+    font-size: v.$font-size-sm;
     line-height: 1.55;
     color: v.$color-text-muted;
   }
@@ -188,34 +186,34 @@ $state-down: #d24b3c;
 }
 
 .state {
-  font-size: 0.82rem;
+  font-size: v.$font-size-sm;
   font-weight: 700;
   color: $muted-text;
 
   .row[data-state='operational'] & {
-    color: $state-ok;
+    color: v.$color-state-ok;
   }
 
   .row[data-state='degraded'] & {
-    color: $state-slow;
+    color: v.$color-state-slow;
   }
 
   .row[data-state='down'] & {
-    color: $state-down;
+    color: v.$color-state-down;
   }
 }
 
 // Timings line up column-wise, so a slow service is visible by shape as well
 // as by colour.
 .latency {
-  font-size: 0.78rem;
+  font-size: v.$font-size-xs;
   color: v.$color-text-muted;
   font-variant-numeric: tabular-nums lining-nums;
 }
 
 .detail {
   flex-basis: 100%;
-  font-size: 0.75rem;
+  font-size: v.$font-size-xs;
   color: v.$color-text-muted;
 
   @include m.respond-to('md') {
@@ -233,14 +231,14 @@ $state-down: #d24b3c;
   grid-column: 1 / -1;
   margin-top: 0.9rem;
   padding: 0.85rem 1rem;
-  border-left: 2px solid $state-down;
-  background: color-mix(in srgb, #{$state-down} 7%, transparent);
+  border-left: 2px solid v.$color-state-down;
+  background: color-mix(in srgb, v.$color-state-down 7%, transparent);
   border-radius: 0 v.$radius-sm v.$radius-sm 0;
 
   p {
     margin: 0;
     max-width: 68ch;
-    font-size: 0.82rem;
+    font-size: v.$font-size-sm;
     line-height: 1.65;
     color: $muted-text;
 
@@ -252,7 +250,7 @@ $state-down: #d24b3c;
 
 .failureLabel {
   font-weight: 700;
-  color: $state-down !important;
+  color: v.$color-state-down !important;
 }
 
 .failureAdvice {
@@ -275,7 +273,7 @@ $state-down: #d24b3c;
 
   h2 {
     margin: 0 0 0.6rem;
-    font-size: 1rem;
+    font-size: v.$font-size-base;
     font-weight: 700;
     color: v.$color-accent;
   }
@@ -283,7 +281,7 @@ $state-down: #d24b3c;
   p {
     margin: 0;
     max-width: 68ch;
-    font-size: 0.86rem;
+    font-size: v.$font-size-sm;
     line-height: 1.7;
     color: $muted-text;
 
@@ -302,15 +300,14 @@ $state-down: #d24b3c;
 .sectionHeading {
   margin: 0 0 0.5rem;
   font-family: v.$font-family-display;
-  font-size: 1.1rem;
+  font-size: v.$font-size-lg;
   font-weight: 700;
-  letter-spacing: -0.024em;
 }
 
 .sectionNote {
   margin: 0 0 1.4rem;
   max-width: 68ch;
-  font-size: 0.84rem;
+  font-size: v.$font-size-sm;
   line-height: 1.7;
   color: v.$color-text-muted;
 }
@@ -339,7 +336,7 @@ $state-down: #d24b3c;
   margin: 0 0 1.4rem;
   padding: 0;
   list-style: none;
-  font-size: 0.75rem;
+  font-size: v.$font-size-xs;
   color: v.$color-text-muted;
 
   li {
@@ -359,17 +356,17 @@ $state-down: #d24b3c;
 
   &[data-state='operational'] {
     height: 5px;
-    background: $state-ok;
+    background: v.$color-state-ok;
   }
 
   &[data-state='degraded'] {
     height: 10px;
-    background: $state-slow;
+    background: v.$color-state-slow;
   }
 
   &[data-state='down'] {
     height: 16px;
-    background: $state-down;
+    background: v.$color-state-down;
   }
 }
 
@@ -381,7 +378,7 @@ $state-down: #d24b3c;
 .timelineRow {
   h3 {
     margin: 0 0 0.5rem;
-    font-size: 0.82rem;
+    font-size: v.$font-size-sm;
     font-weight: 700;
     color: $muted-text;
   }
@@ -402,7 +399,7 @@ $state-down: #d24b3c;
     gap: 0.35rem 1rem;
     padding: 0.8rem 0;
     border-bottom: 1px solid v.$color-border;
-    font-size: 0.82rem;
+    font-size: v.$font-size-sm;
   }
 }
 
@@ -418,7 +415,7 @@ $state-down: #d24b3c;
 
 .incidentLength {
   margin-left: auto;
-  color: $state-down;
+  color: v.$color-state-down;
   font-variant-numeric: tabular-nums;
 }
 
@@ -443,12 +440,12 @@ $state-down: #d24b3c;
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.82rem;
+  font-size: v.$font-size-sm;
 
   caption {
     padding: 0.9rem 1rem;
     text-align: left;
-    font-size: 0.78rem;
+    font-size: v.$font-size-xs;
     color: v.$color-text-muted;
   }
 
@@ -481,7 +478,7 @@ $state-down: #d24b3c;
 
 .privacy {
   margin-top: 1.5rem !important;
-  font-size: 0.78rem !important;
+  font-size: v.$font-size-xs !important;
   color: v.$color-text-muted !important;
 }
 
@@ -492,15 +489,14 @@ $state-down: #d24b3c;
 
   h2 {
     margin: 0 0 0.7rem;
-    font-size: 1.2rem;
-    font-weight: 600;
-    letter-spacing: -0.024em;
+    font-size: v.$font-size-lg;
+    font-weight: v.$font-weight-medium;
   }
 
   p {
     margin: 0;
     max-width: 62ch;
-    font-size: 0.9rem;
+    font-size: v.$font-size-sm;
     line-height: 1.7;
     color: $muted-text;
   }
@@ -515,7 +511,7 @@ $state-down: #d24b3c;
 
 .action {
   color: $line;
-  font-size: 0.86rem;
+  font-size: v.$font-size-sm;
   font-weight: 700;
 
   &::after {

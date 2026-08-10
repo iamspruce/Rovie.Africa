@@ -17,26 +17,25 @@
   // The bar's own background, drawn as a layer behind its contents rather than
   // set on the element.
   //
-  // This is not decoration for its own sake: backdrop-filter makes an element
-  // the containing block for every fixed-position descendant, and the mobile
-  // sheet is fixed to the viewport. Blurring .header directly would size the
-  // sheet against the 4rem bar instead of the screen, collapsing it to
-  // nothing. Behind a pseudo-element the effect is identical and .header stays
-  // an ordinary box.
+  // Opaque, and deliberately so. This used to be a translucent layer with a
+  // 12px backdrop blur behind it; the system rules out blur along with
+  // gradients and shadows, and on a warm flat palette the blur was doing
+  // visible harm - content sliding under the bar turned into a smear of
+  // off-white instead of disappearing cleanly behind an edge.
+  //
+  // It stays a pseudo-element rather than moving onto .header itself. That is
+  // load-bearing for a different reason: the mobile sheet is fixed to the
+  // viewport, and several of the properties that have lived on this layer
+  // (blur before, filters later) make an element the containing block for its
+  // fixed descendants, which would size the sheet against the 56px bar
+  // instead of the screen and collapse it to nothing. Keeping the layer
+  // separate means .header stays an ordinary box no matter what lands here.
   &::before {
     content: '';
     position: absolute;
     inset: 0;
     z-index: -1;
-    // Translucent, so the page reads as passing underneath the bar rather than
-    // stopping at it. The solid colour is what browsers without
-    // backdrop-filter get, and what prints.
     background: v.$color-bg;
-
-    @supports (backdrop-filter: blur(1px)) {
-      background: color-mix(in srgb, v.$color-bg 82%, transparent);
-      backdrop-filter: blur(12px) saturate(1.4);
-    }
   }
 }
 
@@ -64,7 +63,7 @@
 }
 
 .bar {
-  @include m.container;
+  @include m.container-wide;
   position: relative;
   height: v.$header-height;
   display: flex;
@@ -72,16 +71,12 @@
   gap: v.$space-4;
 }
 
+// The wordmark is drawn artwork now rather than set type, so this carries no
+// font of its own - only the colour the logo inherits and the focus ring.
 .logo {
   display: inline-flex;
   align-items: center;
-  gap: v.$space-1;
-  // The wordmark is the display face at its widest weight - the one place
-  // Bricolage is allowed to be loud.
-  font-family: v.$font-family-display;
-  font-weight: 800;
-  font-size: v.$font-size-lg;
-  letter-spacing: -0.03em;
+  color: v.$color-text;
   // Never the thing that gives way when the bar runs out of room.
   flex-shrink: 0;
 

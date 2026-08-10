@@ -49,7 +49,7 @@
 
   code {
     font-family: v.$font-family-mono;
-    font-weight: 600;
+    font-weight: v.$font-weight-medium;
   }
 }
 
@@ -57,7 +57,7 @@
   width: 100%;
   padding: 11px 14px;
   border: 1px solid v.$color-border;
-  border-radius: v.$radius-md;
+  border-radius: v.$radius-input;
   background-color: v.$color-bg;
   color: v.$color-text;
   font-family: inherit;
@@ -66,7 +66,7 @@
   &:focus {
     outline: none;
     border-color: v.$color-danger;
-    box-shadow: 0 0 0 3px color-mix(in srgb, v.$color-danger 18%, transparent);
+    box-shadow: 0 0 0 2px v.$color-danger;
   }
 
   &:disabled {

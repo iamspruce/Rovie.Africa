@@ -16,9 +16,8 @@ $line: v.$color-line;
 
   h1 {
     margin: 0.9rem 0 0;
-    font-size: clamp(2rem, 4.4vw, 3rem);
-    font-weight: 600;
-    letter-spacing: -0.032em;
+    font-size: clamp(v.$font-size-2xl, 4.4vw, v.$font-size-3xl);
+    font-weight: v.$font-weight-medium;
     line-height: 1.06;
   }
 }
@@ -26,14 +25,17 @@ $line: v.$color-line;
 .eyebrow {
   display: block;
   color: $line;
-  font: 700 0.66rem/1 v.$font-family-display;
-  letter-spacing: 0.2em;
+  font-family: v.$font-family-base;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-bold;
+  line-height: v.$line-height-tight;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
 .standfirst {
   margin: 1rem 0 0;
-  font-size: 1rem;
+  font-size: v.$font-size-base;
   line-height: 1.65;
   color: color-mix(in srgb, v.$color-text 76%, v.$color-text-muted);
   text-wrap: pretty;
@@ -41,7 +43,7 @@ $line: v.$color-line;
 
 .updated {
   margin: 1.1rem 0 0;
-  font-size: 0.78rem;
+  font-size: v.$font-size-xs;
   color: v.$color-text-muted;
   font-variant-numeric: tabular-nums;
 }
@@ -54,7 +56,7 @@ $line: v.$color-line;
   border: 1px solid color-mix(in srgb, v.$color-accent 45%, v.$color-border);
   border-radius: v.$radius-md;
   background: color-mix(in srgb, v.$color-accent 8%, transparent);
-  font-size: 0.85rem;
+  font-size: v.$font-size-sm;
   line-height: 1.65;
   color: color-mix(in srgb, v.$color-text 88%, v.$color-accent);
 

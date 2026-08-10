@@ -160,7 +160,7 @@ export function Rankings() {
   const appShare = data ? attributedShare(data.apps, data.totals.tokens) : null;
 
   return (
-    <main className={`container ${styles.page}`}>
+    <main className={`containerWide ${styles.page}`}>
       {isDemo && (
         <p className={styles.demoBanner} role="alert">
           <strong>Sample data.</strong> Every figure on this page is made up, for previewing the

@@ -1,5 +1,5 @@
 /* -----------------------------------------------------------------------
- * Rovie's palette and typefaces, expressed in Starlight's token names.
+ * Rovie's palette and typeface, expressed in Starlight's token names.
  *
  * The values are NOT invented here. Every colour below is copied from
  * ../../../src/styles/base/_theme.scss, which is the app's source of truth and
@@ -12,119 +12,153 @@
  * :root carrying dark and [data-theme='light'] overriding - so the blocks
  * below read in the opposite order from _theme.scss. The values are the same
  * ones, on the same side.
+ *
+ * THE RULE THE PALETTE IS BUILT ON, restated because it is easy to break from
+ * this side: nothing here is a pure neutral. The dark page is #201d1d, not
+ * #000; the light page is #fdfcfc, not #fff. Every grey carries a red-channel
+ * lift. A single #000 or #ffffff dropped in goes visibly blue against
+ * everything around it.
  * --------------------------------------------------------------------- */
 
-@import '@fontsource-variable/bricolage-grotesque';
-@import '@fontsource/atkinson-hyperlegible/400.css';
-@import '@fontsource/atkinson-hyperlegible/700.css';
+/* One face for the whole site, at the three weights the system uses: 400
+ * body, 500 interactive, 700 headings. Berkeley Mono leads the stack in the
+ * declarations below and IBM Plex Mono is what actually ships - Berkeley is
+ * commercially licensed and cannot be redistributed. Same arrangement as the
+ * app's main.tsx. */
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+@import '@fontsource/ibm-plex-mono/700.css';
+@import '@fontsource/ibm-plex-mono/400-italic.css';
 
 :root {
-  /* ------------------------------------------------------------ typefaces
-   * The same three roles the app uses, for the same reasons:
+  /* ------------------------------------------------------------- typeface
+   * ONE FACE, EVERYWHERE - prose, headings, code, UI chrome. The design
+   * system builds its whole hierarchy out of size and weight, and pairing
+   * nothing with it is the discipline that makes that work.
    *
-   * Display - Bricolage Grotesque, a grotesque assembled from parts that
-   * don't quite agree, which is the shape of what Rovie does.
+   * On a docs site this costs nothing and buys something: every page here is
+   * full of API keys, base URLs, model IDs and per-million prices, and the
+   * face that a code block needs is the face that reads those best in a
+   * sentence too. The old split - a grotesque for headings, Atkinson for
+   * prose, system mono for code - meant three faces to render one page whose
+   * subject was machine text throughout.
    *
-   * Body - Atkinson Hyperlegible, drawn so characters cannot be mistaken for
-   * one another. On a docs site full of API keys, base URLs and per-million
-   * prices, "cannot misread a digit or an l/1/I" is a functional requirement.
-   *
-   * Code - the reader's own system mono, deliberately. A code block should
-   * look like the terminal it is about to be pasted into. */
-  --sl-font: 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --sl-font-mono: ui-monospace, 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  --rv-font-display: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+   * --rv-font-display is kept as a name because the heading rules below
+   * reference it, and because a future decision to reintroduce a display face
+   * then has exactly one place to change. */
+  --sl-font:
+    'Berkeley Mono', 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Monaco, Consolas,
+    'Liberation Mono', monospace;
+  --sl-font-mono: var(--sl-font);
+  --rv-font-display: var(--sl-font);
 
-  /* Starlight's default 1.75 is set for short pages. Docs are read in long
-   * passes and the measure below is wide, so the lines need more air. */
+  /* Starlight's default is 1.75 and it stays 1.75, which is above the design
+   * system's stated 1.5 for body copy. That figure is drawn for UI text -
+   * labels, table cells, a paragraph or two in a panel. These pages are read
+   * in long passes down a wide column, and a fixed-pitch face is denser per
+   * line than the proportional one the figure assumes. Tightening to 1.5 here
+   * would cost real legibility to match a number nobody can see. */
   --sl-line-height: 1.75;
 
-  /* Wider than the 45rem default. Every API reference page here carries a
-   * parameter table, and a table that has to scroll sideways inside the prose
-   * column is a table nobody reads. */
-  --sl-content-width: 50rem;
+  /* The design system's measure, 880px, rather than Starlight's 45rem
+   * default. Every API reference page carries a parameter table, and a table
+   * that has to scroll sideways inside the prose column is a table nobody
+   * reads. */
+  --sl-content-width: 55rem;
 }
 
 /* ------------------------------------------------------------------ dark
- * Starlight's default. Matches the @media (prefers-color-scheme: dark) half
- * of the app's _theme.scss - a true black page, not a charcoal one. */
+ * Starlight's default, and the design system's home ground: warm near-black,
+ * never #000. Matches the @media (prefers-color-scheme: dark) half of the
+ * app's _theme.scss. */
 :root {
-  --sl-color-white: #ffffff;
-  --sl-color-gray-1: #e9edf1;
-  --sl-color-gray-2: #c3c9d0;
-  --sl-color-gray-3: #8b949d; /* --rv-text-muted, 8.0:1 on black */
-  --sl-color-gray-4: #4a525a;
-  --sl-color-gray-5: #272d34; /* --rv-border */
-  --sl-color-gray-6: #16191d; /* --rv-surface */
-  --sl-color-black: #000000; /* --rv-bg */
+  --sl-color-white: #fdfcfc; /* --rv-text */
+  --sl-color-gray-1: #e8e6e5;
+  --sl-color-gray-2: #c8c6c4;
+  --sl-color-gray-3: #9a9898; /* --rv-text-muted, 5.6:1 */
+  --sl-color-gray-4: #6e6e73;
+  --sl-color-gray-5: #464343; /* --rv-border */
+  --sl-color-gray-6: #302c2c; /* --rv-surface */
+  --sl-color-black: #201d1d; /* --rv-bg */
 
-  /* --rv-primary / --rv-line. The brand blue is 2.6:1 on black - too dark to
-   * be a link there - so dark gets the lifted version. */
-  --sl-color-accent-low: #062b46;
-  --sl-color-accent: #3d9ae0;
-  --sl-color-accent-high: #a9d2f0;
+  /* --rv-primary / --rv-line. The system's accent is #007aff, which is 3.2:1
+   * on this ground - fine as a fill, too dark to be a link - so dark takes the
+   * lifted version at 7.0:1. */
+  --sl-color-accent-low: #00305f;
+  --sl-color-accent: #4da3ff;
+  --sl-color-accent-high: #a8ccff;
 
-  --sl-color-text-accent: #5ea0cc; /* --rv-line */
-  --sl-color-bg-nav: #000000;
-  --sl-color-bg-sidebar: #000000;
-  --sl-color-hairline-shade: #272d34;
+  --sl-color-text-accent: #4da3ff; /* --rv-line */
+  --sl-color-bg-nav: #201d1d;
+  --sl-color-bg-sidebar: #201d1d;
+  --sl-color-hairline-shade: #464343;
 
-  /* Asides. Note (blue) and tip (green) carry the theme's own hues rather
-   * than Starlight's defaults, so a callout reads as part of this site. */
-  --sl-color-blue: #3d9ae0;
-  --sl-color-blue-low: #062b46;
-  --sl-color-blue-high: #a9d2f0;
-  --sl-color-green: #2f9e6a; /* --rv-success */
-  --sl-color-green-low: #06301e;
-  --sl-color-green-high: #63c79b; /* --rv-success-text */
-  --sl-color-orange: #e08c1f; /* --rv-accent */
+  /* Asides. Note (blue), tip (green), caution (orange) and danger (red) carry
+   * the theme's own hues rather than Starlight's defaults, so a callout reads
+   * as part of this site. The -low value is the panel fill, the -high value is
+   * the text on it. */
+  --sl-color-blue: #4da3ff;
+  --sl-color-blue-low: #00305f;
+  --sl-color-blue-high: #a8ccff;
+  --sl-color-green: #30d158; /* --rv-success */
+  --sl-color-green-low: #0a2e1a;
+  --sl-color-green-high: #7fe49b;
+  --sl-color-orange: #ff9f0a; /* --rv-accent */
   --sl-color-orange-low: #3a2404;
-  --sl-color-orange-high: #f0c07a;
-  --sl-color-red: #d9503f; /* --rv-danger */
+  --sl-color-orange-high: #ffcb7a;
+  --sl-color-red: #ff3b30; /* --rv-danger */
   --sl-color-red-low: #3d100b;
-  --sl-color-red-high: #f08b7d; /* --rv-danger-text */
+  --sl-color-red-high: #ff6b62; /* --rv-danger-text */
 }
 
 /* ----------------------------------------------------------------- light
- * The :root half of the app's _theme.scss: a white page with a warm
- * off-white for raised surfaces, and the brand blue at full strength. */
+ * The :root half of the app's _theme.scss: the system's warm off-white as the
+ * page, its near-black as the ink - the same two colours as dark, swapped. */
 :root[data-theme='light'] {
-  --sl-color-white: #000000; /* --rv-text */
-  --sl-color-gray-1: #1a1a1a;
-  --sl-color-gray-2: #3d3a34;
-  --sl-color-gray-3: #6b675e; /* --rv-text-muted, 5.6:1 on white */
-  --sl-color-gray-4: #8c887e;
-  --sl-color-gray-5: #e2ded6; /* --rv-border */
-  --sl-color-gray-6: #f5f3ee; /* --rv-surface */
-  --sl-color-gray-7: #faf9f6;
-  --sl-color-black: #ffffff; /* --rv-bg */
+  --sl-color-white: #201d1d; /* --rv-text */
+  --sl-color-gray-1: #322e2e;
+  --sl-color-gray-2: #4a4646;
+  --sl-color-gray-3: #6e6e73; /* --rv-text-muted, 5.5:1 */
+  --sl-color-gray-4: #8e8b8b;
+  --sl-color-gray-5: #e3dfdf; /* --rv-border, flattened from rgba(15,0,0,.12) */
+  --sl-color-gray-6: #f8f7f7; /* --rv-surface */
+  --sl-color-gray-7: #fbfafa;
+  --sl-color-black: #fdfcfc; /* --rv-bg */
 
-  --sl-color-accent-low: #dbeaf6;
-  --sl-color-accent: #076db0; /* --rv-primary, 5.0:1 */
-  --sl-color-accent-high: #05578d; /* --rv-line, 7.4:1 */
+  /* The system states its accent as #007aff -> #0056b3 -> #004085, and light
+   * takes the middle stop as its base: #007aff is only 3.9:1 here and this
+   * token carries link text. Same reasoning as --rv-primary in _theme.scss. */
+  --sl-color-accent-low: #dbeaf9;
+  --sl-color-accent: #0056b3; /* --rv-primary, 6.9:1 */
+  --sl-color-accent-high: #004085; /* --rv-line, 8.1:1 */
 
-  --sl-color-text-accent: #05578d;
-  --sl-color-bg-nav: #ffffff;
-  --sl-color-bg-sidebar: #ffffff;
-  --sl-color-hairline-shade: #e2ded6;
+  --sl-color-text-accent: #0056b3;
+  --sl-color-bg-nav: #fdfcfc;
+  --sl-color-bg-sidebar: #fdfcfc;
+  --sl-color-hairline-shade: #e3dfdf;
 
-  --sl-color-blue: #076db0;
-  --sl-color-blue-low: #dbeaf6;
-  --sl-color-blue-high: #05578d;
-  --sl-color-green: #0c6b42; /* --rv-success */
-  --sl-color-green-low: #d6efe3;
-  --sl-color-green-high: #0a5a38; /* --rv-success-text */
-  --sl-color-orange: #b45309; /* --rv-accent, 4.7:1 - the map's amber */
-  --sl-color-orange-low: #fbe8d5;
-  --sl-color-orange-high: #8a3f07;
-  --sl-color-red: #b32d1f; /* --rv-danger */
-  --sl-color-red-low: #f8dcd9;
-  --sl-color-red-high: #96271b; /* --rv-danger-text */
+  --sl-color-blue: #0056b3;
+  --sl-color-blue-low: #dbeaf9;
+  --sl-color-blue-high: #004085;
+  --sl-color-green: #10693c; /* --rv-state-ok */
+  --sl-color-green-low: #d9f0e3;
+  --sl-color-green-high: #0d5731;
+  --sl-color-orange: #a85f02; /* --rv-accent, 4.6:1 */
+  --sl-color-orange-low: #fbead4;
+  --sl-color-orange-high: #7d4602;
+  --sl-color-red: #c1271d; /* --rv-danger-text, 5.1:1 */
+  --sl-color-red-low: #fadfdc;
+  --sl-color-red-high: #9b1e16;
 }
 
 /* --------------------------------------------------------------- headings
- * Bricolage sets tighter than a system grotesque, so tracking is pulled back
- * here rather than per-page - the same figures as the app's _typography.scss. */
+ * Same face as the body, so the hierarchy is carried by size and weight
+ * alone - 700 here, and 700 nowhere else.
+ *
+ * Tracking is 0. The negative tracking this used to carry was tuned for a
+ * grotesque that set loose; a fixed-pitch face is already spaced on an even
+ * pitch, and pulling it in closes the counters and costs exactly the
+ * character separation the face was chosen for. */
 .sl-markdown-content h1,
 .sl-markdown-content h2,
 .sl-markdown-content h3,
@@ -132,20 +166,15 @@
 .content-panel h1,
 .site-title {
   font-family: var(--rv-font-display);
-  font-optical-sizing: auto;
   font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.content-panel h1,
-.sl-markdown-content h1 {
-  letter-spacing: -0.035em;
+  letter-spacing: 0;
 }
 
 /* ----------------------------------------------------------------- digits
  * Every figure on this site is money, a token count or a context window, and
- * all three are read by comparison down a column. Lining tabular digits are
- * the point of the body face. */
+ * all three are read by comparison down a column. A mono face already advances
+ * every glyph by the same width; `lining-nums` keeps the digits off the
+ * old-style descenders that would otherwise break the column. */
 .sl-markdown-content table,
 .sl-markdown-content td,
 .sl-markdown-content th,
@@ -161,8 +190,44 @@ code {
   max-width: 100%;
 }
 
+/* ------------------------------------------------------------------ shape
+ * The system is flat and effectively single-radius: 4px on everything, 6px on
+ * inputs because they are the one component drawn with generous internal
+ * padding. Starlight has no radius token, so the surfaces that ship rounded
+ * are corrected here. Depth is communicated with borders and colour shifts,
+ * never with a drop shadow. */
+:root {
+  --rv-radius: 4px;
+  --rv-radius-input: 6px;
+}
+
+.sl-markdown-content pre,
+.sl-markdown-content .expressive-code .frame,
+.sl-markdown-content .expressive-code pre,
+.starlight-aside,
+.card,
+.sl-markdown-content blockquote {
+  border-radius: var(--rv-radius);
+}
+
+/* Inline code is a token inside a sentence, not a panel: it takes the small
+ * radius too, and a border rather than the tint-only treatment, so it reads as
+ * quoted machine text on either ground. */
+.sl-markdown-content :not(pre) > code {
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: var(--rv-radius);
+}
+
+/* Search is the one real input on the site. */
+.search-input,
+site-search button,
+site-search dialog {
+  border-radius: var(--rv-radius-input);
+}
+
 /* ------------------------------------------------------------- site title
- * Sits next to the mark in the header, the same pairing as the app's. */
+ * Sits next to the mark in the header. Weight 700, tracking 0 - see the
+ * heading note above. */
 .site-title {
-  letter-spacing: -0.03em;
+  letter-spacing: 0;
 }

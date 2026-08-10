@@ -26,20 +26,30 @@ Not running the docs locally? Set `VITE_DOCS_URL=https://docs.rovie.africa` in
 `.env.local` and the links point at the deployed site instead. The reverse
 override is `ROVIE_APP_URL` for the docs build.
 
-They share a palette, two typefaces and a wordmark, and link into each other's
-routes — but nothing else. See `docs/README.md` for why the documentation is a
+They share a palette, a typeface and the brand artwork, and link into each
+other's routes — but nothing else. See `docs/README.md` for why the documentation is a
 separate site rather than a section of this one, and how to deploy it.
 
-## Map geometry
+## Generated assets
 
-`src/assets/geo/` is generated, not written. `npm run geo:build` rebuilds it
-from the `world-atlas` package: the globe's GeoJSON, the wordmark's outline and
-the sign-in plate's projected paths. Commit what it produces, and don't edit
-those files by hand — see `scripts/build-geo.mjs` for what each one is for.
+Two directories are generated, not written. Commit what they produce and don't
+edit the output by hand.
 
-The docs site generates its logo from the same wordmark outline
-(`docs/scripts/build-logo.mjs`), so `npm run geo:build` should be followed by
-`cd docs && npm run logo:build`. CI checks that it was.
+`src/assets/geo/` — `npm run geo:build` rebuilds it from the `world-atlas`
+package: the homepage globe's GeoJSON and the sign-in plate's projected paths.
+See `scripts/build-geo.mjs` for what each one is for.
+
+`src/assets/logo.generated.ts` — `npm run logo:build` bakes the brand SVGs in
+`public/logos/` into the path data the `Logo` component inlines. Inlined rather
+than loaded as an `<img>` so every stroke can be `currentColor` and follow the
+theme; that is also why the `-inverted` files in `public/logos/` are never used
+by the app, and stay there only as downloadable assets.
+
+The docs site bakes its own header mark from that same generated module
+(`docs/scripts/build-logo.mjs`) — Starlight renders the logo in an `<img>`,
+which inherits no colour, so it needs one file per theme. After replacing a
+logo SVG, run `npm run logo:build` and then `cd docs && npm run logo:build`.
+CI checks that it was.
 
 ## Where the documentation went
 

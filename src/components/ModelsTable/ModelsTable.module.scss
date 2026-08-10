@@ -16,12 +16,12 @@
 
   thead th {
     color: v.$color-text-muted;
-    font-weight: 600;
+    font-weight: v.$font-weight-medium;
     white-space: nowrap;
   }
 
   tbody th {
-    font-weight: 600;
+    font-weight: v.$font-weight-medium;
   }
 }
 
@@ -67,7 +67,7 @@
 
 .logo {
   flex: 0 0 auto;
-  font-size: 1.25rem;
+  font-size: v.$font-size-lg;
 }
 
 .modelText {
@@ -78,7 +78,7 @@
 }
 
 .modelName {
-  font-weight: 600;
+  font-weight: v.$font-weight-medium;
 }
 
 .badges {
@@ -89,11 +89,11 @@
 
 .badge {
   padding: 0 v.$space-2;
-  font-size: 0.6875rem;
+  font-size: v.$font-size-xs;
   font-weight: 400;
   color: v.$color-text-muted;
   border: 1px solid v.$color-border;
-  border-radius: 999px;
+  border-radius: v.$radius-sm;
   white-space: nowrap;
 }
 
@@ -164,7 +164,7 @@
   min-width: 0;
 
   dt {
-    font-size: 0.6875rem;
+    font-size: v.$font-size-xs;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     color: v.$color-text-muted;

@@ -9,7 +9,7 @@
 
 .label {
   font-size: v.$font-size-sm;
-  font-weight: 600;
+  font-weight: v.$font-weight-medium;
   color: v.$color-text;
 }
 
@@ -17,7 +17,7 @@
   width: 100%;
   padding: 11px 14px;
   border: 1px solid v.$color-border;
-  border-radius: v.$radius-md;
+  border-radius: v.$radius-input;
   background-color: v.$color-bg;
   color: v.$color-text;
   font-family: inherit;
@@ -31,14 +31,14 @@
   &:focus {
     outline: none;
     border-color: v.$color-primary;
-    box-shadow: 0 0 0 3px color-mix(in srgb, v.$color-primary 18%, transparent);
+    box-shadow: 0 0 0 2px v.$color-primary;
   }
 
   &[aria-invalid='true'] {
     border-color: v.$color-danger;
 
     &:focus {
-      box-shadow: 0 0 0 3px color-mix(in srgb, v.$color-danger 18%, transparent);
+      box-shadow: 0 0 0 2px v.$color-danger;
     }
   }
 
@@ -120,12 +120,12 @@
   width: 100%;
   padding: 11px 18px;
   border: 1px solid v.$color-border;
-  border-radius: 100px;
+  border-radius: v.$radius-sm;
   background-color: v.$color-bg;
   color: v.$color-text;
   font-family: inherit;
   font-size: v.$font-size-sm;
-  font-weight: 600;
+  font-weight: v.$font-weight-medium;
   letter-spacing: 0.32px;
   cursor: pointer;
   transition: background-color 0.15s ease;

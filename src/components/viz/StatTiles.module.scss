@@ -20,7 +20,7 @@
 }
 
 .label {
-  font-size: 0.75rem;
+  font-size: v.$font-size-xs;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: v.$color-text-muted;
@@ -39,7 +39,7 @@
 
 .note {
   margin: 0;
-  font-size: 0.75rem;
+  font-size: v.$font-size-xs;
   color: v.$color-text-muted;
 }
 

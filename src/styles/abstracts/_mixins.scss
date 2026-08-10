@@ -23,7 +23,11 @@
   }
 }
 
-// Consistent focus ring for keyboard accessibility across every interactive element.
+// Consistent focus ring for keyboard accessibility across every interactive
+// element. The system specifies a 2px accent ring; it is drawn as an `outline`
+// rather than the spec's `box-shadow` because a shadow is clipped by any
+// `overflow: hidden` ancestor, and several of these controls live inside one.
+// Same appearance, one fewer way to silently lose a focus indicator.
 @mixin focus-ring {
   &:focus-visible {
     outline: 2px solid v.$color-primary;
@@ -32,14 +36,43 @@
 }
 
 // A horizontally-centered, max-width content container.
-@mixin container {
+//
+// Gutters step 16 -> 20 -> 24 with the viewport. They grow rather than shrink
+// because the measure is capped: past 880px the extra width goes to the
+// margins, and a gutter that stayed at 16px there would leave the text
+// looking like it had been shoved against the edge of its own column.
+@mixin container($max: v.$container-max-width) {
   width: 100%;
-  max-width: v.$container-max-width;
+  max-width: $max;
   margin-inline: auto;
   padding-inline: v.$space-4;
 
   @include respond-to('md') {
-    padding-inline: v.$space-6;
+    padding-inline: 20px;
+  }
+
+  @include respond-to('lg') {
+    padding-inline: v.$space-5;
+  }
+}
+
+// The container for pages built around a wide table or chart - leaderboard,
+// models, dashboard. See $container-max-width-wide for why these are allowed
+// past the system's measure.
+@mixin container-wide {
+  @include container(v.$container-max-width-wide);
+}
+
+// The vertical rhythm between full-page sections.
+@mixin section-spacing($property: padding-block) {
+  #{$property}: v.$space-section-sm;
+
+  @include respond-to('md') {
+    #{$property}: v.$space-section-md;
+  }
+
+  @include respond-to('lg') {
+    #{$property}: v.$space-section;
   }
 }
 

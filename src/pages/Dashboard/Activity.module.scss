@@ -15,7 +15,7 @@
   }
 
   th {
-    font-weight: 600;
+    font-weight: v.$font-weight-medium;
     color: v.$color-text-muted;
   }
 
@@ -42,7 +42,7 @@
 // not to compete with the model name it explains.
 .cached {
   margin-left: v.$space-2;
-  font-size: 0.75rem;
+  font-size: v.$font-size-xs;
   color: v.$color-text-muted;
 }
 

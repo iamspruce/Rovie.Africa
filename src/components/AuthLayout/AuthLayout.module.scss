@@ -58,14 +58,12 @@
 .title {
   margin: 0 0 v.$space-2;
   font-family: v.$font-family-display;
-  // Bricolage is variable, so the display size gets its own optical size and
-  // a tighter track than the body face - the point of carrying a variable
-  // display face at all.
-  font-variation-settings: 'opsz' 32;
+  // Size and weight carry this on their own - there is one face on the site
+  // now, so a display size is a display size because it is big and bold, not
+  // because it is set in something else.
   font-size: v.$font-size-2xl;
   font-weight: 700;
   line-height: 1.1;
-  letter-spacing: -0.02em;
   color: v.$color-text;
 }
 
@@ -85,6 +83,6 @@
 
   a {
     color: v.$color-primary;
-    font-weight: 600;
+    font-weight: v.$font-weight-medium;
   }
 }

@@ -16,16 +16,15 @@
 
   h2 {
     margin: 0.75rem 0 0.8rem;
-    font-size: clamp(1.6rem, 3.2vw, 2.4rem);
-    font-weight: 600;
-    letter-spacing: -0.028em;
+    font-size: clamp(v.$font-size-2xl, 3.2vw, v.$font-size-3xl);
+    font-weight: v.$font-weight-medium;
     line-height: 1.12;
     text-wrap: balance;
   }
 
   p {
     margin: 0;
-    font-size: 0.98rem;
+    font-size: v.$font-size-base;
     line-height: 1.7;
     color: color-mix(in srgb, v.$color-text 70%, v.$color-text-muted);
   }
@@ -33,8 +32,11 @@
 
 .eyebrow {
   color: v.$color-line;
-  font: 700 0.66rem/1 v.$font-family-display;
-  letter-spacing: 0.2em;
+  font-family: v.$font-family-base;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-bold;
+  line-height: v.$line-height-tight;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
@@ -66,10 +68,10 @@
 // Bigger than the old glyphs - the mark is how a developer scans this list,
 // so it gets to be the first thing the eye lands on.
 .logo {
-  font-size: 1.75rem;
+  font-size: v.$font-size-2xl;
 
   @include m.respond-to('sm') {
-    font-size: 2rem;
+    font-size: v.$font-size-2xl;
   }
 }
 
@@ -83,15 +85,14 @@
 
 .name {
   font-family: v.$font-family-display;
-  font-size: 1.05rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-medium;
   color: v.$color-text;
 }
 
 .released {
   font-variant-numeric: tabular-nums lining-nums;
-  font-size: 0.72rem;
+  font-size: v.$font-size-xs;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: v.$color-text-muted;
@@ -119,7 +120,7 @@
 // give, so it carries the strongest text on the row.
 .yield {
   font-variant-numeric: tabular-nums lining-nums;
-  font-size: 1rem;
+  font-size: v.$font-size-base;
   font-weight: 700;
   color: v.$color-text;
   white-space: nowrap;
@@ -127,7 +128,7 @@
 
 .rate {
   font-variant-numeric: tabular-nums lining-nums;
-  font-size: 0.76rem;
+  font-size: v.$font-size-xs;
   color: v.$color-text-muted;
   white-space: nowrap;
 }
@@ -147,7 +148,7 @@
 
 .caption {
   margin: 1.5rem 0 0;
-  font-size: 0.76rem;
+  font-size: v.$font-size-xs;
   line-height: 1.5;
   color: v.$color-text-muted;
 }
@@ -156,7 +157,7 @@
   display: inline-block;
   margin-top: 1.6rem;
   color: v.$color-line;
-  font-size: 0.86rem;
+  font-size: v.$font-size-sm;
   font-weight: 700;
   text-decoration: none;
 
@@ -174,7 +175,7 @@
 .state {
   margin: 0;
   padding-block: 1.5rem;
-  font-size: 0.92rem;
+  font-size: v.$font-size-sm;
   line-height: 1.6;
   color: v.$color-text-muted;
 

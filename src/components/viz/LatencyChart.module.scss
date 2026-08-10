@@ -18,7 +18,7 @@
   margin: 0 0 v.$space-3;
   padding: 0;
   list-style: none;
-  font-size: 0.75rem;
+  font-size: v.$font-size-xs;
   // Legend text wears text ink, never the series colour. The swatch beside it
   // carries the identity.
   color: v.$color-text-muted;
@@ -39,14 +39,14 @@
 
 .tick {
   fill: v.$color-text-muted;
-  font-size: 0.6875rem;
+  font-size: v.$font-size-xs;
   font-variant-numeric: tabular-nums;
 }
 
 // The one series label that does wear its series colour: it is standing in for
 // a legend swatch at the end of the line, not describing a value.
 .seriesLabel {
-  font-size: 0.6875rem;
+  font-size: v.$font-size-xs;
   font-weight: 700;
 }
 
@@ -61,7 +61,7 @@
 
 .thresholdLabel {
   fill: v.$color-accent;
-  font-size: 0.625rem;
+  font-size: v.$font-size-xs;
 }
 
 .crosshair {

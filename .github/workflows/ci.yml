@@ -34,6 +34,17 @@ jobs:
 
       - run: npm ci
 
+      # src/assets/logo.generated.ts is baked from public/logos/*.svg, and the
+      # header, the footer, the sign-in plate and the docs site's own mark all
+      # read from it. Replacing an SVG without rerunning the script would leave
+      # every one of them drawing the previous logo, with nothing to notice it
+      # by. The script also asserts the two lockups still share their mark
+      # artwork, so this catches a half-finished re-export too.
+      - name: Check the logo is up to date
+        run: |
+          npm run logo:build
+          git diff --exit-code src/assets/logo.generated.ts
+
       - name: Lint
         run: npm run lint
 
@@ -68,10 +79,11 @@ jobs:
       - name: Validate openapi.yaml
         run: npm run openapi:validate
 
-      # The mark is generated from the app's own wordmark geometry. Rebuilding
-      # it here catches the case where that geometry changed and the committed
-      # SVGs were not regenerated - the docs would otherwise ship a stale logo
-      # indefinitely, with nothing to notice it by.
+      # The header mark is baked from the app's src/assets/logo.generated.ts -
+      # one file per theme, because Starlight renders the logo in an <img>,
+      # which inherits none of the page's colour. Rebuilding it here catches
+      # the case where the artwork changed and these two SVGs were not
+      # regenerated; the docs would otherwise ship a stale logo indefinitely.
       - name: Check the logo is up to date
         run: |
           npm run logo:build

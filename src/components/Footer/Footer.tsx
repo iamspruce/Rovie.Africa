@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { LogoMap } from '../LogoMap/LogoMap';
+import { Logo } from '../Logo/Logo';
 import { SmartLink } from '../SmartLink/SmartLink';
 import { Button } from '../Button/Button';
 import { CONTACT_EMAIL } from '../../content/navLinks';
@@ -132,9 +132,10 @@ export function Footer() {
 
       <div className={styles.sitemap}>
         <div className={styles.brand}>
+          {/* Horizontal lockup, matching the header. The mark and the "Rovie"
+              span it used to sit beside are both inside the artwork now. */}
           <Link to="/" className={styles.logo} aria-label="Rovie.africa home">
-            <LogoMap size={30} />
-            <span>Rovie</span>
+            <Logo variant="horizontal" height={38} />
           </Link>
 
           <p className={styles.blurb}>
@@ -178,7 +179,7 @@ export function Footer() {
             is about, sitting under the last line on the page. Decorative, so
             it's hidden from assistive tech and takes no pointer events. */}
         <div className={styles.watermark} aria-hidden="true">
-          <LogoMap size={300} />
+          <Logo variant="mark" height={300} />
         </div>
 
         <p className={styles.copyright}>

@@ -45,7 +45,7 @@
   composes: choice;
   border-color: v.$color-primary;
   background-color: color-mix(in srgb, v.$color-primary 12%, transparent);
-  font-weight: 600;
+  font-weight: v.$font-weight-medium;
 }
 
 .actions {

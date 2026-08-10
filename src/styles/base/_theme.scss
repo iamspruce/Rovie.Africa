@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------
-// Theme tokens.
+// Theme tokens - OpenCode design system.
 //
 // Every colour on the site resolves through a custom property declared here.
 // Sass variables can't follow a preference that changes after build, so the
@@ -10,6 +10,14 @@
 // when the visitor's operating system asks for one. There is no toggle and no
 // stored choice: the OS already knows, and honouring it is both less code and
 // the answer people expect.
+//
+// THE ONE RULE THIS PALETTE IS BUILT ON: nothing here is a pure neutral. The
+// dark ground is #201d1d, not #000; the light ground is #fdfcfc, not #fff.
+// Every grey carries a red-channel lift. That warmth is what makes the system
+// read as a terminal someone has been living in rather than as a spec sheet,
+// and a single #000 or #ffffff dropped into it is visible immediately - it
+// goes blue against everything around it. If you need a new neutral, mix it
+// from a token that is already here rather than reaching for a hex.
 //
 // Contrast figures below are against that theme's own background, measured as
 // WCAG 2.1 contrast ratio. Anything carrying small text is kept at 4.5:1 or
@@ -24,73 +32,98 @@
   color-scheme: light dark;
 
   // ------------------------------------------------------------ surfaces
-  --rv-bg: #ffffff;
-  // Warm off-white for hover states and raised panels. Far enough from the
-  // page to be visible, which #fffdf9 was not - a 1% step reads as a
-  // rendering artefact rather than as a surface.
-  --rv-surface: #f5f3ee;
-  --rv-border: #e2ded6;
+  // The system's warm off-white, used as the ground here and as the ink in
+  // dark. Same two colours at both ends, swapped - that is the whole idea.
+  --rv-bg: #fdfcfc;
+  // The input fill from the spec, doing duty as every raised panel and hover
+  // state. A 2% step, which is all a flat system needs to separate a surface
+  // from the page when there is a border doing the real work.
+  --rv-surface: #f8f7f7;
+  // Warm transparent rather than a solid grey, so it darkens whatever it sits
+  // on instead of painting a fixed line over it.
+  --rv-border: rgba(15, 0, 0, 0.12);
 
   // ---------------------------------------------------------------- text
-  --rv-text: #000000;
-  // 5.6:1. The previous #333 sat at 12.6:1 - indistinguishable from body
-  // text, so "muted" meant nothing.
-  --rv-text-muted: #6b675e;
+  --rv-text: #201d1d;
+  // 5.5:1. The system's "meta" grey - captions, timestamps, table sublabels.
+  --rv-text-muted: #6e6e73;
 
   // --------------------------------------------------------------- brand
-  // 5.0:1 on white as text, and carries white at 5.0:1 as a fill.
-  --rv-primary: #076db0;
-  --rv-primary-contrast: #ffffff;
-  // The rail, the eyebrows, the step markers - the site's "line that means
-  // something". On a light ground it has to go darker than the brand blue,
-  // not lighter. 7.4:1.
-  --rv-line: #05578d;
+  // The system states its accent as a three-stage progression - #007aff ->
+  // #0056b3 -> #004085 - and this theme takes the middle stop as its base
+  // rather than the first. That is not a deviation for its own sake: #007aff
+  // is 3.9:1 on this ground, and $color-primary is used as small text in a
+  // dozen components (inline links, the sign-in/sign-up switch, dropdown
+  // labels on hover), all of which would fail AA. #0056b3 is 6.9:1 as text
+  // and carries #fdfcfc at 6.9:1 as a fill, so one value covers both jobs.
+  //
+  // #007aff is not lost - it is the bright end of the button gradient below,
+  // which is a large filled shape and the one place it reads correctly here.
+  --rv-primary: #0056b3;
+  --rv-primary-contrast: #fdfcfc;
+  // The accent's darkest stop, carrying the site's "line that means
+  // something": the mission rail, the eyebrows, the step markers. 8.1:1.
+  --rv-line: #004085;
 
-  // Amber means "your country" on the map and nothing else. #d97706 is only
-  // 3.0:1 on white, so the light theme uses a deeper burnt tone at 4.7:1 and
-  // keeps the brighter one for dark.
-  --rv-accent: #b45309;
+  // Amber means "your country" on the map and nothing else. The system's
+  // warning orange is 2.1:1 on a light ground, so light uses a deepened tone
+  // and keeps #ff9f0a for dark, where it belongs.
+  --rv-accent: #a85f02; // 4.6:1
 
-  --rv-danger: #b32d1f; // 5.9:1
-  --rv-success: #0c6b42; // 5.4:1
+  --rv-danger: #ff3b30;
+  --rv-success: #30d158;
 
   // ------------------------------------------------------------ feedback
-  // Status text sits on the page background, so it needs the readable tone
-  // rather than the fill tone.
-  --rv-danger-text: #96271b;
-  --rv-success-text: #0a5a38;
+  // Status text sits on the page background, so it needs a readable tone
+  // rather than the fill tone - the system's raw red and green are 3.3:1 and
+  // 1.7:1 here, both unusable for a sentence.
+  --rv-danger-text: #c1271d; // 5.1:1
+  --rv-success-text: #10693c; // 5.2:1
+
+  // Service state on the status page and the support page. Kept separate from
+  // the generic danger/success pair even though they currently resolve to the
+  // same colours: "degraded" is a third state that neither of those names, and
+  // these three were previously hardcoded per-file, which meant they were the
+  // only colours on the site that did not follow the theme. They carry small
+  // text as well as dots, so both ends are held at 4.5:1.
+  --rv-state-ok: #10693c; // 5.2:1
+  --rv-state-slow: #a85f02; // 4.6:1
+  --rv-state-down: #c1271d; // 5.1:1
 
   // --------------------------------------------------------------- misc
   // Behind a modal. Warm near-black rather than pure, so it reads as shade
   // over a warm page instead of as a hole in it.
-  --rv-scrim: rgba(26, 23, 18, 0.45);
+  --rv-scrim: rgba(32, 29, 29, 0.45);
 
-  // The primary button. A gradient in both themes, but the light one is
-  // brand blue - the dark theme's silver reads as a dead control on white.
-  --rv-btn-primary-from: #05639f;
-  --rv-btn-primary-to: #2b8fd0;
-  --rv-btn-primary-text: #ffffff;
+  // The primary button - the one place this site departs from the system on
+  // purpose. OpenCode specifies a flat dark fill; the gradient is kept
+  // because it is the site's own signature. Everything around it went flat,
+  // which makes the one gradient louder than it was before, so it is spent
+  // only on the primary action and nowhere else.
+  --rv-btn-primary-from: #004085;
+  --rv-btn-primary-to: #007aff;
+  --rv-btn-primary-text: #fdfcfc;
 
   // ---------------------------------------------------------------- map
   // The homepage globe. Land is a tint of the page, not a darkening of it.
-  --rv-map-land: #eae7df;
-  --rv-map-land-stroke: #d8d4ca;
+  --rv-map-land: #efedec;
+  --rv-map-land-stroke: #ddd9d8;
   // Keyline around the country you're in. It has to separate amber from the
-  // ocean behind it, so it goes dark here and white on the dark theme -
-  // white-on-amber over a pale ocean would erase the edge it exists to draw.
-  --rv-map-highlight-stroke: #7a3705;
-  // The dashed routes cross the lit face of Africa, which is a mid-blue in
+  // ocean behind it, so it goes dark here and light on the dark theme -
+  // pale-on-amber over a pale ocean would erase the edge it exists to draw.
+  --rv-map-highlight-stroke: #5c3401;
+  // The dashed routes cross the lit face of Africa, which is a mid tone in
   // both themes. Reading over that means going the opposite way from the
   // page: deep here, pale there.
-  --rv-map-route: #06304f;
+  --rv-map-route: #002b59;
 
   // ----------------------------------------------------- visualisation
   // Chart chrome only - the data colours are in _variables.scss and in
   // lib/viz/palette.ts, and are shared by both themes.
-  --rv-viz-empty: #e6e2da;
-  --rv-viz-grid: #ebe8e1;
-  --rv-viz-axis: #c7c2b8;
-  --rv-viz-primary: #1a6cb4;
+  --rv-viz-empty: #eeecec;
+  --rv-viz-grid: #f1efef;
+  --rv-viz-axis: #cbc8c8;
+  --rv-viz-primary: #007aff;
 
   // --------------------------------------------------------------- plate
   // The sign-in / sign-up panel that carries the Africa map.
@@ -103,69 +136,82 @@
   // in light mode would leave the amber "your country" mark with nothing to
   // sit against, which is the one thing the panel exists to show.
   //
+  // It is built from the dark theme's own surface stack, so the plate is
+  // literally a piece of the dark site set down on the light one. Note it
+  // takes the dark theme's SURFACE (#302c2c) and not its background: on the
+  // dark theme the plate has to stay an object sitting on the page, and a
+  // plate painted #201d1d on a #201d1d page is not an object, it is a hole.
+  //
   // Contrast is measured against --rv-plate, not the page.
-  --rv-plate: #071b2b;
-  --rv-plate-text: #f3f1ec; // 14.9:1
-  --rv-plate-muted: #93aec4; // 7.2:1
-  --rv-plate-land: #0f3149;
-  --rv-plate-stroke: #1e4a6d; // border weight only, never carries text
-  --rv-plate-rule: #14384f; // the latitude rule behind the marker
+  --rv-plate: #302c2c;
+  --rv-plate-text: #fdfcfc; // 13.3:1
+  --rv-plate-muted: #9a9898; // 4.8:1
+  --rv-plate-land: #464343;
+  --rv-plate-stroke: #5c5858; // border weight only, never carries text
+  --rv-plate-rule: #3d3939; // the latitude rule behind the marker
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --rv-bg: #000000;
-    --rv-surface: #16191d;
-    --rv-border: #272d34;
+    // The system's home ground. Warm near-black, never #000.
+    --rv-bg: #201d1d;
+    --rv-surface: #302c2c;
+    // Solid here rather than transparent: a dark translucent line over a dark
+    // ground disappears, so dark gets the system's explicit border grey.
+    --rv-border: #464343;
 
-    --rv-text: #ffffff;
-    // 8.0:1. The previous #5b6670 was 4.06:1 on pure black, which fails AA
-    // for the small text it was mostly used on.
-    --rv-text-muted: #8b949d;
+    --rv-text: #fdfcfc;
+    // 5.6:1. The system's muted grey; its dimmer "meta" tone is reserved for
+    // the plate, where the ground is the same but the type is larger.
+    --rv-text-muted: #9a9898;
 
-    // The brand blue is 2.6:1 on black - too dark to be a link or an active
-    // state there. Dark gets a lifted version at 7.3:1, and the fill carries
-    // dark text rather than white.
-    --rv-primary: #3d9ae0;
-    --rv-primary-contrast: #041d2e;
-    // What `color-mix(in srgb, #076db0 65%, #fff)` used to resolve to, now
-    // named instead of recomputed in fifteen files.
-    --rv-line: #5ea0cc;
+    // #007aff is only 3.2:1 on this ground - fine as a fill, too dark to be a
+    // link. Dark lifts the accent and takes dark text on top of it.
+    --rv-primary: #4da3ff; // 7.0:1
+    --rv-primary-contrast: #201d1d;
+    --rv-line: #4da3ff;
 
-    --rv-accent: #e08c1f;
+    // The system's warning orange, at full strength where it works. 9.0:1.
+    --rv-accent: #ff9f0a;
 
-    --rv-danger: #d9503f;
-    --rv-success: #2f9e6a;
-    --rv-danger-text: #f08b7d;
-    --rv-success-text: #63c79b;
+    --rv-danger: #ff3b30;
+    --rv-success: #30d158;
+    --rv-danger-text: #ff6b62; // 5.7:1
+    --rv-success-text: #30d158; // 9.9:1
 
-    --rv-scrim: rgba(0, 0, 0, 0.66);
+    // The system's semantic trio at full strength - which is where they were
+    // drawn to sit. All three clear 5:1 on this ground.
+    --rv-state-ok: #30d158; // 9.9:1
+    --rv-state-slow: #ff9f0a; // 9.0:1
+    --rv-state-down: #ff6b62; // 5.7:1
 
-    // Unchanged: the silver gradient was drawn for a black page and still
-    // belongs here.
-    --rv-btn-primary-from: rgb(110, 113, 128);
-    --rv-btn-primary-to: rgb(237, 242, 242);
-    --rv-btn-primary-text: rgb(29, 35, 40);
+    --rv-scrim: rgba(20, 18, 18, 0.7);
 
-    --rv-map-land: #12161a;
-    --rv-map-land-stroke: #232a31;
-    --rv-map-highlight-stroke: #ffffff;
-    --rv-map-route: #9cc5df;
+    // Same two accent stops as light, ordered dark-to-light so the sweep runs
+    // the same direction against a ground that moved the other way.
+    --rv-btn-primary-from: #0056b3;
+    --rv-btn-primary-to: #007aff;
+    --rv-btn-primary-text: #fdfcfc;
 
-    --rv-viz-empty: #262d33;
-    --rv-viz-grid: #2c2c2a;
-    --rv-viz-axis: #383835;
-    --rv-viz-primary: #3987e5;
+    --rv-map-land: #302c2c;
+    --rv-map-land-stroke: #464343;
+    --rv-map-highlight-stroke: #fdfcfc;
+    --rv-map-route: #ffc46b;
+
+    --rv-viz-empty: #302c2c;
+    --rv-viz-grid: #2c2929;
+    --rv-viz-axis: #464343;
+    --rv-viz-primary: #4da3ff;
 
     // Identical to the light block on purpose - see the note there. The
     // plate is an object with fixed ink, so it does not flip. Repeated
     // rather than omitted so that anyone reading only this block sees the
     // real values instead of assuming they were forgotten.
-    --rv-plate: #071b2b;
-    --rv-plate-text: #f3f1ec;
-    --rv-plate-muted: #93aec4;
-    --rv-plate-land: #0f3149;
-    --rv-plate-stroke: #1e4a6d;
-    --rv-plate-rule: #14384f;
+    --rv-plate: #302c2c;
+    --rv-plate-text: #fdfcfc;
+    --rv-plate-muted: #9a9898;
+    --rv-plate-land: #464343;
+    --rv-plate-stroke: #5c5858;
+    --rv-plate-rule: #3d3939;
   }
 }

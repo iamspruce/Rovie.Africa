@@ -20,7 +20,7 @@
 
 .export {
   font-size: v.$font-size-sm;
-  font-weight: 600;
+  font-weight: v.$font-weight-medium;
   color: v.$color-primary;
   @include m.focus-ring;
 }

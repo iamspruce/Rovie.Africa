@@ -12,7 +12,7 @@
   line-height: 1.5;
 
   a {
-    font-weight: 600;
+    font-weight: v.$font-weight-medium;
     text-decoration: underline;
   }
 }
@@ -55,7 +55,7 @@
 
   a {
     color: v.$color-primary;
-    font-weight: 600;
+    font-weight: v.$font-weight-medium;
     @include m.focus-ring;
   }
 }

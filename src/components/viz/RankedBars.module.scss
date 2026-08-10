@@ -15,7 +15,7 @@
 
   thead th {
     color: v.$color-text-muted;
-    font-weight: 600;
+    font-weight: v.$font-weight-medium;
     white-space: nowrap;
   }
 }
@@ -32,7 +32,7 @@
 }
 
 .label {
-  font-weight: 600;
+  font-weight: v.$font-weight-medium;
   min-width: 8rem;
 }
 
@@ -44,7 +44,7 @@
 .sublabel {
   display: block;
   font-weight: 400;
-  font-size: 0.75rem;
+  font-size: v.$font-size-xs;
   color: v.$color-text-muted;
 }
 

@@ -20,7 +20,7 @@ $muted-text: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
 // ----------------------------------------------------------- newsletter
 
 .newsletter {
-  @include m.container;
+  @include m.container-wide;
   padding-block: 4rem;
   text-align: center;
 }
@@ -30,14 +30,13 @@ $muted-text: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
   margin-inline: auto;
 
   h2 {
-    font-size: clamp(1.35rem, 2.6vw, 1.9rem);
-    letter-spacing: -0.03em;
+    font-size: clamp(v.$font-size-xl, 2.6vw, v.$font-size-2xl);
     margin: 0 0 0.6rem;
   }
 
   p {
     margin: 0;
-    font-size: 0.9rem;
+    font-size: v.$font-size-sm;
     line-height: 1.6;
     color: color-mix(in srgb, v.$color-text 70%, v.$color-text-muted);
   }
@@ -61,7 +60,7 @@ $muted-text: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
   gap: 0.4rem;
   padding: 0.3rem 0.3rem 0.3rem 1.1rem;
   border: 1px solid v.$color-border;
-  border-radius: 100px;
+  border-radius: v.$radius-input;
   background: color-mix(in srgb, v.$color-surface 50%, v.$color-bg);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
@@ -71,7 +70,7 @@ $muted-text: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
 
   &:focus-within {
     border-color: color-mix(in srgb, v.$color-primary 75%, v.$color-border);
-    box-shadow: 0 0 0 3px color-mix(in srgb, v.$color-primary 20%, transparent);
+    box-shadow: 0 0 0 2px v.$color-primary;
   }
 
   input {
@@ -82,7 +81,7 @@ $muted-text: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
     background: none;
     color: v.$color-text;
     font: inherit;
-    font-size: 0.9rem;
+    font-size: v.$font-size-sm;
 
     &::placeholder {
       color: v.$color-text-muted;
@@ -101,7 +100,7 @@ $muted-text: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
 
   &:focus-within {
     border-color: v.$color-danger;
-    box-shadow: 0 0 0 3px color-mix(in srgb, v.$color-danger 30%, transparent);
+    box-shadow: 0 0 0 2px v.$color-danger;
   }
 }
 
@@ -114,7 +113,7 @@ $muted-text: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
 .newsletterStatus {
   min-height: 1.4rem;
   margin: 0.65rem 0 0;
-  font-size: 0.78rem;
+  font-size: v.$font-size-xs;
   line-height: 1.4;
   color: v.$color-text-muted;
 }
@@ -130,7 +129,7 @@ $muted-text: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
 // -------------------------------------------------------------- sitemap
 
 .sitemap {
-  @include m.container;
+  @include m.container-wide;
   display: grid;
   gap: 3rem;
   padding-block: 3.5rem 4rem;
@@ -157,26 +156,22 @@ $muted-text: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
   max-width: 34ch;
 }
 
+// Drawn artwork now rather than a mark set next to type, so this carries only
+// the colour the logo inherits. The mark used to be stroked in amber here and
+// in brand blue in the header - the same logo in two colours on one page. It
+// is one colour in both places now, and amber is back to meaning "your
+// country" on the map and nothing else.
 .logo {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
   color: v.$color-text;
-  font-family: v.$font-family-display;
-  font-size: 1.2rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-
-  svg {
-    stroke: v.$color-accent;
-  }
 
   @include m.focus-ring;
 }
 
 .blurb {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: v.$font-size-sm;
   line-height: 1.65;
   color: $muted-text;
 }
@@ -188,9 +183,8 @@ $muted-text: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
   margin: 0.4rem 0 0;
   padding-left: 1.1rem;
   font-family: v.$font-family-display;
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-medium;
   line-height: 1.4;
   color: v.$color-text;
   text-wrap: balance;
@@ -226,8 +220,11 @@ $muted-text: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
     margin: 0 0 1rem;
     padding-top: 0.85rem;
     border-top: 1px solid v.$color-border;
-    font: 700 0.66rem/1 v.$font-family-display;
-    letter-spacing: 0.18em;
+    font-family: v.$font-family-base;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-bold;
+  line-height: v.$line-height-tight;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: v.$color-text-muted;
   }
@@ -243,7 +240,7 @@ $muted-text: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
 
   a {
     display: inline-block;
-    font-size: 0.85rem;
+    font-size: v.$font-size-sm;
     line-height: 1.35;
     color: $muted-text;
     text-decoration: none;
@@ -263,7 +260,7 @@ $muted-text: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
 // --------------------------------------------------------------- bottom
 
 .bottom {
-  @include m.container;
+  @include m.container-wide;
   position: relative;
   display: flex;
   flex-wrap: wrap;
@@ -301,7 +298,7 @@ $muted-text: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
   position: relative;
   z-index: 1;
   margin: 0;
-  font-size: 0.72rem;
+  font-size: v.$font-size-xs;
   color: v.$color-text-muted;
 }
 

@@ -3,7 +3,7 @@ import { render } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, Link } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import { RouteSeo } from '../Seo/Seo';
-import { canonicalFor, seoForPath, titleFor } from '../../content/seo';
+import { OG_IMAGE_PATH, SITE_URL, canonicalFor, seoForPath, titleFor } from '../../content/seo';
 
 function metaContent(selector: string): string | null {
   return document.head.querySelector(selector)?.getAttribute('content') ?? null;
@@ -82,7 +82,13 @@ describe('RouteSeo', () => {
 
     expect(metaContent('meta[property="og:title"]')).toBe(titleFor(seo));
     expect(metaContent('meta[property="og:url"]')).toBe(canonicalFor('/models'));
-    expect(metaContent('meta[property="og:image"]')).toMatch(/^https:\/\/rovie\.africa\/og\.png$/);
+    // Asserted against the constants rather than a literal path. What matters
+    // here is that the tag is ABSOLUTE - Slack, WhatsApp, X and LinkedIn all
+    // drop a relative og:image - not what the file happens to be called.
+    // Hardcoding the filename only made this fail when the artwork was
+    // replaced, which is not a bug worth a failing test.
+    expect(metaContent('meta[property="og:image"]')).toBe(`${SITE_URL}${OG_IMAGE_PATH}`);
+    expect(metaContent('meta[property="og:image"]')).toMatch(/^https:\/\//);
     expect(metaContent('meta[name="twitter:card"]')).toBe('summary_large_image');
   });
 });

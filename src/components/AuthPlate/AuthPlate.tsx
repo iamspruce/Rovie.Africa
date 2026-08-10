@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { LogoMap } from '../LogoMap/LogoMap';
+import { Logo } from '../Logo/Logo';
 import { useVisitorCountry } from '../../hooks/useVisitorCountry';
 import { currencyForAlpha2 } from '../../lib/d3/africaCountries';
 import {
@@ -42,8 +42,7 @@ export function AuthPlate() {
   return (
     <aside className={styles.plate}>
       <Link to="/" className={styles.brand} aria-label="Rovie.africa home">
-        <LogoMap size={26} />
-        <span>Rovie</span>
+        <Logo variant="horizontal" height={32} />
       </Link>
 
       <div className={styles.figure}>

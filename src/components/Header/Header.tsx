@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Button } from '../Button/Button';
-import { LogoMap } from '../LogoMap/LogoMap';
+import { Logo } from '../Logo/Logo';
 import { NavDropdown } from './NavDropdown';
 import { ModelLibraryCard } from './ModelLibraryCard';
 import { HamburgerButton, HamburgerMenu } from '../HamburgerMenu/HamburgerMenu';
@@ -58,9 +58,12 @@ export function Header() {
       </a>
 
       <div className={styles.bar}>
+        {/* The horizontal lockup already draws the wordmark, so the literal
+            "Rovie" text node that used to sit beside the mark is gone. The
+            link keeps its aria-label, which is now the only accessible name
+            it has. */}
         <Link to="/" className={styles.logo} aria-label="Rovie.africa home">
-          <LogoMap size={28} />
-          Rovie
+          <Logo variant="horizontal" height={34} />
         </Link>
 
         {/* The real navigation, visible from the large breakpoint up. Below

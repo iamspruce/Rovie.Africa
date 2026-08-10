@@ -29,7 +29,7 @@
   gap: v.$space-2;
   padding: 0;
   font-size: v.$font-size-sm;
-  font-weight: 600;
+  font-weight: v.$font-weight-medium;
   color: v.$color-text-muted;
 }
 
@@ -48,7 +48,7 @@
   color: v.$color-text;
   background: v.$color-bg;
   border: 1px solid v.$color-border;
-  border-radius: v.$radius-sm;
+  border-radius: v.$radius-input;
   @include m.focus-ring;
 }
 
@@ -67,7 +67,7 @@
   color: v.$color-text-muted;
   background: v.$color-bg;
   border: 1px solid v.$color-border;
-  border-radius: 999px;
+  border-radius: v.$radius-sm;
   cursor: pointer;
   user-select: none;
 
@@ -94,7 +94,7 @@
 }
 
 .chipCount {
-  font-size: 0.75rem;
+  font-size: v.$font-size-xs;
   opacity: 0.7;
   font-variant-numeric: tabular-nums;
 }
@@ -106,7 +106,7 @@
 
 .note {
   margin: 0;
-  font-size: 0.75rem;
+  font-size: v.$font-size-xs;
   color: v.$color-text-muted;
 }
 

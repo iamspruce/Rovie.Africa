@@ -40,9 +40,18 @@ describe('theme tokens', () => {
     expect(themeSrc).toMatch(/color-scheme:\s*light dark/);
   });
 
-  it('uses the background the user asked for at each end', () => {
-    expect(lightBlock).toMatch(/--rv-bg:\s*#ffffff/);
-    expect(darkBlock).toMatch(/--rv-bg:\s*#000000/);
+  it('uses the design system grounds at each end', () => {
+    expect(lightBlock).toMatch(/--rv-bg:\s*#fdfcfc/);
+    expect(darkBlock).toMatch(/--rv-bg:\s*#201d1d/);
+  });
+
+  // The single rule the palette is built on. Every neutral carries a warm
+  // lift, and one pure #000 or #ffffff dropped in goes visibly blue against
+  // everything around it - which is exactly the failure this catches, because
+  // a pure neutral is what anyone reaches for by reflex.
+  it('never uses a pure neutral', () => {
+    const pureNeutrals = [...themeSrc.matchAll(/(--rv-[a-z0-9-]+):\s*(#fff(?:fff)?|#000(?:000)?)\b/gi)];
+    expect(pureNeutrals.map(([, token]) => token)).toEqual([]);
   });
 });
 

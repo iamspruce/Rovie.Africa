@@ -6,7 +6,7 @@
 }
 
 .inner {
-  @include m.container;
+  @include m.container-wide;
   // Narrower than the marketing pages. These are records to read and act on,
   // not a landing page, and a 1200px-wide table of key prefixes is a scan
   // across empty space.
@@ -26,10 +26,8 @@
 .title {
   margin: 0;
   font-family: v.$font-family-display;
-  font-variation-settings: 'opsz' 28;
   font-size: v.$font-size-xl;
   font-weight: 700;
-  letter-spacing: -0.02em;
   color: v.$color-text;
 }
 
@@ -45,7 +43,7 @@
 
   a {
     color: v.$color-primary;
-    font-weight: 600;
+    font-weight: v.$font-weight-medium;
   }
 }
 
@@ -73,7 +71,7 @@
   margin-bottom: -1px;
   color: v.$color-text-muted;
   font-size: v.$font-size-sm;
-  font-weight: 600;
+  font-weight: v.$font-weight-medium;
   text-decoration: none;
   white-space: nowrap;
 

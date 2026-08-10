@@ -4,6 +4,12 @@
   @include m.container;
 }
 
+// For pages whose main content is a wide table or chart. Everything else
+// should use `.container` and stay at the system's 880px measure.
+.containerWide {
+  @include m.container-wide;
+}
+
 // Keeps the global footer pinned to the bottom on short pages.
 .appShell {
   display: flex;

@@ -33,7 +33,7 @@
       content="One account and one API key for GPT, Claude, Gemini, Llama and every leading AI model — priced in your own currency, paid for the way Africa pays."
     />
     <meta property="og:url" content="https://rovie.africa/" />
-    <meta property="og:image" content="https://rovie.africa/og.png" />
+    <meta property="og:image" content="https://rovie.africa/favicons/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Rovie — the AI layer for Africa" />
@@ -44,18 +44,30 @@
       name="twitter:description"
       content="One account and one API key for GPT, Claude, Gemini, Llama and every leading AI model — priced in your own currency, paid for the way Africa pays."
     />
-    <meta name="twitter:image" content="https://rovie.africa/og.png" />
+    <meta name="twitter:image" content="https://rovie.africa/favicons/og-image.png" />
 
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <!--
+      Icons. The set is generated into /favicons; only favicon.ico is also
+      copied to the root, because crawlers and feed readers still probe
+      /favicon.ico directly without ever parsing these tags.
+
+      The .ico is listed first and sized, so browsers that understand SVG skip
+      straight past it to the next line - the SVG is the one that stays sharp
+      on a high-DPI tab strip and in the bookmark bar.
+    -->
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" type="image/svg+xml" href="/favicons/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicons/apple-touch-icon.png" />
+    <link rel="manifest" href="/favicons/site.webmanifest" />
 
     <!--
       The browser's own furniture - address bar on mobile, form controls -
-      follows the page instead of sitting light against a black one. The values
-      are --rv-bg from each half of base/_theme.scss.
+      follows the page instead of sitting light against a dark one. The values
+      are --rv-bg from each half of base/_theme.scss, and they are warm rather
+      than pure: see the note at the top of that file.
     -->
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fdfcfc" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#201d1d" />
     <meta name="color-scheme" content="light dark" />
 
     <!--
@@ -72,7 +84,7 @@
             "@id": "https://rovie.africa/#organization",
             "name": "Rovie",
             "url": "https://rovie.africa/",
-            "logo": "https://rovie.africa/og.png",
+            "logo": "https://rovie.africa/logos/rovie-mark-nested.svg",
             "email": "hello@rovie.africa",
             "description": "Rovie is the infrastructure between African builders and the world's frontier AI models — one account, every leading model, priced in local currency.",
             "areaServed": {

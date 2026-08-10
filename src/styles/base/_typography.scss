@@ -3,46 +3,65 @@
 body {
   font-family: v.$font-family-base;
   font-size: v.$font-size-base;
+  font-weight: v.$font-weight-regular;
+  line-height: v.$line-height-base;
   color: v.$color-text;
   background-color: v.$color-bg;
-  // No smoothing or text-rendering hacks: Atkinson is drawn open enough to
-  // hold up on black on its own, and optimizeLegibility carries real costs.
 }
 
-// Headings carry the display face. Bricolage sets tighter than a system
-// grotesque, so tracking is pulled back here rather than per-component.
+// Headings are the same face as everything else. The entire hierarchy is
+// carried by size and weight, which is what makes a one-face system legible
+// instead of flat: 700 is reserved for headings, so bold anywhere in the page
+// reads as "this is a heading" without needing a second typeface to say it.
+//
+// Tracking sits at 0. A mono face is already spaced on a fixed pitch, and
+// pulling that in - which the old grotesque needed - closes the counters and
+// costs the exact character separation this face was chosen for.
 h1,
 h2,
 h3,
 h4 {
   font-family: v.$font-family-display;
-  font-optical-sizing: auto;
-  font-weight: 700;
+  font-weight: v.$font-weight-bold;
   line-height: 1.15;
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
+  text-wrap: balance;
 }
 
 h1 {
-  font-size: v.$font-size-2xl;
-  letter-spacing: -0.035em;
+  font-size: v.$font-size-3xl;
 }
 
 h2 {
-  font-size: v.$font-size-xl;
-  letter-spacing: -0.03em;
+  font-size: v.$font-size-2xl;
 }
 
 h3 {
+  font-size: v.$font-size-xl;
+}
+
+h4 {
   font-size: v.$font-size-lg;
 }
 
 p {
   color: v.$color-text-muted;
+  text-wrap: pretty;
+}
+
+// Interactive text sits at 500 - the middle rung of the three-weight system.
+// It is enough to separate a control from the prose around it without
+// borrowing the weight that means "heading".
+button,
+label,
+th {
+  font-weight: v.$font-weight-medium;
 }
 
 // Every figure on this site is money or a token count, and both are read by
-// comparison down a column. Lining tabular digits by default is the point of
-// the body face.
+// comparison down a column. A mono face already advances every glyph by the
+// same width, but `lining-nums` still matters: it keeps digits off the
+// baseline descenders that old-style figures would introduce.
 table,
 input,
 output,
@@ -51,6 +70,10 @@ data {
   font-variant-numeric: tabular-nums lining-nums;
 }
 
+// Code no longer needs a face of its own - the page is already set in the
+// terminal's typeface. What still has to change is the surface, so a snippet
+// reads as a quoted block of machine output rather than as a sentence that
+// happened to be indented.
 code,
 pre {
   font-family: v.$font-family-mono;

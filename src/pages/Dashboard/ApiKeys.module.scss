@@ -18,7 +18,7 @@
 
 .labelText {
   font-size: v.$font-size-sm;
-  font-weight: 600;
+  font-weight: v.$font-weight-medium;
   color: v.$color-text;
 }
 
@@ -26,7 +26,7 @@
   width: 100%;
   padding: 11px 14px;
   border: 1px solid v.$color-border;
-  border-radius: v.$radius-md;
+  border-radius: v.$radius-input;
   background-color: v.$color-bg;
   color: v.$color-text;
   font-family: inherit;
@@ -39,7 +39,7 @@
   &:focus {
     outline: none;
     border-color: v.$color-primary;
-    box-shadow: 0 0 0 3px color-mix(in srgb, v.$color-primary 18%, transparent);
+    box-shadow: 0 0 0 2px v.$color-primary;
   }
 
   &:disabled {
@@ -56,7 +56,7 @@
 
   a {
     color: v.$color-primary;
-    font-weight: 600;
+    font-weight: v.$font-weight-medium;
   }
 }
 
@@ -115,7 +115,7 @@
 
 .keyLabel {
   font-size: v.$font-size-sm;
-  font-weight: 600;
+  font-weight: v.$font-weight-medium;
   color: v.$color-text;
 }
 
@@ -140,14 +140,14 @@
   }
 
   dt {
-    font-size: 0.75rem;
+    font-size: v.$font-size-xs;
     color: v.$color-text-muted;
   }
 
   dd {
     margin: 2px 0 0;
     font-size: v.$font-size-sm;
-    font-weight: 600;
+    font-weight: v.$font-weight-medium;
     color: v.$color-text;
     font-variant-numeric: tabular-nums;
   }
@@ -181,7 +181,7 @@
   background: none;
   font-family: inherit;
   font-size: v.$font-size-sm;
-  font-weight: 600;
+  font-weight: v.$font-weight-medium;
   cursor: pointer;
 
   @include m.focus-ring;

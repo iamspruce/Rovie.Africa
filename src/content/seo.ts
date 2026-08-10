@@ -18,7 +18,7 @@ export const SITE_LOCALE = 'en_US';
 
 // 1200x630. Referenced absolutely in the tags because Slack, WhatsApp, X and
 // LinkedIn all reject a relative og:image.
-export const OG_IMAGE_PATH = '/og.png';
+export const OG_IMAGE_PATH = '/favicons/og-image.png';
 
 // Empty until the accounts exist - same rule the footer's SOCIAL_LINKS follow.
 // An empty string renders no tag rather than a tag pointing at nobody.
