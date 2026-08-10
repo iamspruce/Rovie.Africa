@@ -43,12 +43,6 @@
   .graticule {
     shape-rendering: optimizeSpeed;
   }
-
-  // A pulsing ring forces a repaint of its own layer on every frame it
-  // animates, on top of the frames the drag is already producing.
-  .markerPulse {
-    animation: none;
-  }
 }
 
 .svg {
@@ -148,6 +142,11 @@
 // lightness separation, not just more opacity, and which way to separate
 // depends on the theme: $color-map-route is pale on the dark globe and deep
 // on the light one.
+// The dashes are static. This group sits under a feDropShadow, and an SVG
+// filter re-rasterises whenever anything beneath it changes - so animating
+// the dash offset here meant re-blurring a region twice the size of the
+// canvas, sixty times a second, for as long as the page was open. A drawn
+// dashed line reads as a route perfectly well standing still.
 .connections {
   stroke: v.$color-map-route;
   stroke-width: 1.4;
@@ -155,26 +154,6 @@
   stroke-dasharray: 4 5;
   stroke-linecap: round;
   pointer-events: none;
-  animation: routeFlow 3.5s linear infinite;
-}
-
-// A route that drifts reads as a live connection rather than a drawn line.
-// The globe already animates (the visitor marker pulses), so this speaks the
-// language that's here rather than importing a new one.
-@keyframes routeFlow {
-  to {
-    stroke-dashoffset: -18;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .connections {
-    animation: none;
-  }
-
-  .markerPulse {
-    animation: none;
-  }
 }
 
 .markerGroup {
@@ -187,18 +166,14 @@
   stroke-width: 2;
 }
 
-.markerPulse {
+// A fixed halo around the visitor's dot, at the radius the old pulse used to
+// expand through. Held back to a little under half opacity so it reads as
+// surrounding glow rather than as a second, harder circle.
+.markerRing {
   fill: none;
   stroke: v.$color-accent;
   stroke-width: 1.5;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: markerPulse 2.4s ease-out infinite;
-}
-
-@keyframes markerPulse {
-  0% { transform: scale(0.55); opacity: 0.9; }
-  100% { transform: scale(1.9); opacity: 0; }
+  stroke-opacity: 0.45;
 }
 
 // --- model price tags ---------------------------------------------------

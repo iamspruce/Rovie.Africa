@@ -339,7 +339,10 @@ export function AfricaMapSvg({
         </radialGradient>
 
         {/* The routes run over the lit face of Africa, which is the same blue
-            they are. The glow is what separates them from it. */}
+            they are. The glow is what separates them from it. Nothing under
+            either of these filters moves except during a drag, when the
+            stylesheet switches them off - so each is rasterised once and
+            reused until the globe is turned. */}
         <filter id="rovieRouteGlow" x="-50%" y="-50%" width="200%" height="200%">
           <feDropShadow dx="0" dy="0" stdDeviation="2.5" floodColor="#8ecbf5" floodOpacity="0.6" />
         </filter>
@@ -422,7 +425,7 @@ export function AfricaMapSvg({
 
       {markerCentroid && (
         <g data-testid="visitor-marker" className={styles.markerGroup}>
-          <circle cx={markerCentroid[0]} cy={markerCentroid[1]} r={11} className={styles.markerPulse} />
+          <circle cx={markerCentroid[0]} cy={markerCentroid[1]} r={11} className={styles.markerRing} />
           <circle cx={markerCentroid[0]} cy={markerCentroid[1]} r={5} className={styles.marker} />
         </g>
       )}
