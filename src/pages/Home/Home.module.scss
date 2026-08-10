@@ -9,12 +9,43 @@
 // ---------------------------------------------------------------- hero
 
 .hero {
+  // The quote rails' geometry, declared here because the hero is what makes
+  // room for them - components/HeroTestimonials positions itself against these.
+  // Wider than it needs to be for the text alone. A narrow card turns every
+  // quote into six short lines and a tall box; at this width they run three or
+  // four and the card is wider than it is tall, which is the shape a quote
+  // wants to be read in.
+  --rv-rail-w: 235px;
+  --rv-rail-inset: 12px;
+  // How much width the hero gives up for them, which is now effectively none:
+  // the cards sit over the globe's canvas rather than pushing the globe out of
+  // the way. That canvas is far wider than the sphere drawn in it, and its
+  // outer strip carries nothing - a model tag is positioned off the sphere, and
+  // the sphere is nowhere near that far out.
+  //
+  // This number is the whole story of how big the globe is. The map is
+  // min(hero content box, 1180px), so the hero has to be 1180 + 2x this wide
+  // before the map reaches full size: at 120px that took a 1420px window, at
+  // 64px a 1308px one, and at 2px the map is at full size everywhere the rails
+  // are drawn at all.
+  --rv-rail-reserve: 2px;
+
   position: relative;
-  padding: 3rem 1rem 4rem;
+  // The rails slide out through the left and right edges of this box, and this
+  // is what clips them on the way. The hero runs the full width of the page, so
+  // its edges are the screen's edges.
   overflow: hidden;
+  padding: 3rem 1rem 4rem;
 
   @include m.respond-to('md') {
     padding: 4rem 2.5rem 5rem;
+  }
+
+  // Room for the rails, at the width they start being drawn at - see
+  // HeroTestimonials.module.scss, which uses the same breakpoint. Below it
+  // nothing is reserved and the globe keeps the whole viewport.
+  @include m.respond-to('xl') {
+    padding-inline: var(--rv-rail-reserve);
   }
 }
 
@@ -139,11 +170,9 @@ $rail-gutter: 1.75rem;
   padding-bottom: 1.5rem;
 
   &::before {
-    background: repeating-linear-gradient(
-      to bottom,
-      v.$color-text-muted 0 3px,
-      transparent 3px 7px
-    );
+    background: repeating-linear-gradient(to bottom,
+        v.$color-text-muted 0 3px,
+        transparent 3px 7px);
   }
 }
 

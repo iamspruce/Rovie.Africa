@@ -159,6 +159,11 @@ $radius-pill: 9999px;
 $ring: 0 0 0 1px var(--rv-border);
 $ring-strong: 0 0 0 2px var(--rv-border);
 
+// The single exception, and it is spent: the hero's testimonial cards, which
+// float over the globe rather than sitting in the page beside it. See the note
+// on --rv-shadow-card in base/_theme.scss. Nothing else gets one.
+$shadow-card: var(--rv-shadow-card);
+
 // Breakpoints (used via the respond-to mixin)
 $breakpoint-sm: 480px;
 $breakpoint-md: 768px;

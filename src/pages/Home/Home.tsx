@@ -3,6 +3,7 @@ import { AfricaMapLazy } from '../../components/AfricaMap/AfricaMapLazy';
 import type { MapModelTag } from '../../components/AfricaMap/AfricaMapSvg';
 import { FeaturedModels } from '../../components/FeaturedModels/FeaturedModels';
 import { GetStartedSteps } from '../../components/GetStartedSteps/GetStartedSteps';
+import { HeroTestimonials } from '../../components/HeroTestimonials/HeroTestimonials';
 import { useFxRates } from '../../hooks/useFxRates';
 import { useModels } from '../../hooks/useModels';
 import { useVisitorCountry } from '../../hooks/useVisitorCountry';
@@ -106,6 +107,8 @@ export function Home() {
   return (
     <main className={styles.page}>
       <section className={styles.hero}>
+        <HeroTestimonials />
+
         <div className={styles.heroContent}>
           {/* "Layer" is the load-bearing word: a tool has features, a layer has
               things built on top of it. The accent lands on the second line

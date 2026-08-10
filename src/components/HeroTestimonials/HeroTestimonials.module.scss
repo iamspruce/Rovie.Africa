@@ -1,0 +1,285 @@
+@use 'sass:list';
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+// -----------------------------------------------------------------------
+// The two quote rails, in the gutters either side of the hero.
+//
+// They read --rv-rail-w and --rv-rail-inset, which the hero declares in
+// pages/Home/Home.module.scss - it is the element that reserves the space
+// they occupy, so it owns the numbers. The fallbacks here only matter if this
+// component is ever dropped into something that doesn't set them.
+//
+// Below $breakpoint-xl there is no room to sit in: the hero's copy and the
+// globe want the whole width, and three cards squeezed beside a small globe
+// help nobody. The rails are display:none there rather than restacked, and
+// HeroTestimonials.tsx watches the same width so it doesn't bother driving
+// what isn't drawn - a desktop-only flourish, deliberately.
+// -----------------------------------------------------------------------
+
+.rails {
+  display: none;
+
+  // $breakpoint-xl - 1280px - is also written out in HeroTestimonials.tsx,
+  // which cannot read a Sass token. Change the token and change that constant.
+  @include m.respond-to('xl') {
+    display: block;
+    position: absolute;
+    inset: 0;
+    // Under the headline and the globe. They don't overlap either - they're in
+    // the padding - but if a long quote ever changed that, the hero's own
+    // content is what should win.
+    z-index: 1;
+    // The rails are decoration draped over the hero; the globe underneath is
+    // dragged with a pointer and must not lose a gesture to them. Only the
+    // cards themselves take the pointer back, so their text stays selectable.
+    pointer-events: none;
+  }
+}
+
+.rail {
+  // How far each rail sits above the hero's vertical centre. The cards belong
+  // up with the headline rather than down against the globe's lower half, and
+  // centred they hung far too low. Both rails take the same lift.
+  --rail-lift: -3rem;
+
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: var(--rv-rail-w, 235px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.15rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  // `translate` rather than `transform`, so this can never be confused with
+  // the transform the scroll handler owns on the cards inside.
+  translate: 0 var(--rail-lift);
+}
+
+.railLeft {
+  left: var(--rv-rail-inset, 12px);
+  // The card's own margin then pushes it back in from this edge - see $curve.
+  align-items: flex-start;
+}
+
+.railRight {
+  right: var(--rv-rail-inset, 12px);
+  align-items: flex-end;
+  // The arc and the tilt are written once, for the left rail, and mirrored
+  // here. A tilt that leant the same way on both sides would read as the whole
+  // page being slightly crooked rather than as two hands of cards.
+  --tilt-sign: -1;
+}
+
+// --- the arrangement -----------------------------------------------------
+//
+// Three cards flush against the edge, evenly spaced, read as a table of
+// contents. These sit at three different distances from it - furthest out in
+// the middle, tucked in at top and bottom - so the column traces a shallow arc
+// around the globe, which is at its widest at exactly the height the middle
+// card sits at.
+//
+// The uneven vertical margins and the sub-2-degree tilts are the other half of
+// it. Both are small enough that you read them as "arranged" rather than
+// noticing either one. Zero the three lists below and the rails go back to
+// dead-straight columns.
+
+$curve: (
+  34px,
+  0,
+  20px
+); // pushed in from the screen edge
+$tilt: (
+  -1.3deg,
+  0.9deg,
+  -0.7deg
+);
+$lift: (
+  0,
+  1.15rem,
+  0.4rem
+); // extra air above and below
+
+@for $i from 1 through 3 {
+  .card:nth-child(#{$i}) {
+    --curve: #{list.nth($curve, $i)};
+    --tilt: #{list.nth($tilt, $i)};
+
+    margin-block: list.nth($lift, $i);
+  }
+}
+
+.railLeft .card {
+  margin-left: var(--curve);
+}
+
+.railRight .card {
+  margin-right: var(--curve);
+}
+
+// --- the card ------------------------------------------------------------
+//
+// The <li> carries the scroll retreat and nothing else: HeroTestimonials.tsx
+// writes `transform` and `opacity` here on every frame the page moves, so this
+// rule must not set either, and must not put a transition on either.
+
+.card {
+  width: 100%;
+  pointer-events: auto;
+  // Promoted for the duration of the scroll effect. Six small layers cost a
+  // little GPU memory and save the main thread from repainting the hero every
+  // frame of the retreat - which is the whole reason the motion stays smooth.
+  will-change: transform, opacity;
+}
+
+// --- the entrance --------------------------------------------------------
+//
+// The <figure> carries the arrival, separately from the <li>'s retreat. It
+// runs once, `both` so the card is off-screen during its own delay rather
+// than flashing at rest first, and then it is finished - nothing here
+// animates on an idle page.
+
+.face {
+  // Resolved once here so the resting state, the keyframe and the mirrored
+  // right rail all read the same value.
+  --tilt-final: calc(var(--tilt, 0deg) * var(--tilt-sign, 1));
+
+  // WHAT KEEPS THE TWO RAILS LEVEL WITH EACH OTHER.
+  //
+  // Each rail centres itself in the hero, so its position depends on how tall
+  // its own column is - and the two columns hold different quotes. The right
+  // one ran two lines longer than the left, which centred it ~20px higher for
+  // no reason a reader could see. Holding every card to the height of the
+  // longest quote makes the columns identical, and identical columns centre
+  // identically.
+  //
+  // It is a floor, not a fixed height: a quote longer than the ones here still
+  // gets the room it needs, at the cost of that rail drifting again. If you
+  // swap in real quotes and the sides stop lining up, this is the number - or
+  // the length of the longest quote - to look at.
+  min-height: var(--card-min-h, 9.75rem);
+  margin: 0;
+  padding: 0.9rem 1rem 1rem;
+  background: color-mix(in srgb, v.$color-surface 92%, v.$color-bg);
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  // The site's one shadow - see $shadow-card. These cards are over the globe,
+  // not beside it, and a border alone left them looking printed onto the
+  // sphere. Free to draw: the card is already on its own compositor layer for
+  // the scroll retreat, so the shadow is rasterised once and then only moved.
+  box-shadow: v.$shadow-card;
+  // The resting tilt, for before the animation starts and for anyone who has
+  // turned it off. The keyframe below finishes on this same value.
+  transform: rotate(var(--tilt-final));
+  animation: cardEnter 620ms v.$ease-standard both;
+  animation-delay: var(--enter-delay, 0ms);
+}
+
+// Out past the edge it will come in from, and back out the same way when the
+// hero leaves. 160% of the card's own width clears the gutter it sits in.
+.card[data-side='left'] .face {
+  --enter-from: -160%;
+}
+
+.card[data-side='right'] .face {
+  --enter-from: 160%;
+}
+
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    // Arrives flat and settles into its tilt, so the rotation is something the
+    // card does on landing rather than a crooked box flying in.
+    transform: translate3d(var(--enter-from, 0), 0, 0) rotate(0deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(var(--tilt-final));
+  }
+}
+
+// A visitor who has asked for less motion gets the cards, in place, with no
+// arrival and no retreat. The component watches this query too and leaves the
+// scroll listener unattached.
+@media (prefers-reduced-motion: reduce) {
+  .face {
+    animation: none;
+  }
+
+  .card {
+    will-change: auto;
+  }
+}
+
+// --- contents ------------------------------------------------------------
+
+.attribution {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.avatar {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: v.$radius-pill;
+  // A photograph fills it; initials are centred in it. Both want the same box.
+  display: grid;
+  place-items: center;
+  object-fit: cover;
+  background: color-mix(in srgb, v.$color-primary 16%, transparent);
+  border: 1px solid color-mix(in srgb, v.$color-primary 38%, transparent);
+  color: v.$color-text;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-bold;
+  line-height: v.$line-height-tight;
+  letter-spacing: 0.02em;
+}
+
+.who {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.name {
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-bold;
+  line-height: 1.25;
+  color: v.$color-text;
+}
+
+.role {
+  font-size: 11px;
+  line-height: 1.25;
+  color: v.$color-text-muted;
+  // Roles carry a city after a middot and the rail is narrow. Truncating is
+  // better than a two-line role pushing the quote down by a line.
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quote {
+  margin: 0.7rem 0 0;
+  font-size: v.$font-size-xs;
+  line-height: 1.65;
+  color: color-mix(in srgb, v.$color-text 78%, v.$color-text-muted);
+  // The marks are drawn rather than typed, so content/testimonials.ts holds
+  // clean sentences and no entry can get its own punctuation wrong.
+  quotes: '\201C' '\201D';
+
+  &::before {
+    content: open-quote;
+  }
+
+  &::after {
+    content: close-quote;
+  }
+}

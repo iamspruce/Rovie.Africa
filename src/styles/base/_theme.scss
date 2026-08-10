@@ -95,6 +95,14 @@
   // over a warm page instead of as a hole in it.
   --rv-scrim: rgba(32, 29, 29, 0.45);
 
+  // The one raised element on the site, and a deliberate exception to the
+  // rule in _variables.scss that depth is drawn with rings and never with a
+  // shadow: the hero's testimonial cards, which genuinely float over the
+  // globe rather than sitting in the page beside it. It is a token rather
+  // than a literal so it stays warm - the same near-black as the scrim, never
+  // a pure one - and so the exception is countable. Nothing else may use it.
+  --rv-shadow-card: 0 1px 2px rgba(32, 29, 29, 0.1), 0 10px 24px -8px rgba(32, 29, 29, 0.22);
+
   // The primary button - the one place this site departs from the system on
   // purpose. OpenCode specifies a flat dark fill; the gradient is kept
   // because it is the site's own signature. Everything around it went flat,
@@ -186,6 +194,11 @@
     --rv-state-down: #ff6b62; // 5.7:1
 
     --rv-scrim: rgba(20, 18, 18, 0.7);
+
+    // Deeper and more opaque than the light theme's. A shadow on a dark ground
+    // has less room to work in - the surface it falls on is already dark - so
+    // it has to be carried by spread rather than by darkness alone.
+    --rv-shadow-card: 0 1px 2px rgba(20, 18, 18, 0.5), 0 14px 32px -10px rgba(20, 18, 18, 0.75);
 
     // Same two accent stops as light, ordered dark-to-light so the sweep runs
     // the same direction against a ground that moved the other way.
