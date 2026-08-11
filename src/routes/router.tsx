@@ -32,6 +32,10 @@ const Status = lazy(() => import('../pages/Status/Status').then((m) => ({ defaul
 const Support = lazy(() =>
   import('../pages/Support/Support').then((m) => ({ default: m.Support }))
 );
+// Split for its typeface as much as for its markup: About is the only page
+// that loads Borel, and that file has no business in the bundle someone
+// downloads to read the homepage.
+const About = lazy(() => import('../pages/About/About').then((m) => ({ default: m.About })));
 const Legal = lazy(() => import('../pages/Legal/Legal').then((m) => ({ default: m.Legal })));
 const Placeholder = lazy(() =>
   import('../pages/Placeholder/Placeholder').then((m) => ({ default: m.Placeholder }))
@@ -72,6 +76,7 @@ export function AppRoutes(): React.JSX.Element {
         <Route path="/rankings" element={<Rankings />} />
         <Route path="/status" element={<Status />} />
         <Route path="/support" element={<Support />} />
+        <Route path="/about" element={<About />} />
 
         {/* Auth pages render their own full-page two-column layout and are
             deliberately outside the site header/footer - see AuthLayout. */}

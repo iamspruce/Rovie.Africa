@@ -56,6 +56,7 @@ describe('Footer', () => {
       '/rankings',
       '/status',
       '/support',
+      '/about',
       ...LEGAL_DOCS.map((doc) => doc.path),
       ...PLACEHOLDER_PAGES.map((page) => page.path),
     ]);

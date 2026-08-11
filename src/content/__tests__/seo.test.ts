@@ -21,6 +21,7 @@ const ROUTED_PATHS = [
   '/rankings',
   '/status',
   '/support',
+  '/about',
   '/signin',
   '/signup',
   '/reset-password',

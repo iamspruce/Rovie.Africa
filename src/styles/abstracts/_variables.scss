@@ -101,6 +101,21 @@ $font-family-mono: 'Berkeley Mono', 'IBM Plex Mono', ui-monospace, 'SFMono-Regul
 $font-family-base: $font-family-mono;
 $font-family-display: $font-family-mono;
 
+// The one exception, and it is spent. Borel is a handwriting face used for
+// exactly two lines on the About page - the opening headline and the closing
+// sign-off - where the page stops describing infrastructure and speaks in the
+// first person. Nothing else on the site may reach for it: a second face earns
+// its place by being rare, and a mono system that starts scattering script
+// around has simply become a two-face system with no rule behind it.
+//
+// It is loaded from inside pages/About, not from main.tsx, so a visitor who
+// never opens that page never downloads it.
+//
+// Set at a size, never at a caption. The face has tall ascenders, deep
+// descenders and near-joined letterforms; below about 28px it stops being
+// legible, and it has no bold - weight is not a lever here.
+$font-family-script: 'Borel', 'Segoe Script', 'Bradley Hand', cursive;
+
 // Type scale, in px for the same reason the spacing is: these are grid
 // positions, not reading preferences. 12 / 14 / 16 / 18 / 22 / 28 / 38 / 48.
 $font-size-xs: 12px;

@@ -1,0 +1,302 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+// The reading colour used across the prose pages - one step warmer than the
+// muted token, which is tuned for captions rather than for paragraphs.
+$muted-text: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
+$line: v.$color-line;
+
+.page {
+  max-width: 720px;
+  padding-block: 4rem 6rem;
+}
+
+// ------------------------------------------------------------------ head
+//
+// Centred, and the only part of the page that is. Below the fold everything
+// goes flush left, so the change of alignment marks the change of voice -
+// the same move the homepage makes between its hero and its mission.
+
+.head {
+  margin-bottom: 4.5rem;
+  text-align: center;
+}
+
+.eyebrow {
+  display: block;
+  color: $line;
+  font-family: v.$font-family-base;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-bold;
+  line-height: v.$line-height-tight;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+// The script face. Two elements on the site carry this class and both are on
+// this page.
+//
+// 1.28 line-height, not the 1.15 the rest of the headings use: Borel's
+// ascenders and descenders are enormous, and at heading leading the tail of a
+// 'y' lands in the line beneath it. The padding is the same problem at the
+// block's own edges, where a descender would otherwise be clipped by an
+// ancestor's overflow.
+//
+// Weight is 400 because 400 is all there is. Left at the 700 the global
+// heading rule sets, every browser synthesises a bold by smearing the outline
+// sideways, which on a joined script closes the loops.
+.display {
+  margin: 0.9rem 0 0;
+  font-family: v.$font-family-script;
+  font-weight: v.$font-weight-regular;
+  font-size: clamp(v.$font-size-3xl, 7vw, 60px);
+  line-height: 1.28;
+  padding-bottom: 0.12em;
+  letter-spacing: 0;
+}
+
+// The claim the rest of the page argues for. Set at the interactive weight
+// rather than the heading one: it is a sentence, not a heading, and it sits
+// close enough to the script line that a second bold would fight it.
+.thesis {
+  margin: 1.5rem auto 0;
+  max-width: 44ch;
+  font-size: clamp(v.$font-size-base, 2.2vw, v.$font-size-lg);
+  font-weight: v.$font-weight-medium;
+  line-height: 1.75;
+  color: v.$color-text;
+  text-wrap: balance;
+}
+
+// -------------------------------------------------------------- sections
+
+.sectionHeading {
+  margin: 0 0 1.75rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid v.$color-border;
+  font-family: v.$font-family-base;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-bold;
+  line-height: v.$line-height-tight;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: v.$color-text-muted;
+}
+
+.story,
+.money,
+.yet {
+  margin-bottom: 4rem;
+
+  // :not([class]) so the pull quote below, which is also a paragraph inside
+  // this section, is styled by its own rule rather than by overriding this
+  // one - the site's stylesheets get to stay free of !important.
+  p:not([class]) {
+    margin: 0 0 1.15rem;
+    max-width: 64ch;
+    font-size: v.$font-size-base;
+    line-height: 1.8;
+    color: $muted-text;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  strong {
+    color: v.$color-text;
+    font-weight: v.$font-weight-medium;
+  }
+
+  a {
+    color: v.$color-text;
+    font-weight: v.$font-weight-medium;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: color-mix(in srgb, v.$color-text 35%, transparent);
+
+    &:hover {
+      text-decoration-color: currentcolor;
+    }
+
+    @include m.focus-ring;
+  }
+}
+
+// The sentence the company was started over, given a line of its own and the
+// mission rail's marker. Not set in the script face - two script moments per
+// page is the budget, and both are spent on the opening and the sign-off.
+.pull {
+  margin: 2rem 0 2.25rem;
+  padding-left: 1.5rem;
+  border-left: 2px solid $line;
+  max-width: 32ch;
+  font-size: clamp(v.$font-size-lg, 3vw, v.$font-size-xl);
+  font-weight: v.$font-weight-medium;
+  line-height: 1.45;
+  color: v.$color-text;
+}
+
+// ----------------------------------------------------------------- built
+//
+// The gap between cells is the container's background showing through a 1px
+// grid gap, so each cell paints its own ground - the same construction the
+// support page's routes use.
+
+.built {
+  margin-bottom: 4rem;
+}
+
+.builtList {
+  display: grid;
+  gap: 1px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: v.$color-border;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-lg;
+  overflow: hidden;
+
+  @include m.respond-to('md') {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.builtItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1.6rem 1.5rem;
+  background: v.$color-bg;
+
+  h3 {
+    margin: 0;
+    font-size: v.$font-size-base;
+    font-weight: v.$font-weight-bold;
+  }
+
+  p {
+    margin: 0;
+    font-size: v.$font-size-sm;
+    line-height: 1.65;
+    color: v.$color-text-muted;
+  }
+}
+
+// ---------------------------------------------------------------- limits
+
+.limits {
+  margin-bottom: 4rem;
+}
+
+.limitList {
+  margin: 0;
+  border-top: 1px solid v.$color-border;
+}
+
+.limit {
+  padding: 1.4rem 0;
+  border-bottom: 1px solid v.$color-border;
+
+  @include m.respond-to('md') {
+    display: grid;
+    grid-template-columns: 13rem minmax(0, 1fr);
+    gap: 1.5rem;
+    align-items: baseline;
+  }
+
+  dt {
+    margin: 0 0 0.5rem;
+    font-weight: v.$font-weight-bold;
+    font-size: v.$font-size-sm;
+
+    // The heading is a refusal, so it is struck through - the page is a list
+    // of things that do not happen, and reading only the left column should
+    // still say so.
+    text-decoration: line-through;
+    text-decoration-color: color-mix(in srgb, v.$color-text 45%, transparent);
+    text-decoration-thickness: 1px;
+
+    @include m.respond-to('md') {
+      margin: 0;
+    }
+  }
+
+  dd {
+    margin: 0;
+    max-width: 58ch;
+    font-size: v.$font-size-sm;
+    line-height: 1.7;
+    color: $muted-text;
+
+    a {
+      color: v.$color-text;
+      font-weight: v.$font-weight-medium;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+
+      @include m.focus-ring;
+    }
+  }
+}
+
+// ----------------------------------------------------------------- close
+
+.close {
+  padding-top: 3rem;
+  border-top: 1px solid v.$color-border;
+  text-align: center;
+}
+
+// Smaller than the opening line: a sign-off, not a second title.
+.signoff {
+  margin: 0;
+  font-size: clamp(v.$font-size-2xl, 5vw, 44px);
+}
+
+.closeBody {
+  margin: 1.25rem auto 0;
+  max-width: 52ch;
+  font-size: v.$font-size-base;
+  line-height: 1.75;
+  color: $muted-text;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem 1.75rem;
+  margin-top: 2rem;
+}
+
+.primaryAction {
+  padding: 0.7rem 1.4rem;
+  border-radius: v.$radius-sm;
+  background: v.$color-primary;
+  color: v.$color-primary-contrast;
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-medium;
+  line-height: v.$line-height-tight;
+
+  &:hover {
+    background: color-mix(in srgb, v.$color-primary 88%, v.$color-text);
+  }
+
+  @include m.focus-ring;
+}
+
+.action {
+  color: $line;
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-medium;
+
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  @include m.focus-ring;
+}

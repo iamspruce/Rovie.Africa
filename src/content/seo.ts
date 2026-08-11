@@ -90,9 +90,9 @@ export const ROUTE_SEO: readonly RouteSeo[] = [
 
   {
     path: '/about',
-    title: 'About',
+    title: 'Why Rovie exists',
     description:
-      'Who is building Rovie, and why frontier AI being priced and plumbed for somewhere else is a problem worth building a company around.',
+      'Frontier AI is priced in dollars and billed to a card, which rules out most of a continent. What we built instead, how we make money, and what we will not do.',
   },
   {
     path: '/privacy',
