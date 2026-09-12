@@ -166,7 +166,7 @@ export function TopUp({ onStarted }: { onStarted?: () => void }) {
 
   if (needsCountry) {
     return (
-      <Card title="Add credit" description="Set your country first — it decides which currencies you can pay in.">
+      <Card title="Add Route credit" description="Set your country first — it decides which currencies you can pay in.">
         <p className={styles.blocked}>
           <Link to="/dashboard/account">Set your country</Link> to add credit.
         </p>
@@ -180,8 +180,8 @@ export function TopUp({ onStarted }: { onStarted?: () => void }) {
 
   return (
     <Card
-      title="Add credit"
-      description="Pay in your own currency. Credit is added to your account once the payment confirms."
+      title="Add Route credit"
+      description="Pay in your own currency. Route credit is added once the payment confirms."
     >
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.amountRow}>

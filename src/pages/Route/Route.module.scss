@@ -1,0 +1,122 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+.hero,
+.features {
+  @include m.container;
+  max-width: 1000px;
+}
+
+.hero {
+  padding-block: 5rem;
+  max-width: 720px;
+
+  h1 {
+    margin: 0.7rem 0 0;
+    font-size: clamp(v.$font-size-4xl, 8vw, 5.5rem);
+    font-weight: v.$font-weight-medium;
+    line-height: 0.96;
+    letter-spacing: -0.05em;
+  }
+
+  p {
+    margin: 1.5rem 0 0;
+    max-width: 42rem;
+    font-size: clamp(v.$font-size-base, 2.2vw, v.$font-size-lg);
+    line-height: 1.65;
+    color: v.$color-text-muted;
+  }
+}
+
+.eyebrow {
+  color: v.$color-line;
+  font-family: v.$font-family-base;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-bold;
+  letter-spacing: 0.12em;
+  line-height: v.$line-height-tight;
+  text-transform: uppercase;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.primaryAction,
+.secondaryAction {
+  padding: 0.7rem 1rem;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-sm;
+  font-family: v.$font-family-base;
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-medium;
+  line-height: v.$line-height-tight;
+  text-decoration: none;
+  @include m.focus-ring;
+}
+
+.primaryAction {
+  background: v.$color-text;
+  border-color: v.$color-text;
+  color: v.$color-bg;
+}
+
+.secondaryAction {
+  color: v.$color-text;
+
+  &:hover {
+    background: v.$color-surface;
+  }
+}
+
+.features {
+  padding-bottom: 5rem;
+  margin-bottom: 5rem;
+
+  > h2 {
+    margin: 0 0 1.5rem;
+    color: v.$color-text-muted;
+    font-family: v.$font-family-base;
+    font-size: v.$font-size-xs;
+    font-weight: v.$font-weight-bold;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  ul {
+    display: grid;
+    gap: 1px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: v.$color-border;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-lg;
+    overflow: hidden;
+
+    @include m.respond-to('md') {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  li {
+    padding: 1.75rem 1.5rem;
+    background: v.$color-bg;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: v.$font-size-base;
+    font-weight: v.$font-weight-medium;
+  }
+
+  p {
+    margin: 0.75rem 0 0;
+    font-size: v.$font-size-sm;
+    line-height: 1.7;
+    color: v.$color-text-muted;
+  }
+}

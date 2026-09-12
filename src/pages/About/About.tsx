@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 // else, and this route is a lazy chunk, so a visitor who only reads the
 // homepage never pays for the file. See $font-family-script for the rule.
 import '@fontsource/borel/latin-400.css';
-import { CONTACT_EMAIL, DOCS_URL } from '../../content/navLinks';
+import { CONTACT_EMAIL, DOCS_URL, ROUTE_URL } from '../../content/navLinks';
 import styles from './About.module.scss';
 
 // -----------------------------------------------------------------------
@@ -187,9 +187,9 @@ export function About() {
         </p>
 
         <div className={styles.actions}>
-          <Link className={styles.primaryAction} to="/signup">
+          <a className={styles.primaryAction} href={`${ROUTE_URL}/signup`}>
             Create an account
-          </Link>
+          </a>
           <a className={styles.action} href={`${DOCS_URL}/start/quickstart/`}>
             Read the quickstart
           </a>

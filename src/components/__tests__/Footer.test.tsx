@@ -3,9 +3,10 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { Footer } from '../Footer/Footer';
-import { PRIMARY_NAV } from '../../content/navLinks';
+import { PRODUCT_NAV } from '../../content/navLinks';
 import {
   PRODUCT_LINKS,
+  LEARN_LINKS,
   DEVELOPER_LINKS,
   COMPANY_LINKS,
   SOCIAL_LINKS,
@@ -29,21 +30,22 @@ describe('Footer', () => {
 
   // The footer's Product column reads from the same list as the header, so a
   // destination can't be reachable from one and missing from the other.
-  it('links to every primary destination the header offers', () => {
+  it('links to every product destination the header offers', () => {
     renderFooter();
-    PRIMARY_NAV.forEach((link) => {
-      expect(screen.getByRole('link', { name: link.longLabel })).toHaveAttribute('href', link.to);
+    PRODUCT_NAV.forEach((link) => {
+      expect(screen.getAllByRole('link', { name: link.longLabel }).some((item) => item.getAttribute('href') === link.to)).toBe(true);
     });
   });
 
   it.each([
     ['Product', PRODUCT_LINKS],
+    ['Learn', LEARN_LINKS],
     ['Developers', DEVELOPER_LINKS],
     ['Company', COMPANY_LINKS],
   ])('renders every %s link with a real destination', (_column, links) => {
     renderFooter();
     links.forEach((link) => {
-      expect(screen.getByRole('link', { name: link.label })).toHaveAttribute('href', link.to);
+      expect(screen.getAllByRole('link', { name: link.label }).some((item) => item.getAttribute('href') === link.to)).toBe(true);
     });
   });
 
@@ -52,6 +54,8 @@ describe('Footer', () => {
   it('never links to a route the app does not serve', () => {
     const routed = new Set<string>([
       '/',
+      '/code',
+      '/research',
       '/models',
       '/rankings',
       '/status',
@@ -61,7 +65,7 @@ describe('Footer', () => {
       ...PLACEHOLDER_PAGES.map((page) => page.path),
     ]);
 
-    [...PRODUCT_LINKS, ...DEVELOPER_LINKS, ...COMPANY_LINKS]
+    [...PRODUCT_LINKS, ...LEARN_LINKS, ...DEVELOPER_LINKS, ...COMPANY_LINKS]
       .filter((link) => !link.external)
       .forEach((link) => {
         expect(routed.has(link.to)).toBe(true);
@@ -76,7 +80,7 @@ describe('Footer', () => {
   // http://localhost:4321 in dev and under test. Asserting the scheme would be
   // asserting which environment the suite ran in.
   it('gives every off-site link an absolute URL', () => {
-    const external = [...PRODUCT_LINKS, ...DEVELOPER_LINKS, ...COMPANY_LINKS].filter(
+    const external = [...PRODUCT_LINKS, ...LEARN_LINKS, ...DEVELOPER_LINKS, ...COMPANY_LINKS].filter(
       (link) => link.external
     );
 
@@ -114,9 +118,9 @@ describe('Footer', () => {
     expect(screen.queryByLabelText(/currencies you can top up in/i)).not.toBeInTheDocument();
   });
 
-  it('closes on the mission the homepage opens with', () => {
+  it('closes on the company purpose the homepage introduces', () => {
     renderFooter();
-    expect(screen.getByText(/AI should be accessible, no matter where you build/i)).toBeInTheDocument();
+    expect(screen.getByText(/Africa should help shape the future of AI/i)).toBeInTheDocument();
   });
 
   // The oversized mark behind the bottom bar is decoration; it must not reach

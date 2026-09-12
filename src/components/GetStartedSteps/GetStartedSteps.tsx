@@ -26,8 +26,8 @@ export function GetStartedSteps() {
   return (
     <section className={styles.steps} aria-labelledby="steps-heading">
       <div className={styles.head}>
-        <span className={styles.eyebrow}>Getting started</span>
-        <h2 id="steps-heading">Three steps to your first call</h2>
+        <span className={styles.eyebrow}>Start with Route</span>
+        <h2 id="steps-heading">Choose a model. Make your first call.</h2>
       </div>
 
       <ol className={styles.list}>

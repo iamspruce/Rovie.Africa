@@ -9,43 +9,12 @@
 // ---------------------------------------------------------------- hero
 
 .hero {
-  // The quote rails' geometry, declared here because the hero is what makes
-  // room for them - components/HeroTestimonials positions itself against these.
-  // Wider than it needs to be for the text alone. A narrow card turns every
-  // quote into six short lines and a tall box; at this width they run three or
-  // four and the card is wider than it is tall, which is the shape a quote
-  // wants to be read in.
-  --rv-rail-w: 235px;
-  --rv-rail-inset: 12px;
-  // How much width the hero gives up for them, which is now effectively none:
-  // the cards sit over the globe's canvas rather than pushing the globe out of
-  // the way. That canvas is far wider than the sphere drawn in it, and its
-  // outer strip carries nothing - a model tag is positioned off the sphere, and
-  // the sphere is nowhere near that far out.
-  //
-  // This number is the whole story of how big the globe is. The map is
-  // min(hero content box, 1180px), so the hero has to be 1180 + 2x this wide
-  // before the map reaches full size: at 120px that took a 1420px window, at
-  // 64px a 1308px one, and at 2px the map is at full size everywhere the rails
-  // are drawn at all.
-  --rv-rail-reserve: 2px;
-
   position: relative;
-  // The rails slide out through the left and right edges of this box, and this
-  // is what clips them on the way. The hero runs the full width of the page, so
-  // its edges are the screen's edges.
   overflow: hidden;
-  padding: 3rem 1rem 4rem;
+  padding: 3rem 1rem 4.5rem;
 
   @include m.respond-to('md') {
-    padding: 4rem 2.5rem 5rem;
-  }
-
-  // Room for the rails, at the width they start being drawn at - see
-  // HeroTestimonials.module.scss, which uses the same breakpoint. Below it
-  // nothing is reserved and the globe keeps the whole viewport.
-  @include m.respond-to('xl') {
-    padding-inline: var(--rv-rail-reserve);
+    padding: 4rem 2.5rem 5.5rem;
   }
 }
 
@@ -85,9 +54,21 @@
   position: relative;
   z-index: 2;
   width: min(100%, 1180px);
-  margin: 0.75rem auto 0;
+  margin: 1.5rem auto 0;
   display: grid;
   place-items: center;
+}
+
+.mapContext {
+  margin: 0 0 0.7rem;
+  color: v.$color-text-muted;
+  font-family: v.$font-family-base;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-bold;
+  letter-spacing: 0.1em;
+  line-height: v.$line-height-tight;
+  text-align: center;
+  text-transform: uppercase;
 }
 
 .heroMap {
@@ -97,121 +78,229 @@
   z-index: 2;
 }
 
-// ------------------------------------------------------------- mission
-//
-// Left-aligned under a centred hero, so the change of alignment marks the
-// change of voice. Every block carries its own class - no element selectors -
-// so nothing here cancels anything else out.
+// ------------------------------------------------------------- purpose
 
-$rail-solid: v.$color-line;
-$rail-gutter: 1.75rem;
-
-.mission {
+.purpose {
   @include m.container;
-  max-width: 700px;
-  padding-block: 4.5rem 6rem;
+  max-width: 1000px;
+  display: grid;
+  gap: 2rem;
+  padding-block: 4.5rem 5.5rem;
+  border-top: 1px solid v.$color-border;
+
+  @include m.respond-to('md') {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 4rem;
+    align-items: start;
+  }
 }
 
-.missionThesis {
-  margin: 0 0 2.1rem;
+.purposeLead h2 {
+  margin: 0.55rem 0 0;
   font-size: clamp(v.$font-size-2xl, 3.6vw, v.$font-size-3xl);
   font-weight: v.$font-weight-medium;
   line-height: 1.1;
   text-wrap: balance;
 }
 
-.missionArgument {
-  padding-left: 1.25rem;
-
-  @include m.respond-to('sm') {
-    padding-left: $rail-gutter;
-  }
+.purposeBody {
+  max-width: 38rem;
 }
 
-// Each block hangs its own segment of the rail. Spacing is padding rather
-// than margin so the segments butt together into one continuous line.
-.missionBelief,
-.missionFriction,
-.missionTurn,
-.missionPledge {
-  position: relative;
+.purposeBody p {
   margin: 0;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: -1.25rem;
-    width: 1px;
-    background: $rail-solid;
-
-    @include m.respond-to('sm') {
-      left: -$rail-gutter;
-    }
-  }
-}
-
-.missionBelief,
-.missionFriction,
-.missionTurn {
-  font-size: v.$font-size-base;
+  font-size: clamp(v.$font-size-base, 1.8vw, v.$font-size-lg);
   line-height: 1.75;
   color: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
 }
 
-.missionBelief {
-  padding-bottom: 1.15rem;
+.purposeBody p + p {
+  margin-top: 1.2rem;
 }
 
-// The break in the argument, drawn as a break in the line: the 3/4 dash the
-// globe uses for a model it hasn't routed to yet.
-.missionFriction {
-  padding-bottom: 1.5rem;
-
-  &::before {
-    background: repeating-linear-gradient(to bottom,
-        v.$color-text-muted 0 3px,
-        transparent 3px 7px);
-  }
-}
-
-.missionTurn {
-  padding-bottom: 1.75rem;
-  color: v.$color-text;
-  font-weight: v.$font-weight-medium;
-}
-
-.missionPledge {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.7rem;
-}
-
-// Markers and headlines share the display face; the body face is kept for
-// things that are actually read as prose.
-.missionLabel {
-  color: $rail-solid;
-  font-family: v.$font-family-base;
-  font-size: v.$font-size-xs;
-  font-weight: v.$font-weight-bold;
-  line-height: v.$line-height-tight;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.missionStatement {
+.purposeStatement {
+  margin-top: 2rem !important;
+  padding-left: 1.25rem;
+  border-left: 2px solid v.$color-line;
+  color: v.$color-text !important;
   font-family: v.$font-family-display;
-  font-size: clamp(v.$font-size-lg, 2.6vw, v.$font-size-xl);
+  font-size: clamp(v.$font-size-lg, 2.4vw, v.$font-size-xl) !important;
   font-weight: v.$font-weight-medium;
-  line-height: 1.35;
-  color: v.$color-text;
+  line-height: 1.4 !important;
   text-wrap: balance;
 }
 
-// Amber is what the map marks your own country with; it means the same thing
-// here.
-.missionHere {
-  color: v.$color-accent;
+// --------------------------------------------------------------- ecosystem
+// The umbrella site introduces the work as a connected system. Cards use the
+// same one-pixel grid and flat surfaces as the rest of the product, leaving
+// the primary button treatment for an actual conversion action elsewhere.
+
+.products,
+.fromRovie {
+  @include m.container;
+  max-width: 1000px;
+  padding-bottom: 5rem;
+}
+
+.sectionHead {
+  max-width: 630px;
+  margin-bottom: 2rem;
+
+  h2 {
+    margin: 0.55rem 0 0;
+    font-size: clamp(v.$font-size-2xl, 3.6vw, v.$font-size-3xl);
+    font-weight: v.$font-weight-medium;
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+
+  p {
+    margin: 1rem 0 0;
+    font-size: v.$font-size-base;
+    line-height: 1.7;
+    color: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
+  }
+}
+
+.sectionEyebrow,
+.productStatus,
+.workCategory {
+  color: v.$color-text-muted;
+  font-family: v.$font-family-base;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-bold;
+  letter-spacing: 0.12em;
+  line-height: v.$line-height-tight;
+  text-transform: uppercase;
+}
+
+.productList {
+  display: grid;
+  gap: 1px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: v.$color-border;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-lg;
+  overflow: hidden;
+
+  @include m.respond-to('md') {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.product {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 238px;
+  padding: 1.75rem 1.5rem;
+  background: v.$color-bg;
+
+  h3 {
+    margin: 1.25rem 0 0;
+    font-size: v.$font-size-lg;
+    font-weight: v.$font-weight-medium;
+    line-height: 1.2;
+  }
+
+  p {
+    margin: 0.75rem 0 0;
+    font-size: v.$font-size-sm;
+    line-height: 1.7;
+    color: v.$color-text-muted;
+  }
+}
+
+.productStatus {
+  color: v.$color-line;
+}
+
+.productAction {
+  margin-top: auto;
+  padding-top: 1.5rem;
+  color: v.$color-text;
+  font-family: v.$font-family-base;
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-medium;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  @include m.focus-ring;
+}
+
+.fromRovie {
+  padding-bottom: 6rem;
+}
+
+.workList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid v.$color-border;
+}
+
+.workItem {
+  border-bottom: 1px solid v.$color-border;
+}
+
+.workLink {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.65rem 1rem;
+  padding: 1.35rem 0;
+  color: inherit;
+  text-decoration: none;
+
+  &:hover .workTitle {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  @include m.focus-ring;
+
+  @include m.respond-to('md') {
+    grid-template-columns: 11rem minmax(0, 1fr) auto;
+    align-items: start;
+  }
+}
+
+.workCategory {
+  color: v.$color-line;
+}
+
+.workBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.workTitle {
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-medium;
+  line-height: 1.4;
+}
+
+.workDescription {
+  font-size: v.$font-size-sm;
+  line-height: 1.6;
+  color: v.$color-text-muted;
+}
+
+.workArrow {
+  grid-column: 2;
+  grid-row: 1;
+  color: v.$color-text-muted;
+  font-family: v.$font-family-base;
+  font-size: v.$font-size-lg;
+  line-height: 1;
+
+  @include m.respond-to('md') {
+    grid-column: 3;
+  }
 }

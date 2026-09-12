@@ -43,7 +43,7 @@ export interface RouteSeo {
 }
 
 // The homepage's title stands alone - "Rovie · Rovie" helps nobody.
-const HOME_TITLE = 'Rovie — the AI layer for Africa';
+const HOME_TITLE = 'Rovie — AI for Africa';
 const TITLE_SUFFIX = ' · Rovie';
 
 export const ROUTE_SEO: readonly RouteSeo[] = [
@@ -51,13 +51,25 @@ export const ROUTE_SEO: readonly RouteSeo[] = [
     path: '/',
     title: HOME_TITLE,
     description:
-      'One account and one API key for GPT, Claude, Gemini, Llama and every leading AI model — priced in your own currency, paid for the way Africa pays.',
+      'Rovie aims to make AI accessible and cheaper for Africans through research, models, and infrastructure built for everyday use.',
   },
   {
     path: '/models',
     title: 'AI model pricing in your currency',
     description:
       'Every model a Rovie API key reaches, priced per million tokens and converted live from USD into your own currency. Cheapest first, updated as rates move.',
+  },
+  {
+    path: '/code',
+    title: 'Rovie Code',
+    description:
+      'Rovie Code is a home for AI coding agents, bringing models, project context and developer tools into one focused workflow.',
+  },
+  {
+    path: '/research',
+    title: 'Rovie Research',
+    description:
+      'Rovie Research studies how AI systems can be more accessible, useful and responsible for people across Africa.',
   },
   {
     path: '/rankings',
@@ -113,41 +125,6 @@ export const ROUTE_SEO: readonly RouteSeo[] = [
       'The agreement covering your Rovie account, your API key, your balance and your usage of the models we route to.',
   },
 
-  // ----------------------------------------------------------------- auth
-  //
-  // Sign-up is indexable: it is a destination people search for by name and
-  // the page makes a real offer. Sign-in is not - it is furniture, it competes
-  // with the homepage for the brand query, and an indexed login page is a
-  // phishing lure with our name on it.
-
-  {
-    path: '/signup',
-    title: 'Create an account',
-    description:
-      'Open a Rovie account, get an API key, and call any frontier model with a balance topped up in your own currency. No card required to start.',
-  },
-  { path: '/signin', title: 'Sign in', description: 'Sign in to your Rovie account.', noindex: true },
-  // Reached only from an emailed link, and useless without the token in its
-  // query string. Listed so it gets its own title instead of falling through
-  // to "Page not found", which is what an unlisted route would say.
-  {
-    path: '/reset-password',
-    title: 'Set a new password',
-    description: 'Set a new password for your Rovie account.',
-    noindex: true,
-  },
-
-  // ------------------------------------------------------------ dashboard
-  //
-  // One entry covers the whole subtree - see seoForPath. None of it is
-  // reachable without a session, so none of it should be crawled.
-
-  {
-    path: '/dashboard',
-    title: 'Dashboard',
-    description: 'Your Rovie usage, API keys, balance and account settings.',
-    noindex: true,
-  },
 ];
 
 // What a route we have never heard of gets. Noindex matters more than the
@@ -182,8 +159,8 @@ export function seoForPath(pathname: string): RouteSeo {
   const exact = ROUTE_SEO.find((entry) => entry.path === clean);
   if (exact) return exact;
 
-  // /dashboard/usage, /dashboard/keys and the rest inherit the parent's entry
-  // rather than each needing a line here - they are all noindex anyway.
+  // Signed-in Route paths live on route.rovie.africa and are redirected at
+  // the host level, so they deliberately have no umbrella SEO entry.
   const parent = ROUTE_SEO.find(
     (entry) => entry.path !== '/' && clean.startsWith(`${entry.path}/`)
   );

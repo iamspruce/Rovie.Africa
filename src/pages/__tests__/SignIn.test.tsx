@@ -56,7 +56,7 @@ describe('SignIn page', () => {
   it('renders the form and the Africa plate beside it', async () => {
     renderSignIn();
 
-    expect(await screen.findByRole('heading', { name: 'Sign in' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Sign in to Route' })).toBeInTheDocument();
     expect(screen.getByLabelText('Email')).toBeInTheDocument();
     expect(screen.getByLabelText('Password')).toBeInTheDocument();
     // The plate is the left column - a real labelled map, not a decorative img.

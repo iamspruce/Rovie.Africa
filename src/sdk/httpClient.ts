@@ -50,6 +50,12 @@ export interface RequestOptions {
    * attach a cookie to requests that have no use for one.
    */
   credentials?: RequestCredentials;
+  /**
+   * Browser HTTP cache policy. Public catalog data can change independently
+   * of an app deployment, so callers that present it as live can opt out of
+   * a cached response.
+   */
+  cache?: RequestCache;
 }
 
 export interface ApiCallOptions {
@@ -63,6 +69,7 @@ export interface ApiCallOptions {
   signal?: AbortSignal;
   timeoutMs?: number;
   credentials?: RequestCredentials;
+  cache?: RequestCache;
 }
 
 export function buildUrl(baseUrl: string, path: string, query: Record<string, string> = {}): string {
@@ -92,7 +99,15 @@ const DEFAULT_TIMEOUT_MS = 8000;
 
 export async function request(
   url: string,
-  { method = 'GET', headers = {}, body, signal, timeoutMs = DEFAULT_TIMEOUT_MS, credentials }: RequestOptions = {}
+  {
+    method = 'GET',
+    headers = {},
+    body,
+    signal,
+    timeoutMs = DEFAULT_TIMEOUT_MS,
+    credentials,
+    cache,
+  }: RequestOptions = {}
 ): Promise<unknown> {
   const timeoutSignal = AbortSignal.timeout(timeoutMs);
   const combinedSignal = signal ? AbortSignal.any([signal, timeoutSignal]) : timeoutSignal;
@@ -105,6 +120,7 @@ export async function request(
       body: body !== undefined ? JSON.stringify(body) : undefined,
       signal: combinedSignal,
       credentials,
+      cache,
     });
   } catch (networkError: unknown) {
     // A caller-initiated abort is not a failure and must stay recognisable as
@@ -149,8 +165,9 @@ export async function apiCall({
   signal,
   timeoutMs,
   credentials,
+  cache,
 }: ApiCallOptions): Promise<unknown> {
   const url = buildUrl(baseUrl, path, query);
   const headers = buildHeaders({ apiKey, internalKey, json: body !== undefined });
-  return request(url, { method, headers, body, signal, timeoutMs, credentials });
+  return request(url, { method, headers, body, signal, timeoutMs, credentials, cache });
 }

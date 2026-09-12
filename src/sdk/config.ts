@@ -7,8 +7,11 @@ export interface Config {
 }
 
 const isProd = import.meta.env.PROD;
+const isRouteApp = import.meta.env.VITE_APP_TARGET === 'route';
 
 const PRODUCTION_BASE_URL = 'https://api.getrovie.com';
+const ROUTE_PRODUCTION_ORIGIN = 'https://route.rovie.africa';
+const browserOrigin = typeof window !== 'undefined' ? window.location.origin : ROUTE_PRODUCTION_ORIGIN;
 
 export const config: Config = {
   // In dev this is a same-origin path, not an origin: the Vite server proxies
@@ -18,7 +21,9 @@ export const config: Config = {
   accountServiceUrl:
     import.meta.env.VITE_ACCOUNT_SERVICE_URL ||
     (isProd
-      ? PRODUCTION_BASE_URL
+      ? isRouteApp
+        ? ROUTE_PRODUCTION_ORIGIN
+        : PRODUCTION_BASE_URL
       : typeof window !== 'undefined'
         ? `${window.location.origin}/api/account`
         : 'http://localhost:4001'),
@@ -37,12 +42,14 @@ export const config: Config = {
   portalApiUrl:
     import.meta.env.VITE_PORTAL_API_URL ||
     (isProd
-      ? PRODUCTION_BASE_URL
+      ? isRouteApp
+        ? browserOrigin
+        : PRODUCTION_BASE_URL
       : 'http://localhost:4002'),
 
   paymentServiceUrl:
     import.meta.env.VITE_PAYMENT_SERVICE_URL ||
-    (isProd ? PRODUCTION_BASE_URL : 'http://localhost:4003'),
+    (isProd ? (isRouteApp ? browserOrigin : PRODUCTION_BASE_URL) : 'http://localhost:4003'),
 
   litellmUrl:
     import.meta.env.VITE_LITELLM_URL ||

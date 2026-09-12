@@ -137,8 +137,8 @@ export function ApiKeys() {
       {revealed && <RevealedKey apiKey={revealed} onDismiss={() => setRevealed(null)} />}
 
       <Card
-        title="Create a key"
-        description="Every key spends from the same account balance. Revoking one doesn't strand credit."
+        title="Create a Route API key"
+        description="Every Route key spends from the same credit balance. Revoking one doesn't strand credit."
       >
         <form className={styles.createForm} onSubmit={handleCreate}>
           <label className={styles.labelField}>
@@ -168,7 +168,7 @@ export function ApiKeys() {
         {error && <ErrorNote>{error}</ErrorNote>}
       </Card>
 
-      <Card title="Your keys" description="Spend shown covers the last 30 days.">
+      <Card title="Your Route API keys" description="Spend shown covers the last 30 days.">
         {keys === null && !error && <Pending label="Loading your keys…" />}
 
         {keys !== null && active.length === 0 && revoked.length === 0 && (

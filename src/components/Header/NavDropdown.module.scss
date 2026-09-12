@@ -34,6 +34,32 @@
   }
 }
 
+.trigger:not(.triggerPrimary) {
+  justify-content: center;
+  min-width: 6.75rem;
+}
+
+// The only conversion control in the header. It carries the same gradient as
+// Button.primary, but remains a menu trigger because Route has more than one
+// sensible next step: try it, compare models, read docs, or return to work.
+.triggerPrimary {
+  padding-inline: 1rem;
+  color: var(--rv-btn-primary-text);
+  background: linear-gradient(90deg, var(--rv-btn-primary-from) 0%, var(--rv-btn-primary-to) 70%);
+  box-shadow: inset 1px 1px 2px 0 var(--rv-btn-primary-to);
+
+  &:hover,
+  &[aria-expanded='true'],
+  &[data-active] {
+    color: var(--rv-btn-primary-text);
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--rv-btn-primary-from) 88%, black) 0%,
+      color-mix(in srgb, var(--rv-btn-primary-to) 88%, black) 70%
+    );
+  }
+}
+
 .chevron {
   transition: transform 0.18s ease;
 
@@ -66,6 +92,8 @@
   // and against a flat page it separates the panel just as clearly.
   box-shadow: v.$ring-strong;
   animation: panel-in v.$duration-base v.$ease-standard;
+  width: 24rem;
+  max-width: calc(100vw - 2rem);
 
   @media (prefers-reduced-motion: reduce) {
     animation: none;
@@ -82,6 +110,11 @@
   // Never wider than the window on a laptop that is only just wide enough to
   // be showing this menu at all.
   max-width: calc(100vw - 2rem);
+}
+
+.panel[data-align='end'] {
+  right: 0;
+  left: auto;
 }
 
 @keyframes panel-in {

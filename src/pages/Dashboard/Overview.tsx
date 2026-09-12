@@ -141,8 +141,8 @@ export function Overview() {
       </Card>
 
       <Card
-        title="Connect a client"
-        description="Rovie speaks the OpenAI API. Point any compatible client here and change nothing else."
+        title="Connect to Rovie Route"
+        description="Rovie Route uses the OpenAI API format. Point any compatible client here and change nothing else."
         action={
           <Button as={Link} to="/dashboard/keys" variant="secondary">
             Manage keys

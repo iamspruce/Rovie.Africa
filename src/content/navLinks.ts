@@ -29,6 +29,19 @@ export const DOCS_URL: string =
   import.meta.env.VITE_DOCS_URL ||
   (import.meta.env.PROD ? 'https://docs.rovie.africa' : 'http://localhost:4321');
 
+/**
+ * Rovie Route is a product in its own right, with its own signed-in surface.
+ * The umbrella site links there as a real cross-origin navigation rather than
+ * mounting Route's account and billing screens under rovie.africa.
+ *
+ * Set VITE_ROUTE_URL locally when a Route web app is running. Production is
+ * deliberately explicit: authentication, account cookies, and dashboards
+ * belong on route.rovie.africa.
+ */
+export const ROUTE_URL: string =
+  import.meta.env.VITE_ROUTE_URL ||
+  (import.meta.env.PROD ? 'https://route.rovie.africa' : 'http://localhost:5174');
+
 export interface NavLink {
   /** An internal route, or an absolute URL when `external` is set. */
   to: string;
@@ -50,22 +63,87 @@ export interface NavLink {
   description?: string;
 }
 
-// The two destinations that earn a slot in the bar itself. Both are pages
-// someone still deciding would want; everything else is either a developer
-// destination or a company one, and those live behind the Developers panel and
-// in the footer respectively.
-export const PRIMARY_NAV: readonly NavLink[] = [
+/** Rovie's product family, shared by the footer and mobile navigation. */
+export const PRODUCT_NAV: readonly NavLink[] = [
   {
-    to: '/models',
-    label: 'Models',
-    longLabel: 'Models & pricing',
-    description: 'Every model and its price per million tokens, in your currency',
+    to: ROUTE_URL,
+    external: true,
+    label: 'Route',
+    longLabel: 'Rovie Route',
+    description: 'One API for leading models, priced and paid for locally',
+  },
+  {
+    to: '/code',
+    label: 'Code',
+    longLabel: 'Rovie Code',
+    description: 'A focused workflow for AI coding agents',
+  },
+  {
+    to: '/research',
+    label: 'Research',
+    longLabel: 'Rovie Research',
+    description: 'Research for AI that serves Africa',
+  },
+];
+
+/** Reading and company context, kept separate from product conversion. */
+export const LEARN_NAV: readonly NavLink[] = [
+  {
+    to: '/about',
+    label: 'About',
+    longLabel: 'About Rovie',
+    description: 'Why Rovie exists and the problem we are here to solve',
+  },
+  {
+    to: '/research',
+    label: 'Research',
+    longLabel: 'Research approach',
+    description: 'Our areas of inquiry and public body of work',
   },
   {
     to: '/rankings',
     label: 'Rankings',
     longLabel: 'What Africa is building with',
-    description: 'Measured usage: what the continent actually runs',
+    description: 'Measured usage across Rovie Route',
+  },
+];
+
+/** Everything someone needs to evaluate, begin, or return to Route. */
+export const ROUTE_NAV: readonly NavLink[] = [
+  {
+    to: ROUTE_URL,
+    external: true,
+    label: 'Overview',
+    longLabel: 'Rovie Route overview',
+    description: 'One API for leading models, priced and paid for locally',
+  },
+  {
+    to: `${ROUTE_URL}/models`,
+    external: true,
+    label: 'Models',
+    longLabel: 'Models and pricing',
+    description: 'The live catalog, capabilities, and local-currency prices',
+  },
+  {
+    to: `${DOCS_URL}/start/quickstart/`,
+    external: true,
+    label: 'Docs',
+    longLabel: 'Route documentation',
+    description: 'Set up your key and make your first call',
+  },
+  {
+    to: `${ROUTE_URL}/signin`,
+    external: true,
+    label: 'Sign in',
+    longLabel: 'Sign in to Route',
+    description: 'Open your Route dashboard',
+  },
+  {
+    to: `${ROUTE_URL}/signup`,
+    external: true,
+    label: 'Start',
+    longLabel: 'Create a Route account',
+    description: 'Get an API key and start building',
   },
 ];
 
@@ -104,5 +182,8 @@ export const DEVELOPER_NAV: readonly NavLink[] = [
 
 /** The label on the bar item that opens the developer panel. */
 export const DEVELOPER_NAV_LABEL = 'Developers';
+
+/** @deprecated Use PRODUCT_NAV. Kept while downstream navigation migrates. */
+export const PRIMARY_NAV = PRODUCT_NAV;
 
 export const CONTACT_EMAIL = 'hello@rovie.africa';

@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
-import { Button } from '../Button/Button';
+import { Link, useLocation } from 'react-router-dom';
 import { Logo } from '../Logo/Logo';
 import { NavDropdown } from './NavDropdown';
 import { ModelLibraryCard } from './ModelLibraryCard';
 import { HamburgerButton, HamburgerMenu } from '../HamburgerMenu/HamburgerMenu';
-import { DEVELOPER_NAV, DEVELOPER_NAV_LABEL, PRIMARY_NAV } from '../../content/navLinks';
-import { useAuth } from '../../context/AuthContext';
+import {
+  DEVELOPER_NAV,
+  DEVELOPER_NAV_LABEL,
+  LEARN_NAV,
+  PRODUCT_NAV,
+  ROUTE_NAV,
+} from '../../content/navLinks';
 import styles from './Header.module.scss';
 
 // How far down the page the bar starts drawing its underline. Far enough that
@@ -14,7 +18,6 @@ import styles from './Header.module.scss';
 const SCROLLED_AFTER_PX = 8;
 
 export function Header() {
-  const { isSignedIn, isLoading } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { pathname } = useLocation();
@@ -72,18 +75,8 @@ export function Header() {
             phone without one of them shrinking to nothing. */}
         <nav className={styles.nav} aria-label="Main">
           <ul>
-            {PRIMARY_NAV.map((link) => (
-              <li key={link.to}>
-                <NavLink
-                  to={link.to}
-                  className={({ isActive }) =>
-                    isActive ? `${styles.navLink} ${styles.navLinkActive}` : styles.navLink
-                  }
-                >
-                  {link.label}
-                </NavLink>
-              </li>
-            ))}
+            <li><NavDropdown label="Products" links={PRODUCT_NAV} /></li>
+            <li><NavDropdown label="Learn" links={LEARN_NAV} /></li>
             <li>
               <NavDropdown
                 label={DEVELOPER_NAV_LABEL}
@@ -95,26 +88,7 @@ export function Header() {
         </nav>
 
         <div className={styles.actions}>
-          {/* Nothing is rendered until the session check lands. Showing
-              "Sign in" first and swapping it for "Dashboard" a moment later
-              tells a signed-in user they've been logged out. */}
-          {!isLoading &&
-            (isSignedIn ? (
-              <Button as={Link} to="/dashboard" variant="primary">
-                Dashboard
-              </Button>
-            ) : (
-              <>
-                {/* Hidden on the narrowest screens, where it would push the
-                    primary action off the bar. The sheet carries it there. */}
-                <Button as={Link} to="/signin" variant="ghost" className={styles.signIn}>
-                  Sign in
-                </Button>
-                <Button as={Link} to="/signup" variant="primary">
-                  Get started
-                </Button>
-              </>
-            ))}
+          <NavDropdown label="Try Route" links={ROUTE_NAV} variant="primary" align="end" />
 
           <HamburgerButton isOpen={isMenuOpen} onToggle={() => setIsMenuOpen((v) => !v)} />
         </div>
@@ -122,8 +96,6 @@ export function Header() {
 
       <HamburgerMenu
         isOpen={isMenuOpen}
-        isSignedIn={isSignedIn}
-        isAuthLoading={isLoading}
         onNavigate={() => setIsMenuOpen(false)}
       />
     </header>

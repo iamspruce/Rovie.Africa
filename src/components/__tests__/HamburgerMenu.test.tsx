@@ -1,9 +1,15 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { HamburgerButton, HamburgerMenu } from '../../components/HamburgerMenu/HamburgerMenu';
-import { CONTACT_EMAIL, DEVELOPER_NAV, PRIMARY_NAV } from '../../content/navLinks';
+import {
+  CONTACT_EMAIL,
+  DEVELOPER_NAV,
+  LEARN_NAV,
+  PRODUCT_NAV,
+  ROUTE_NAV,
+} from '../../content/navLinks';
 import { COMPANY_LINKS } from '../../content/siteLinks';
 
 function renderMenu(props: Partial<React.ComponentProps<typeof HamburgerMenu>> = {}) {
@@ -11,8 +17,6 @@ function renderMenu(props: Partial<React.ComponentProps<typeof HamburgerMenu>> =
     <MemoryRouter>
       <HamburgerMenu
         isOpen
-        isSignedIn={false}
-        isAuthLoading={false}
         onNavigate={() => {}}
         {...props}
       />
@@ -52,12 +56,15 @@ describe('HamburgerMenu', () => {
   // Below the large breakpoint this sheet is the only navigation above the
   // footer, so it carries every group - not just the two in the desktop bar.
   it.each([
-    ['product', PRIMARY_NAV],
-    ['developer', DEVELOPER_NAV],
-  ])('renders every %s destination', (_group, links) => {
+    ['Products', PRODUCT_NAV],
+    ['Learn', LEARN_NAV],
+    ['Rovie Route', ROUTE_NAV],
+    ['Developers', DEVELOPER_NAV],
+  ])('renders every %s destination', (group, links) => {
     renderMenu();
+    const menu = within(screen.getByRole('list', { name: group }));
     links.forEach((link) => {
-      expect(screen.getByRole('link', { name: new RegExp(link.longLabel, 'i') })).toHaveAttribute(
+      expect(menu.getByRole('link', { name: new RegExp(link.longLabel, 'i') })).toHaveAttribute(
         'href',
         link.to
       );
@@ -66,8 +73,9 @@ describe('HamburgerMenu', () => {
 
   it('renders the company destinations the desktop bar leaves to the footer', () => {
     renderMenu();
+    const company = within(screen.getByRole('list', { name: 'Company' }));
     COMPANY_LINKS.forEach((link) => {
-      expect(screen.getByRole('link', { name: new RegExp(link.label, 'i') })).toHaveAttribute(
+      expect(company.getByRole('link', { name: new RegExp(link.label, 'i') })).toHaveAttribute(
         'href',
         link.to
       );
@@ -82,30 +90,25 @@ describe('HamburgerMenu', () => {
     );
   });
 
-  it('offers both auth actions when signed out', () => {
+  it('sends Route authentication to the separate Route site', () => {
     renderMenu();
-    expect(screen.getByRole('link', { name: /sign in/i })).toHaveAttribute('href', '/signin');
-    expect(screen.getByRole('link', { name: /get started/i })).toHaveAttribute('href', '/signup');
-  });
-
-  it('offers the dashboard instead once signed in', () => {
-    renderMenu({ isSignedIn: true });
-    expect(screen.getByRole('link', { name: /dashboard/i })).toHaveAttribute('href', '/dashboard');
-    expect(screen.queryByRole('link', { name: /sign in/i })).not.toBeInTheDocument();
-  });
-
-  // Offering "Sign in" and then swapping it for "Dashboard" a moment later
-  // tells a signed-in visitor they have been logged out.
-  it('offers neither until the session check lands', () => {
-    renderMenu({ isAuthLoading: true });
-    expect(screen.queryByRole('link', { name: /sign in/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: /dashboard/i })).not.toBeInTheDocument();
+    const routeMenu = within(screen.getByRole('list', { name: 'Rovie Route' }));
+    expect(routeMenu.getByRole('link', { name: /sign in to route/i })).toHaveAttribute(
+      'href',
+      ROUTE_NAV.find((link) => link.label === 'Sign in')?.to
+    );
+    expect(routeMenu.getByRole('link', { name: /create a route account/i })).toHaveAttribute(
+      'href',
+      ROUTE_NAV.find((link) => link.label === 'Start')?.to
+    );
   });
 
   it('calls onNavigate when a link is clicked', async () => {
     const onNavigate = vi.fn();
     renderMenu({ onNavigate });
-    await userEvent.click(screen.getByRole('link', { name: /models & pricing/i }));
+    await userEvent.click(
+      within(screen.getByRole('list', { name: 'Products' })).getByRole('link', { name: /rovie route/i })
+    );
     expect(onNavigate).toHaveBeenCalledTimes(1);
   });
 });

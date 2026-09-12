@@ -1,14 +1,15 @@
-import { NavLink, Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import {
   CONTACT_EMAIL,
   DEVELOPER_NAV,
   DEVELOPER_NAV_LABEL,
-  PRIMARY_NAV,
+  LEARN_NAV,
+  PRODUCT_NAV,
+  ROUTE_NAV,
 } from '../../content/navLinks';
 import type { NavLink as NavLinkData } from '../../content/navLinks';
 import { COMPANY_LINKS } from '../../content/siteLinks';
 import { SmartLink } from '../SmartLink/SmartLink';
-import { Button } from '../Button/Button';
 import styles from './HamburgerMenu.module.scss';
 
 interface HamburgerButtonProps {
@@ -73,9 +74,6 @@ function Group({ id, title, links, onNavigate }: GroupProps) {
 
 interface HamburgerMenuProps {
   isOpen: boolean;
-  isSignedIn: boolean;
-  /** The session check hasn't landed yet, so neither answer is honest. */
-  isAuthLoading: boolean;
   onNavigate: () => void;
 }
 
@@ -87,8 +85,6 @@ interface HamburgerMenuProps {
  */
 export function HamburgerMenu({
   isOpen,
-  isSignedIn,
-  isAuthLoading,
   onNavigate,
 }: HamburgerMenuProps) {
   if (!isOpen) return null;
@@ -98,10 +94,17 @@ export function HamburgerMenu({
       <nav className={styles.sheetInner} aria-label="Site navigation">
         <Group
           id="rovie-nav-product"
-          title="Product"
-          links={PRIMARY_NAV}
+          title="Products"
+          links={PRODUCT_NAV}
           onNavigate={onNavigate}
         />
+        <Group
+          id="rovie-nav-learn"
+          title="Learn"
+          links={LEARN_NAV}
+          onNavigate={onNavigate}
+        />
+        <Group id="rovie-nav-route" title="Rovie Route" links={ROUTE_NAV} onNavigate={onNavigate} />
         <Group
           id="rovie-nav-developers"
           title={DEVELOPER_NAV_LABEL}
@@ -137,27 +140,6 @@ export function HamburgerMenu({
           </ul>
         </div>
 
-        {/* The bar drops "Sign in" under 480px and both actions are easier to
-            hit down here anyway. Nothing renders until the session check
-            lands, for the same reason the bar renders nothing. */}
-        {!isAuthLoading && (
-          <div className={styles.actions}>
-            {isSignedIn ? (
-              <Button as={Link} to="/dashboard" variant="primary" onClick={onNavigate}>
-                Dashboard
-              </Button>
-            ) : (
-              <>
-                <Button as={Link} to="/signin" variant="ghost" onClick={onNavigate}>
-                  Sign in
-                </Button>
-                <Button as={Link} to="/signup" variant="primary" onClick={onNavigate}>
-                  Get started
-                </Button>
-              </>
-            )}
-          </div>
-        )}
       </nav>
     </div>
   );

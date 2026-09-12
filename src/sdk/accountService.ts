@@ -74,6 +74,9 @@ export function getModels({ signal }: GetModelsOptions = {}): Promise<unknown> {
     baseUrl: config.accountServiceUrl,
     path: '/models',
     signal,
+    // The homepage labels this a live catalog. Do not let a browser reuse an
+    // older response when a provider adds, retires, or reprices a model.
+    cache: 'no-store',
   });
 }
 

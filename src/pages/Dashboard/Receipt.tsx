@@ -71,8 +71,8 @@ function receiptHtml(payment: PortalPayment, user: PortalUser | null): string {
 </style>
 </head>
 <body>
-  <h1>Rovie</h1>
-  <p class="muted">Prepaid API credit</p>
+  <h1>Rovie Route</h1>
+  <p class="muted">Prepaid Route API credit</p>
   <table>
     ${rows
       .map(([label, value]) => `<tr><th>${escapeHtml(label)}</th><td>${escapeHtml(value)}</td></tr>`)

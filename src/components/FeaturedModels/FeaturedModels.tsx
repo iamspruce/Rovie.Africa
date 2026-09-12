@@ -26,13 +26,13 @@ export function FeaturedModels({
   return (
     <section className={styles.featured} aria-labelledby="featured-models-heading">
       <div className={styles.head}>
-        <span className={styles.eyebrow}>Live catalog</span>
+        <span className={styles.eyebrow}>Models on Rovie</span>
         <h2 id="featured-models-heading">The most {referencePriceText} can buy</h2>
         {/* The heading carries the amount, so this doesn't repeat it - it says
             what the list is and where the numbers come from. */}
         <p>
-          One model from each family, newest first. These are the prices we route at today — they
-          move when the providers move theirs.
+          One current model from each family, newest first. Rovie routes these models today while
+          we build more of the AI stack for Africa.
         </p>
       </div>
 

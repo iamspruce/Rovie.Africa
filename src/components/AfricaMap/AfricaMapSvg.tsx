@@ -430,27 +430,29 @@ export function AfricaMapSvg({
         </g>
       )}
 
-      <g
-        className={styles.modelTags}
-        filter="url(#rovieTagShadow)"
-        aria-label="Top model prices in the selected currency"
-      >
-        {tagPositions.map((tag) => (
-          <g
-            key={tag.id}
-            transform={`translate(${tag.point[0]} ${tag.point[1]}) scale(${tagScale})`}
-          >
-            <rect x={-TAG_WIDTH / 2} y={-TAG_HEIGHT / 2} width={TAG_WIDTH} height={TAG_HEIGHT} rx="10" />
-            <TagLogo family={tag.family} />
-            <text x={-TAG_WIDTH / 2 + 44} y="-3" className={styles.tagName}>
-              {tag.name}
-            </text>
-            <text x={-TAG_WIDTH / 2 + 44} y="13" className={styles.tagPrice}>
-              {tag.price}
-            </text>
-          </g>
-        ))}
-      </g>
+      {tagPositions.length > 0 && (
+        <g
+          className={styles.modelTags}
+          filter="url(#rovieTagShadow)"
+          aria-label="Top model prices in the selected currency"
+        >
+          {tagPositions.map((tag) => (
+            <g
+              key={tag.id}
+              transform={`translate(${tag.point[0]} ${tag.point[1]}) scale(${tagScale})`}
+            >
+              <rect x={-TAG_WIDTH / 2} y={-TAG_HEIGHT / 2} width={TAG_WIDTH} height={TAG_HEIGHT} rx="10" />
+              <TagLogo family={tag.family} />
+              <text x={-TAG_WIDTH / 2 + 44} y="-3" className={styles.tagName}>
+                {tag.name}
+              </text>
+              <text x={-TAG_WIDTH / 2 + 44} y="13" className={styles.tagPrice}>
+                {tag.price}
+              </text>
+            </g>
+          ))}
+        </g>
+      )}
 
       {hovered && (
         <g

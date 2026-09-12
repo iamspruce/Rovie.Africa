@@ -17,8 +17,10 @@ export function DashboardLayout() {
     <div className={styles.dashboard}>
       <div className={styles.inner}>
         <header className={styles.header}>
-          <p className={styles.eyebrow}>Signed in as {user?.email ?? user?.name ?? 'your account'}</p>
-          <h1 className={styles.title}>{user?.name ? `Hello, ${user.name}` : 'Your account'}</h1>
+          <p className={styles.eyebrow}>
+            Rovie Route · Signed in as {user?.email ?? user?.name ?? 'your account'}
+          </p>
+          <h1 className={styles.title}>{user?.name ? `Hello, ${user.name}` : 'Rovie Route dashboard'}</h1>
         </header>
 
         {/* Google and magic-link signups arrive with no country, and a key
@@ -32,7 +34,7 @@ export function DashboardLayout() {
           </p>
         )}
 
-        <nav className={styles.tabs} aria-label="Dashboard sections">
+        <nav className={styles.tabs} aria-label="Rovie Route dashboard sections">
           {SECTIONS.map((section) => (
             <NavLink
               key={section.to}

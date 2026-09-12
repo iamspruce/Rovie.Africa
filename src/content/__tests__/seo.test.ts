@@ -9,7 +9,7 @@ import {
   titleFor,
 } from '../seo';
 import { PLACEHOLDER_PAGES } from '../placeholderPages';
-import { PRIMARY_NAV, DEVELOPER_NAV } from '../navLinks';
+import { DEVELOPER_NAV, LEARN_NAV, PRODUCT_NAV, ROUTE_NAV } from '../navLinks';
 import { COMPANY_LINKS } from '../siteLinks';
 import { LEGAL_DOCS } from '../../pages/Legal/Legal';
 
@@ -17,19 +17,13 @@ import { LEGAL_DOCS } from '../../pages/Legal/Legal';
 // absent: they never render, so they never need a title.
 const ROUTED_PATHS = [
   '/',
+  '/code',
+  '/research',
   '/models',
   '/rankings',
   '/status',
   '/support',
   '/about',
-  '/signin',
-  '/signup',
-  '/reset-password',
-  '/dashboard',
-  '/dashboard/usage',
-  '/dashboard/keys',
-  '/dashboard/billing',
-  '/dashboard/account',
   ...LEGAL_DOCS.map((doc) => doc.path),
   ...PLACEHOLDER_PAGES.map((page) => page.path),
 ];
@@ -56,9 +50,9 @@ describe('route metadata', () => {
     expect(NOT_FOUND_SEO.noindex).toBe(true);
   });
 
-  it('lets the dashboard subtree inherit its parent, all of it noindex', () => {
-    expect(seoForPath('/dashboard/keys').path).toBe('/dashboard');
-    expect(seoForPath('/dashboard/keys').noindex).toBe(true);
+  it('keeps Route account pages out of umbrella metadata', () => {
+    expect(seoForPath('/dashboard/keys')).toBe(NOT_FOUND_SEO);
+    expect(seoForPath('/signin')).toBe(NOT_FOUND_SEO);
   });
 
   // Everything reachable from the header or the footer is a page we want
@@ -69,7 +63,7 @@ describe('route metadata', () => {
   // this app's SEO table about a URL it does not serve would only ever return
   // the not-found entry.
   it.each(
-    [...PRIMARY_NAV, ...DEVELOPER_NAV, ...COMPANY_LINKS]
+    [...PRODUCT_NAV, ...LEARN_NAV, ...ROUTE_NAV, ...DEVELOPER_NAV, ...COMPANY_LINKS]
       .filter((link) => !link.external)
       .map((link) => link.to)
   )('keeps the linked destination %s indexable', (path) => {
@@ -99,7 +93,7 @@ describe('titles and descriptions', () => {
 
   // Too short and Google ignores it, padding the snippet with whatever text it
   // scrapes off the page instead. Only enforced on pages we actually want
-  // ranked - "Sign in to your Rovie account." is the whole truth about /signin.
+  // ranked.
   it.each(INDEXABLE_ROUTES.map((entry) => [entry.path, entry] as const))(
     '%s says enough to be used as the snippet',
     (_path, entry) => {
@@ -147,12 +141,12 @@ describe('canonical URLs', () => {
 });
 
 describe('the sitemap set', () => {
-  it('carries the public pages and nothing private', () => {
+  it('carries public umbrella pages and not Route account pages', () => {
     const paths = INDEXABLE_ROUTES.map((entry) => entry.path);
 
     expect(paths).toContain('/');
     expect(paths).toContain('/models');
-    expect(paths).toContain('/signup');
+    expect(paths).not.toContain('/signup');
     expect(paths).not.toContain('/signin');
     expect(paths).not.toContain('/dashboard');
   });

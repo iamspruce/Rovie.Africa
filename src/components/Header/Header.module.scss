@@ -147,10 +147,3 @@
 
 // Under 480px the bar is wordmark + primary action + menu button, and nothing
 // else fits. The sheet carries sign-in at that width.
-.signIn {
-  display: none;
-
-  @include m.respond-to('sm') {
-    display: inline-flex;
-  }
-}

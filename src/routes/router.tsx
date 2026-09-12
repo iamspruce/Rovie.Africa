@@ -1,11 +1,10 @@
 import { Suspense, lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Home } from '../pages/Home/Home';
-import { RequireAuth } from '../components/RequireAuth/RequireAuth';
 import { ExternalRedirect } from '../components/ExternalRedirect/ExternalRedirect';
 import { PLACEHOLDER_PAGES } from '../content/placeholderPages';
 import { LEGAL_DOCS } from '../content/legalDocs';
-import { DOCS_URL } from '../content/navLinks';
+import { DOCS_URL, ROUTE_URL } from '../content/navLinks';
 
 // -----------------------------------------------------------------------
 // Home is imported eagerly; everything else is split.
@@ -16,15 +15,18 @@ import { DOCS_URL } from '../content/navLinks';
 // the opposite of the point.
 //
 // Every other route pays its own way. The weight is not evenly spread: the
-// auth pages carry ~170 KB of projected map geometry for the plate, the legal
-// pages carry react-markdown and three documents, and the dashboard carries
-// five screens nobody signed out will ever open. None of that belongs in the
-// bundle someone downloads to read the homepage.
+// legal pages carry react-markdown and three documents. Route's signed-in
+// product lives on route.rovie.africa, so none of its auth or dashboard code
+// belongs in this umbrella site's route tree.
 //
 // The globe is split separately, from inside Home - see AfricaMapLazy - so
 // the hero's text does not wait on 170 KB of coastline either.
 // -----------------------------------------------------------------------
 const Models = lazy(() => import('../pages/Models/Models').then((m) => ({ default: m.Models })));
+const Code = lazy(() => import('../pages/Code/Code').then((m) => ({ default: m.Code })));
+const Research = lazy(() =>
+  import('../pages/Research/Research').then((m) => ({ default: m.Research }))
+);
 const Rankings = lazy(() =>
   import('../pages/Rankings/Rankings').then((m) => ({ default: m.Rankings }))
 );
@@ -40,29 +42,6 @@ const Legal = lazy(() => import('../pages/Legal/Legal').then((m) => ({ default: 
 const Placeholder = lazy(() =>
   import('../pages/Placeholder/Placeholder').then((m) => ({ default: m.Placeholder }))
 );
-const SignIn = lazy(() => import('../pages/SignIn/SignIn').then((m) => ({ default: m.SignIn })));
-const SignUp = lazy(() => import('../pages/SignUp/SignUp').then((m) => ({ default: m.SignUp })));
-const ResetPassword = lazy(() =>
-  import('../pages/ResetPassword/ResetPassword').then((m) => ({ default: m.ResetPassword }))
-);
-
-const DashboardLayout = lazy(() =>
-  import('../pages/Dashboard/DashboardLayout').then((m) => ({ default: m.DashboardLayout }))
-);
-const Overview = lazy(() =>
-  import('../pages/Dashboard/Overview').then((m) => ({ default: m.Overview }))
-);
-const Usage = lazy(() => import('../pages/Dashboard/Usage').then((m) => ({ default: m.Usage })));
-const ApiKeys = lazy(() =>
-  import('../pages/Dashboard/ApiKeys').then((m) => ({ default: m.ApiKeys }))
-);
-const Billing = lazy(() =>
-  import('../pages/Dashboard/Billing').then((m) => ({ default: m.Billing }))
-);
-const Account = lazy(() =>
-  import('../pages/Dashboard/Account').then((m) => ({ default: m.Account }))
-);
-
 export function AppRoutes(): React.JSX.Element {
   return (
     // No spinner. A route chunk is a local, cached, sub-100ms fetch on
@@ -72,37 +51,22 @@ export function AppRoutes(): React.JSX.Element {
     <Suspense fallback={null}>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/code" element={<Code />} />
+        <Route path="/research" element={<Research />} />
         <Route path="/models" element={<Models />} />
         <Route path="/rankings" element={<Rankings />} />
         <Route path="/status" element={<Status />} />
         <Route path="/support" element={<Support />} />
         <Route path="/about" element={<About />} />
 
-        {/* Auth pages render their own full-page two-column layout and are
-            deliberately outside the site header/footer - see AuthLayout. */}
-        <Route path="/signin" element={<SignIn />} />
-        <Route path="/signup" element={<SignUp />} />
-        {/* Where portal-api sends the browser after checking an emailed reset
-            token. Reached by link only, never linked to from the site. */}
-        <Route path="/reset-password" element={<ResetPassword />} />
-
-        {/* Everything below the guard is session-only. The guard is a
-            convenience: portal-api authorises every request itself, so a
-            bypass here reaches no data. */}
-        <Route
-          path="/dashboard"
-          element={
-            <RequireAuth>
-              <DashboardLayout />
-            </RequireAuth>
-          }
-        >
-          <Route index element={<Overview />} />
-          <Route path="usage" element={<Usage />} />
-          <Route path="keys" element={<ApiKeys />} />
-          <Route path="billing" element={<Billing />} />
-          <Route path="account" element={<Account />} />
-        </Route>
+        {/* Route owns its account, authentication and dashboard surfaces on
+            its own origin. Keep old umbrella URLs useful for existing links,
+            but never render those screens here. */}
+        <Route path="/route" element={<ExternalRedirect to={ROUTE_URL} />} />
+        <Route path="/signin" element={<ExternalRedirect to={`${ROUTE_URL}/signin`} />} />
+        <Route path="/signup" element={<ExternalRedirect to={`${ROUTE_URL}/signup`} />} />
+        <Route path="/reset-password" element={<ExternalRedirect to={`${ROUTE_URL}/reset-password`} />} />
+        <Route path="/dashboard/*" element={<ExternalRedirect to={ROUTE_URL} preservePath />} />
 
         {/* Privacy, Data policy and Terms - one page component, three documents. */}
         {LEGAL_DOCS.map((doc) => (
@@ -136,8 +100,8 @@ export function AppRoutes(): React.JSX.Element {
         <Route path="/sdk" element={<ExternalRedirect to={`${DOCS_URL}/sdks/overview/`} />} />
 
         {/* Common aliases people type or arrive on from old links. */}
-        <Route path="/login" element={<Navigate to="/signin" replace />} />
-        <Route path="/register" element={<Navigate to="/signup" replace />} />
+        <Route path="/login" element={<ExternalRedirect to={`${ROUTE_URL}/signin`} />} />
+        <Route path="/register" element={<ExternalRedirect to={`${ROUTE_URL}/signup`} />} />
 
         <Route path="*" element={<Placeholder />} />
       </Routes>
@@ -150,4 +114,4 @@ export function AppRoutes(): React.JSX.Element {
  * site header and footer off them - a sign-in page offering eight other
  * destinations works against the one thing the visitor came to do.
  */
-export const CHROMELESS_ROUTES: readonly string[] = ['/signin', '/signup', '/reset-password'];
+export const CHROMELESS_ROUTES: readonly string[] = [];

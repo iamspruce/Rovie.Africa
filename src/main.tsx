@@ -1,4 +1,4 @@
-import { StrictMode } from 'react';
+import { lazy, StrictMode, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 // Self-hosted rather than pulled from a font CDN: a third-party round trip is
 // a poor trade on the expensive, unreliable connections a lot of this
@@ -21,8 +21,22 @@ import '@fontsource/ibm-plex-mono/400-italic.css';
 import './styles/main.scss';
 import App from './App';
 
+// The two applications share the same UI source while being served as
+// different products. `dev:route` supplies this build-time target and runs on
+// localhost:5174; production uses the same target at route.rovie.africa.
+// The Route app is lazy specifically so the umbrella bundle never has to
+// download its auth and dashboard screens.
+const RouteApp = lazy(() => import('./RouteApp').then((module) => ({ default: module.RouteApp })));
+const isRouteApp = import.meta.env.VITE_APP_TARGET === 'route';
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    {isRouteApp ? (
+      <Suspense fallback={null}>
+        <RouteApp />
+      </Suspense>
+    ) : (
+      <App />
+    )}
   </StrictMode>
 );

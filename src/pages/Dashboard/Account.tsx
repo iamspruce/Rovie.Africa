@@ -156,7 +156,7 @@ export function Account() {
 
   return (
     <>
-      <Card title="Profile" description="Your country decides which currency prices and balances are quoted in.">
+      <Card title="Route profile" description="Your country decides which currency Route prices and credit are quoted in.">
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="account-name">
@@ -207,7 +207,7 @@ export function Account() {
         </form>
       </Card>
 
-      <Card title="Sign-in details" description="How you get into this account.">
+      <Card title="Sign-in details" description="How you get into your Route account.">
         <dl className={styles.details}>
           <div className={styles.detailRow}>
             <dt className={styles.term}>Email</dt>

@@ -116,7 +116,7 @@ export function Billing() {
         </FormNotice>
       )}
 
-      <Card title="Balance" description="Prepaid credit, shared by every key. It doesn't expire or reset.">
+      <Card title="Route credit" description="Prepaid credit, shared by every Route key. It doesn't expire or reset.">
         {balance.error ? (
           <ErrorNote>{balance.error}</ErrorNote>
         ) : (

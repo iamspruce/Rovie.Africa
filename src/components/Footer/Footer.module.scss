@@ -140,10 +140,10 @@ $muted-text: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
     gap: 3.5rem;
   }
 
-  // Four link columns need real room before they get it; below this they sit
-  // two-up beside the brand instead of four-up.
+  // Five link columns need real room before they get it; below this they sit
+  // two-up beside the brand instead of becoming a row of narrow labels.
   @include m.respond-to('lg') {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 2.7fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 4.25fr);
     gap: 4rem;
   }
 }
@@ -208,7 +208,7 @@ $muted-text: color-mix(in srgb, v.$color-text 72%, v.$color-text-muted);
   gap: 2.5rem 1.75rem;
 
   @include m.respond-to('lg') {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 }
 

@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:route": "VITE_APP_TARGET=route vite --port 5174",
+    "dev:all": "./start-dev.sh",
     "build": "vite build",
+    "build:route": "VITE_APP_TARGET=route vite build",
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run",

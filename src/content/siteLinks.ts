@@ -1,4 +1,4 @@
-import { DEVELOPER_NAV, PRIMARY_NAV } from './navLinks';
+import { DEVELOPER_NAV, LEARN_NAV, PRODUCT_NAV } from './navLinks';
 
 export interface SiteLink {
   /** Internal route, or an absolute URL / mailto: for anything off-site. */
@@ -20,9 +20,13 @@ export interface SocialLink {
 
 // -------------------------------------------------------------- product
 
-// No separate pricing entry: /models is the pricing page - it lists every
-// model's per-million rate in local currency, cheapest first.
-export const PRODUCT_LINKS: readonly SiteLink[] = PRIMARY_NAV.map((link) => ({
+export const PRODUCT_LINKS: readonly SiteLink[] = PRODUCT_NAV.map((link) => ({
+  to: link.to,
+  external: link.external,
+  label: link.longLabel,
+}));
+
+export const LEARN_LINKS: readonly SiteLink[] = LEARN_NAV.map((link) => ({
   to: link.to,
   label: link.longLabel,
 }));

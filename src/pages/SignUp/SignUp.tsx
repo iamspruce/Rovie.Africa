@@ -91,7 +91,7 @@ export function SignUp() {
 
   return (
     <AuthLayout
-      title="Create your account"
+      title="Create your Route account"
       subtitle="Get an API key, top up in your own currency, and call every model through one endpoint."
       footer={
         <>

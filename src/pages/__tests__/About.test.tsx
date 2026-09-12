@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { About } from '../About/About';
+import { ROUTE_URL } from '../../content/navLinks';
 import { CONTACT_EMAIL } from '../../content/navLinks';
 
 function renderAbout() {
@@ -56,7 +57,7 @@ describe('About page', () => {
     renderAbout();
     expect(screen.getByRole('link', { name: /create an account/i })).toHaveAttribute(
       'href',
-      '/signup'
+      `${ROUTE_URL}/signup`
     );
     expect(screen.getByRole('link', { name: CONTACT_EMAIL })).toHaveAttribute(
       'href',

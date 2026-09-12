@@ -1,5 +1,4 @@
 import { BrowserRouter, useLocation } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
 import { Header } from './components/Header/Header';
 import { Footer } from './components/Footer/Footer';
 import { RouteSeo } from './components/Seo/Seo';
@@ -38,11 +37,9 @@ function AppShell() {
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <AppShell />
-      </BrowserRouter>
-    </AuthProvider>
+    <BrowserRouter>
+      <AppShell />
+    </BrowserRouter>
   );
 }
 

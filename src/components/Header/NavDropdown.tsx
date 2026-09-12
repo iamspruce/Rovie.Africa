@@ -30,6 +30,10 @@ const HOVER_CLOSE_MS = 220;
 interface NavDropdownProps {
   label: string;
   links: readonly NavLinkData[];
+  /** The conversion menu keeps the system's one primary treatment. */
+  variant?: 'default' | 'primary';
+  /** Menus opened from the action area grow inward, never past the viewport. */
+  align?: 'start' | 'end';
   /**
    * Second column, if the group has one. The list on the left says how to
    * work with the product; this says what there is.
@@ -37,7 +41,13 @@ interface NavDropdownProps {
   feature?: React.ReactNode;
 }
 
-export function NavDropdown({ label, links, feature }: NavDropdownProps) {
+export function NavDropdown({
+  label,
+  links,
+  variant = 'default',
+  align = 'start',
+  feature,
+}: NavDropdownProps) {
   const panelId = useId();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -178,7 +188,7 @@ export function NavDropdown({ label, links, feature }: NavDropdownProps) {
       <button
         type="button"
         ref={triggerRef}
-        className={styles.trigger}
+        className={`${styles.trigger} ${variant === 'primary' ? styles.triggerPrimary : ''}`}
         data-active={isSectionActive || undefined}
         aria-expanded={isOpen}
         aria-controls={panelId}
@@ -215,6 +225,7 @@ export function NavDropdown({ label, links, feature }: NavDropdownProps) {
           id={panelId}
           ref={panelRef}
           data-columns={feature ? 'two' : undefined}
+          data-align={align === 'end' ? 'end' : undefined}
           onKeyDown={handlePanelKeyDown}
         >
           <ul className={styles.list}>

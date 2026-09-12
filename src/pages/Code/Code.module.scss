@@ -1,0 +1,86 @@
+@use '../../styles/abstracts/variables' as v;
+@use '../../styles/abstracts/mixins' as m;
+
+.page {
+  @include m.container;
+  max-width: 800px;
+  padding-block: 5rem 6rem;
+}
+
+.hero {
+  padding-bottom: 5rem;
+
+  h1 {
+    margin: 0.7rem 0 0;
+    font-size: clamp(v.$font-size-4xl, 8vw, 5.5rem);
+    font-weight: v.$font-weight-medium;
+    letter-spacing: -0.05em;
+    line-height: 0.96;
+  }
+
+  p {
+    max-width: 44rem;
+    margin: 1.5rem 0 0;
+    font-size: clamp(v.$font-size-base, 2.2vw, v.$font-size-lg);
+    line-height: 1.65;
+    color: v.$color-text-muted;
+  }
+}
+
+.eyebrow {
+  color: v.$color-line;
+  font-family: v.$font-family-base;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-bold;
+  letter-spacing: 0.12em;
+  line-height: v.$line-height-tight;
+  text-transform: uppercase;
+}
+
+.promise,
+.next {
+  padding-top: 1.5rem;
+  border-top: 1px solid v.$color-border;
+}
+
+.promise h2,
+.next h2 {
+  max-width: 38rem;
+  margin: 0;
+  font-size: clamp(v.$font-size-xl, 3vw, v.$font-size-2xl);
+  font-weight: v.$font-weight-medium;
+  line-height: 1.2;
+}
+
+.promise {
+  margin-bottom: 5rem;
+
+  p {
+    max-width: 40rem;
+    margin: 1.25rem 0 0;
+    font-size: v.$font-size-base;
+    line-height: 1.8;
+    color: v.$color-text-muted;
+  }
+}
+
+.next h2 {
+  margin: 0.65rem 0 0;
+}
+
+.action {
+  display: inline-block;
+  margin-top: 1.5rem;
+  color: v.$color-text;
+  font-family: v.$font-family-base;
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-medium;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  @include m.focus-ring;
+}

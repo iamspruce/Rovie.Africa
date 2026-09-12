@@ -33,8 +33,8 @@ import { transformWithOxc } from 'vite';
  * latter, so `transformWithEsbuild` throws here unless esbuild is installed
  * separately as a dependency this build does not otherwise need.
  */
-async function loadSeoModule(root) {
-  const path = resolve(root, 'src/content/seo.ts');
+async function loadSeoModule(root, target = 'company') {
+  const path = resolve(root, target === 'route' ? 'src/content/routeSeo.ts' : 'src/content/seo.ts');
   const source = await readFile(path, 'utf8');
   const { code } = await transformWithOxc(source, path, { lang: 'ts' });
   return import(`data:text/javascript;base64,${Buffer.from(code).toString('base64')}`);
@@ -135,7 +135,7 @@ export function seoPlugin() {
     // own HTML plugin during generateBundle, so this has to run after the
     // whole thing has landed on disk.
     async closeBundle() {
-      const seo = await loadSeoModule(root);
+      const seo = await loadSeoModule(root, process.env.VITE_APP_TARGET === 'route' ? 'route' : 'company');
       const indexPath = resolve(outDir, 'index.html');
       const html = await readFile(indexPath, 'utf8');
       const lastmod = new Date().toISOString().slice(0, 10);

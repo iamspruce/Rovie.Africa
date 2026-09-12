@@ -29,6 +29,20 @@
 /api-reference      https://docs.rovie.africa/api/   301!
 /sdk                https://docs.rovie.africa/sdks/overview/   301!
 
+# ----------------------------------------------------------- Rovie Route
+#
+# Route is a separate product site. Its sign-in, sign-up and account pages
+# must never remain under the umbrella origin: session cookies and the
+# dashboard belong to route.rovie.africa.
+/route              https://route.rovie.africa/                301!
+/signin             https://route.rovie.africa/signin          301!
+/signup             https://route.rovie.africa/signup          301!
+/reset-password     https://route.rovie.africa/reset-password  301!
+/dashboard/*        https://route.rovie.africa/dashboard/:splat 301!
+/dashboard          https://route.rovie.africa/dashboard       301!
+/login              https://route.rovie.africa/signin          301!
+/register           https://route.rovie.africa/signup          301!
+
 # ------------------------------------------------------------------- SPA
 #
 # Everything else is served by the app. This has to come LAST: it matches every

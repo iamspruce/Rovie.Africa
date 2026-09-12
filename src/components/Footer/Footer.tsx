@@ -6,6 +6,7 @@ import { Button } from '../Button/Button';
 import { CONTACT_EMAIL } from '../../content/navLinks';
 import {
   PRODUCT_LINKS,
+  LEARN_LINKS,
   DEVELOPER_LINKS,
   COMPANY_LINKS,
   SOCIAL_LINKS,
@@ -139,19 +140,15 @@ export function Footer() {
           </Link>
 
           <p className={styles.blurb}>
-            One account and one API key for the world&apos;s leading AI models — priced live in your
-            own currency, topped up the way you already pay.
+            Rovie&apos;s aim is to make AI accessible and cheaper for Africans.
           </p>
 
-          {/* The homepage's mission, verbatim. The page opens on this claim and
-              now closes on it too. */}
-          <p className={styles.creed}>
-            AI should be accessible, no matter where you build.
-          </p>
+          <p className={styles.creed}>Africa should help shape the future of AI.</p>
         </div>
 
         <nav className={styles.columns} aria-label="Footer">
           <Column title="Product" links={PRODUCT_LINKS} />
+          <Column title="Learn" links={LEARN_LINKS} />
           <Column title="Developers" links={DEVELOPER_LINKS} />
 
           {/* Support is a routed page now, so it comes through COMPANY_LINKS
@@ -183,7 +180,7 @@ export function Footer() {
         </div>
 
         <p className={styles.copyright}>
-          © {new Date().getFullYear()} Rovie. Making AI accessible across Africa.
+          © {new Date().getFullYear()} Rovie. Making AI accessible and cheaper for Africans.
         </p>
         {/* The catalog says its prices move; so does the page that ends on
             them. Same claim, same wording, both directions. */}
