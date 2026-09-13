@@ -2,7 +2,7 @@
 
 This policy explains what Rovie collects when you create an account, top up a
 balance and make calls through the gateway, and what we do with it. It covers
-`rovie.africa` and the API at `api.getrovie.com`.
+`rovie.africa` and the API at `api.rovie.africa`..
 
 It does **not** cover what the model providers do with a prompt once we route
 it to them. That is a separate question, and it is answered on the

@@ -1,7 +1,7 @@
 ## 1. The agreement
 
 These terms govern your use of Rovie: the website at `rovie.africa`, the API at
-`api.getrovie.com`, and any keys issued to you. Creating an account means you
+`api.rovie.africa`, and any keys issued to you. Creating an account means you
 accept them.
 
 > **[To confirm]** — the registered company name and jurisdiction of the entity

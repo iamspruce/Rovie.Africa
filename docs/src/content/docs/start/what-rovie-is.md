@@ -73,7 +73,7 @@ your code
     │
     │  Authorization: Bearer rv_...
     ▼
-api.getrovie.com  ──────────────┐
+api.rovie.africa  ──────────────┐
     │                           │
     │  meter tokens             │  balance, in USD, funded
     │  draw down balance        │  by a local-currency top-up

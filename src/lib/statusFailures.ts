@@ -2,7 +2,7 @@
 // Turning a failed probe into something a visitor can act on.
 //
 // The old page put `error.message` on screen. "Network request to
-// https://api.getrovie.com/models failed: Failed to fetch" is true, and it
+// https://api.rovie.africa/models failed: Failed to fetch" is true, and it
 // tells a visitor nothing about whether the problem is ours, theirs, or
 // somewhere in between - which is the only question they came to ask.
 //
