@@ -9,7 +9,11 @@ export interface Config {
 const isProd = import.meta.env.PROD;
 const isRouteApp = import.meta.env.VITE_APP_TARGET === 'route';
 
-const PRODUCTION_BASE_URL = 'https://api.getrovie.com';
+// Per-service Fly.io URLs (scale-to-zero, ~300ms cold start)
+const PROD_ACCOUNT_URL  = 'https://rovie-account-service.fly.dev';
+const PROD_PORTAL_URL   = 'https://rovie-portal-api.fly.dev';
+const PROD_PAYMENT_URL  = 'https://rovie-payment-service.fly.dev';
+const PROD_LITELLM_URL  = 'https://rovie-litellm.fly.dev';
 const ROUTE_PRODUCTION_ORIGIN = 'https://route.rovie.africa';
 const browserOrigin = typeof window !== 'undefined' ? window.location.origin : ROUTE_PRODUCTION_ORIGIN;
 
@@ -23,7 +27,7 @@ export const config: Config = {
     (isProd
       ? isRouteApp
         ? ROUTE_PRODUCTION_ORIGIN
-        : PRODUCTION_BASE_URL
+        : PROD_ACCOUNT_URL
       : typeof window !== 'undefined'
         ? `${window.location.origin}/api/account`
         : 'http://localhost:4001'),
@@ -44,16 +48,16 @@ export const config: Config = {
     (isProd
       ? isRouteApp
         ? browserOrigin
-        : PRODUCTION_BASE_URL
+        : PROD_PORTAL_URL
       : 'http://localhost:4002'),
 
   paymentServiceUrl:
     import.meta.env.VITE_PAYMENT_SERVICE_URL ||
-    (isProd ? (isRouteApp ? browserOrigin : PRODUCTION_BASE_URL) : 'http://localhost:4003'),
+    (isProd ? (isRouteApp ? browserOrigin : PROD_PAYMENT_URL) : 'http://localhost:4003'),
 
   litellmUrl:
     import.meta.env.VITE_LITELLM_URL ||
-    (isProd ? PRODUCTION_BASE_URL : 'http://localhost:4000'),
+    (isProd ? PROD_LITELLM_URL : 'http://localhost:4000'),
 
   ipGeolocationUrl:
     import.meta.env.VITE_IP_GEO_URL || 'https://get.geojs.io/v1/ip/geo.json',
