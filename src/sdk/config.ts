@@ -13,7 +13,7 @@ const isRouteApp = import.meta.env.VITE_APP_TARGET === 'route';
 const PROD_ACCOUNT_URL  = 'https://rovie-account-service.fly.dev';
 const PROD_PORTAL_URL   = 'https://rovie-portal-api.fly.dev';
 const PROD_PAYMENT_URL  = 'https://rovie-payment-service.fly.dev';
-const PROD_LITELLM_URL  = 'https://rovie-litellm.fly.dev';
+const PROD_LITELLM_URL  = 'https://api.rovie.africa';
 const ROUTE_PRODUCTION_ORIGIN = 'https://route.rovie.africa';
 const browserOrigin = typeof window !== 'undefined' ? window.location.origin : ROUTE_PRODUCTION_ORIGIN;
 
