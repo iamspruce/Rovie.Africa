@@ -44,7 +44,7 @@ describe('FeaturedModels', () => {
 
   it('still says the list is one model per family, newest first', () => {
     renderFeatured();
-    expect(screen.getByText(/one model from each family, newest first/i)).toBeInTheDocument();
+    expect(screen.getByText(/one current model from each family, newest first/i)).toBeInTheDocument();
   });
 
   it('shows one model per family and never the same family twice', () => {
