@@ -56,9 +56,8 @@ function Newsletter() {
         {/* Input and button share one pill so the whole thing reads as a
             single control; the focus ring lives on the wrapper. */}
         <div
-          className={`${styles.newsletterField} ${
-            status === 'invalid' ? styles.newsletterFieldInvalid : ''
-          }`}
+          className={`${styles.newsletterField} ${status === 'invalid' ? styles.newsletterFieldInvalid : ''
+            }`}
         >
           <input
             id="footer-newsletter-email"
@@ -182,12 +181,7 @@ export function Footer() {
         <p className={styles.copyright}>
           © {new Date().getFullYear()} Rovie. Making AI accessible and cheaper for Africans.
         </p>
-        {/* The catalog says its prices move; so does the page that ends on
-            them. Same claim, same wording, both directions. */}
-        <p className={styles.disclaimer}>
-          Prices convert at live market rates, timestamped when we fetch them. Model costs are set
-          by their providers and move when they do.
-        </p>
+
       </div>
     </footer>
   );

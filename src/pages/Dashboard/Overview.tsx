@@ -109,9 +109,9 @@ export function Overview() {
               />
               <Stat
                 label="Last 7 days"
-                value={usage.data ? money(usage.data.totals.spendUsd) : '—'}
+                value={usage.data?.totals ? money(usage.data.totals.spendUsd) : '—'}
                 note={
-                  usage.data && usage.data.totals.requests > 0
+                  usage.data?.totals && usage.data.totals.requests > 0
                     ? `${usage.data.totals.requests.toLocaleString()} requests`
                     : undefined
                 }

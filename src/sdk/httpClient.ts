@@ -151,6 +151,13 @@ export async function request(
     );
   }
 
+  if (!isJson && typeof data === 'string' && (data.trim().startsWith('<!doctype') || data.trim().startsWith('<html'))) {
+    throw new RovieApiError(
+      `Request to ${url} returned HTML document instead of JSON data. Check routing and proxy configuration.`,
+      { status: response.status, body: data, url }
+    );
+  }
+
   return data;
 }
 

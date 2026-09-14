@@ -29,19 +29,48 @@
 /api-reference      https://docs.rovie.africa/api/   301!
 /sdk                https://docs.rovie.africa/sdks/overview/   301!
 
+# ----------------------------------------------------------- portal-api proxy
+# Netlify rewrites API routes to Fly.io portal-api for route.rovie.africa
+/auth/*        https://rovie-portal-api.fly.dev/auth/:splat        200!
+/auth-config   https://rovie-portal-api.fly.dev/auth-config        200!
+/me            https://rovie-portal-api.fly.dev/me                200!
+/me/*          https://rovie-portal-api.fly.dev/me/:splat          200!
+/keys          https://rovie-portal-api.fly.dev/keys              200!
+/keys/*        https://rovie-portal-api.fly.dev/keys/:splat        200!
+/billing/*     https://rovie-portal-api.fly.dev/billing/:splat     200!
+/top-up/*      https://rovie-portal-api.fly.dev/top-up/:splat      200!
+
 # ----------------------------------------------------------- Rovie Route
 #
-# Route is a separate product site. Its sign-in, sign-up and account pages
-# must never remain under the umbrella origin: session cookies and the
-# dashboard belong to route.rovie.africa.
-/route              https://route.rovie.africa/                301!
-/signin             https://route.rovie.africa/signin          301!
-/signup             https://route.rovie.africa/signup          301!
-/reset-password     https://route.rovie.africa/reset-password  301!
-/dashboard/*        https://route.rovie.africa/dashboard/:splat 301!
-/dashboard          https://route.rovie.africa/dashboard       301!
-/login              https://route.rovie.africa/signin          301!
-/register           https://route.rovie.africa/signup          301!
+# Route is a separate product site. When accessed on the umbrella site
+# (rovie.africa), redirect visitors to route.rovie.africa.
+# These rules use absolute source URLs so they do NOT apply on route.rovie.africa itself.
+https://rovie.africa/route              https://route.rovie.africa/                301!
+https://rovie.africa/signin             https://route.rovie.africa/signin          301!
+https://rovie.africa/signup             https://route.rovie.africa/signup          301!
+https://rovie.africa/reset-password     https://route.rovie.africa/reset-password  301!
+https://rovie.africa/dashboard/*        https://route.rovie.africa/dashboard/:splat 301!
+https://rovie.africa/dashboard          https://route.rovie.africa/dashboard       301!
+https://rovie.africa/login              https://route.rovie.africa/signin          301!
+https://rovie.africa/register           https://route.rovie.africa/signup          301!
+
+https://www.rovie.africa/route          https://route.rovie.africa/                301!
+https://www.rovie.africa/signin         https://route.rovie.africa/signin          301!
+https://www.rovie.africa/signup         https://route.rovie.africa/signup          301!
+https://www.rovie.africa/reset-password https://route.rovie.africa/reset-password  301!
+https://www.rovie.africa/dashboard/*    https://route.rovie.africa/dashboard/:splat 301!
+https://www.rovie.africa/dashboard      https://route.rovie.africa/dashboard       301!
+https://www.rovie.africa/login          https://route.rovie.africa/signin          301!
+https://www.rovie.africa/register       https://route.rovie.africa/signup          301!
+
+https://rovie-africa.netlify.app/route              https://route.rovie.africa/                301!
+https://rovie-africa.netlify.app/signin             https://route.rovie.africa/signin          301!
+https://rovie-africa.netlify.app/signup             https://route.rovie.africa/signup          301!
+https://rovie-africa.netlify.app/reset-password     https://route.rovie.africa/reset-password  301!
+https://rovie-africa.netlify.app/dashboard/*        https://route.rovie.africa/dashboard/:splat 301!
+https://rovie-africa.netlify.app/dashboard          https://route.rovie.africa/dashboard       301!
+https://rovie-africa.netlify.app/login              https://route.rovie.africa/signin          301!
+https://rovie-africa.netlify.app/register           https://route.rovie.africa/signup          301!
 
 # ------------------------------------------------------------------- SPA
 #

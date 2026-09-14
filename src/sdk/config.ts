@@ -25,24 +25,14 @@ export const config: Config = {
   accountServiceUrl:
     import.meta.env.VITE_ACCOUNT_SERVICE_URL ||
     (isProd
-      ? isRouteApp
-        ? ROUTE_PRODUCTION_ORIGIN
-        : PROD_ACCOUNT_URL
+      ? PROD_ACCOUNT_URL
       : typeof window !== 'undefined'
         ? `${window.location.origin}/api/account`
         : 'http://localhost:4001'),
 
   // portal-api, the only service the browser is meant to talk to directly.
-  // Unlike account-service above this is NOT proxied through Vite: sign-in
-  // sets a session cookie, and the Google and magic-link callbacks land on
-  // portal-api's own origin rather than the dev server's. Routing normal
-  // calls through a proxy while those two arrive direct would put the cookie
-  // in one place and look for it in another.
-  //
-  // Cookies ignore ports, so a cookie set by localhost:4002 is sent with
-  // requests from localhost:5173 - dev works without SameSite=None. In
-  // production Caddy serves the app and /auth|/me from one origin (see
-  // infra/caddy/Caddyfile), so it's same-origin there.
+  // In dev it points to localhost:4002. In production for Route, Netlify proxies
+  // /auth and /me to Fly.io so cookies stay strictly first-party.
   portalApiUrl:
     import.meta.env.VITE_PORTAL_API_URL ||
     (isProd
@@ -53,7 +43,7 @@ export const config: Config = {
 
   paymentServiceUrl:
     import.meta.env.VITE_PAYMENT_SERVICE_URL ||
-    (isProd ? (isRouteApp ? browserOrigin : PROD_PAYMENT_URL) : 'http://localhost:4003'),
+    (isProd ? PROD_PAYMENT_URL : 'http://localhost:4003'),
 
   litellmUrl:
     import.meta.env.VITE_LITELLM_URL ||

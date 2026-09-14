@@ -120,17 +120,17 @@ export function Usage() {
       {error && <ErrorNote>{error}</ErrorNote>}
       {isInitialLoad && !error && <Pending label="Loading your usage…" />}
 
-      {data && (
+      {data && totals && (
         <>
           <Card title="Spend">
             <StatRow>
-              <Stat label="Spent" value={money(totals!.spendUsd)} note={`Last ${windowDays} days`} />
-              <Stat label="Requests" value={totals!.requests.toLocaleString()} />
-              <Stat label="Tokens" value={formatCompactNumber(totals!.tokens)} />
+              <Stat label="Spent" value={money(totals.spendUsd)} note={`Last ${windowDays} days`} />
+              <Stat label="Requests" value={totals.requests.toLocaleString()} />
+              <Stat label="Tokens" value={formatCompactNumber(totals.tokens)} />
               <Stat
                 label="Failed"
-                value={totals!.failedRequests.toLocaleString()}
-                note={totals!.failedRequests > 0 ? 'See recent requests' : undefined}
+                value={totals.failedRequests.toLocaleString()}
+                note={totals.failedRequests > 0 ? 'See recent requests' : undefined}
               />
             </StatRow>
 
@@ -198,10 +198,10 @@ export function Usage() {
             </Card>
           )}
 
-          {totals!.cachedTokens > 0 && (
+          {totals && totals.cachedTokens > 0 && (
             <Card title="Cached input">
               <StatRow>
-                <Stat label="Cached tokens" value={formatCompactNumber(totals!.cachedTokens)} />
+                <Stat label="Cached tokens" value={formatCompactNumber(totals.cachedTokens)} />
                 <Stat label="Of your input" value={`${cacheShare}%`} note="Billed at the provider's cache rate" />
               </StatRow>
             </Card>
