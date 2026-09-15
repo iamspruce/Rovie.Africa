@@ -66,12 +66,12 @@ export default defineConfig({
 
   integrations: [
     starlight({
-      title: 'Rovie docs',
+      title: 'Rovie Route docs',
       description:
         'Get an API key and call GPT, Claude, Gemini, Llama and every other frontier model through one OpenAI-compatible endpoint, billed in your own currency.',
       tagline: 'One key. Every model. Priced where you are.',
 
-      // The mark only - the "Rovie docs" beside it is Starlight's own title
+      // The mark only - the "Rovie Route docs" beside it is Starlight's own title
       // text, so it picks up the face from rovie.css. Using the horizontal
       // lockup here would draw the wordmark twice.
       //
@@ -97,7 +97,7 @@ export default defineConfig({
         { tag: 'meta', attrs: { name: 'theme-color', content: '#201d1d', media: '(prefers-color-scheme: dark)' } },
       ],
 
-      social: [{ icon: 'email', label: 'Email Rovie', href: 'mailto:hello@rovie.africa' }],
+      social: [{ icon: 'email', label: 'Email Rovie Route', href: 'mailto:hello@rovie.africa' }],
 
       components: {
         // Starlight has no config key for extra header links, so the way back
@@ -122,7 +122,7 @@ export default defineConfig({
         {
           label: 'Get started',
           items: [
-            { label: 'What Rovie is', slug: 'start/what-rovie-is' },
+            { label: 'What Rovie Route is', slug: 'start/what-rovie-is' },
             { label: 'Quickstart', slug: 'start/quickstart' },
             { label: 'Authentication', slug: 'start/authentication' },
             { label: 'Coming from OpenAI', slug: 'start/from-openai' },
@@ -194,15 +194,15 @@ export default defineConfig({
 
         // /llms.txt, /llms-small.txt and /llms-full.txt. Not decoration for an
         // AI gateway: when somebody asks Claude or ChatGPT "how do I call
-        // Rovie", these files are what it reads. Getting the base URL and the
+        // Rovie Route", these files are what it reads. Getting the base URL and the
         // key format in front of a model is the same job as getting them in
         // front of a person.
         starlightLlmsTxt({
-          projectName: 'Rovie',
+          projectName: 'Rovie Route',
           description:
-            'Rovie is an OpenAI-compatible AI gateway. One API key reaches GPT, Claude, Gemini, Llama, DeepSeek and other frontier models, billed against a balance topped up in African currencies.',
+            'Rovie Route is an OpenAI-compatible AI gateway. One API key reaches GPT, Claude, Gemini, Llama, DeepSeek and other frontier models, billed against a balance topped up in African currencies.',
           details: [
-            '- Base URL: https://api.getrovie.com',
+            '- Base URL: https://api.rovie.africa',
             '- Auth: `Authorization: Bearer rv_...` on every request',
             '- The chat endpoint is OpenAI-compatible: point any OpenAI SDK at the base URL above.',
           ].join('\n'),
@@ -217,18 +217,18 @@ export default defineConfig({
         // pages legitimately point at pages that don't exist yet.
         ...(process.env.NODE_ENV === 'production' || process.env.CI
           ? [
-              starlightLinksValidator({
-                errorOnRelativeLinks: false,
-                // Everything under /api/ is injected by starlight-openapi at
-                // build time, so it is not in the content collection this
-                // plugin validates against and every link into the reference
-                // reads as broken. Excluding it here does NOT stop those links
-                // being checked - scripts/check-api-links.mjs verifies each one
-                // against the built output, which is the only place those
-                // routes exist. `npm run build` runs it.
-                exclude: ['/api', '/api/**'],
-              }),
-            ]
+            starlightLinksValidator({
+              errorOnRelativeLinks: false,
+              // Everything under /api/ is injected by starlight-openapi at
+              // build time, so it is not in the content collection this
+              // plugin validates against and every link into the reference
+              // reads as broken. Excluding it here does NOT stop those links
+              // being checked - scripts/check-api-links.mjs verifies each one
+              // against the built output, which is the only place those
+              // routes exist. `npm run build` runs it.
+              exclude: ['/api', '/api/**'],
+            }),
+          ]
           : []),
       ],
     }),

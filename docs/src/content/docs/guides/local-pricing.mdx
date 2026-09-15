@@ -7,7 +7,7 @@ sidebar:
 
 import { Aside } from '@astrojs/starlight/components';
 
-Every price Rovie shows is converted from USD into the currency of the country
+Every price Rovie Route shows is converted from USD into the currency of the country
 on your account. This page is how to do the same conversion yourself — for a
 cost estimator, an internal dashboard, or a price shown to your own users.
 
@@ -82,14 +82,14 @@ output    500 × $15.00 / 1,000,000 = $0.0075
 Three cases where the naive version prints something wrong.
 
 **A model with no published price.** `cost` is optional — models.dev does not
-have a rate for everything, and Rovie passes through rather than inventing one.
+have a rate for everything, and Rovie Route passes through rather than inventing one.
 Show "price unavailable"; do not treat a missing rate as zero.
 
 **A currency with no rate.** If a code is absent from `currencies`, the rate
 feed did not carry it. Fall back to showing USD, labelled as USD. A naira
 symbol in front of a dollar figure is worse than no conversion at all.
 
-**A stale rate.** `fetchedAt` is Unix **milliseconds**, and it is when Rovie
+**A stale rate.** `fetchedAt` is Unix **milliseconds**, and it is when Rovie Route
 last refreshed the feed — not when you asked. Cache accordingly, and if you are
 quoting something a user will act on, say when the rate was taken.
 
@@ -106,7 +106,7 @@ const display = rate
 
 Two different lists, and conflating them produces a checkout that fails:
 
-- **Quoting** — every currency in `supported`. Rovie can price a model in any
+- **Quoting** — every currency in `supported`. Rovie Route can price a model in any
   of them, and the models page does.
 - **Paying** — **NGN, UGX, GHS, KES** only. Settling a payment means holding
   funds in that currency, which is a compliance question rather than a
@@ -117,7 +117,7 @@ four. See [Balance and top-ups](/guides/billing/).
 
 ## Rates move
 
-The figure you quote is indicative until money changes hands. Rovie locks a
+The figure you quote is indicative until money changes hands. Rovie Route locks a
 rate when a charge is created — that is the binding one, and it is why a quote
 shown before payment is explicitly marked indicative.
 
@@ -130,7 +130,7 @@ support ticket.
 ```python
 import requests
 
-BASE = "https://api.getrovie.com"
+BASE = "https://api.rovie.africa"
 
 def estimate(model_id, currency, prompt_tokens, completion_tokens, calls_per_month):
     models = requests.get(f"{BASE}/models", timeout=10).json()["models"]

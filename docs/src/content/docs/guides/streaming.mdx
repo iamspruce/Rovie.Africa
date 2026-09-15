@@ -58,7 +58,7 @@ for await (const chunk of stream) {
 <TabItem label="curl">
 
 ```bash
-curl -N https://api.getrovie.com/v1/chat/completions \
+curl -N https://api.rovie.africa/v1/chat/completions \
   -H "Authorization: Bearer $ROVIE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -132,7 +132,7 @@ the same as not streaming.
 export async function POST(request: Request) {
   const { messages } = await request.json();
 
-  const upstream = await fetch('https://api.getrovie.com/v1/chat/completions', {
+  const upstream = await fetch('https://api.rovie.africa/v1/chat/completions', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${process.env.ROVIE_API_KEY}`,

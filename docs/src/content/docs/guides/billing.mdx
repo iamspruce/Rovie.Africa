@@ -1,13 +1,13 @@
 ---
 title: Balance and top-ups
-description: How Rovie's balance works — paying in naira, shillings, cedis or stablecoin, what the markup is, and what happens when a payment goes quiet.
+description: How Rovie Route's balance works — paying in naira, shillings, cedis or stablecoin, what the markup is, and what happens when a payment goes quiet.
 sidebar:
   order: 6
 ---
 
 import { Aside, Steps } from '@astrojs/starlight/components';
 
-Rovie is prepaid. You put credit on an account, calls draw it down, and when it
+Rovie Route is prepaid. You put credit on an account, calls draw it down, and when it
 reaches zero the calls stop. No card on file, no subscription, no invoice at
 the end of the month, and nothing that can overdraft.
 
@@ -17,14 +17,14 @@ developers from buying tokens at all.
 
 ## The two currencies
 
-Rovie holds your balance in **USD**, because that is what the providers charge
+Rovie Route holds your balance in **USD**, because that is what the providers charge
 in. You fund it in **your own currency**, and you are quoted in your own
 currency throughout.
 
 <Steps>
 
 1. **You pay** ₦25,000 by bank transfer.
-2. **Rovie converts** at the rate locked at that moment, minus its markup.
+2. **Rovie Route converts** at the rate locked at that moment, minus its markup.
 3. **Your balance** goes up by the resulting USD figure.
 4. **Calls draw down** that USD balance at the providers' per-token rates.
 5. **The dashboard shows** the remainder in both — USD, and naira at today's
@@ -52,7 +52,7 @@ server-side. Where a currency's rate is briefly unavailable, it falls back to
 showing USD rather than printing a wrong local figure.
 
 <Aside type="note" title="Quoting and paying are different lists">
-Rovie can quote a price in every African currency its rate feed carries — that
+Rovie Route can quote a price in every African currency its rate feed carries — that
 is what the map and the models page use. It can *settle* a payment in a shorter
 list: **NGN, UGX, GHS, KES**. Holding funds in a currency is a compliance
 question, not a technical one, so that list grows slowly and deliberately.
@@ -60,7 +60,7 @@ question, not a technical one, so that list grows slowly and deliberately.
 
 ## The markup
 
-Rovie charges the provider's own per-token rate plus a percentage. That
+Rovie Route charges the provider's own per-token rate plus a percentage. That
 percentage is shown on the quote before you pay, and it is the entire business
 model — there is no subscription, no per-request fee, and no charge for a
 request that failed before reaching a provider.
@@ -91,7 +91,7 @@ nothing is charged — the call simply does not happen.
 
 Set the **low-balance email** on
 [your account settings](https://rovie.africa/dashboard/account): a USD figure
-below which Rovie emails you. Pick a number that covers a few days of your
+below which Rovie Route emails you. Pick a number that covers a few days of your
 normal burn, so a top-up is something you schedule rather than something you do
 at 2am.
 

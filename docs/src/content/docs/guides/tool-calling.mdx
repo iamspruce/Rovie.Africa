@@ -50,7 +50,7 @@ TOOLS = [
         "function": {
             "name": "get_balance",
             "description": (
-                "Look up a user's current Rovie balance. Use this whenever the "
+                "Look up a user's current Rovie Route balance. Use this whenever the "
                 "user asks how much credit they have left."
             ),
             "parameters": {
@@ -112,7 +112,7 @@ else:
 
 ### `arguments` is a string
 
-Not an object — a JSON string, because that is OpenAI's shape and Rovie does
+Not an object — a JSON string, because that is OpenAI's shape and Rovie Route does
 not change it. Parse it, and be ready for it not to parse. Models emit invalid
 JSON here often enough that treating it as an unexpected exception is wrong;
 hand the error back to the model as a tool result and it will usually correct

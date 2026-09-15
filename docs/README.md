@@ -129,6 +129,6 @@ it, and only the 301 passes the old URLs' ranking.
 ## For models, not people
 
 The build emits `/llms.txt`, `/llms-small.txt` and `/llms-full.txt`. When
-somebody asks Claude or ChatGPT how to call Rovie, those files are what it
+somebody asks Claude or ChatGPT how to call Rovie Route, those files are what it
 reads — which for an AI gateway is the same job as the docs themselves, not a
 side quest. They are generated from the same pages, so they cannot go stale.

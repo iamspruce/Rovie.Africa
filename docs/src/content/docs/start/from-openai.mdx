@@ -1,6 +1,6 @@
 ---
 title: Coming from OpenAI
-description: The three-line diff that moves working OpenAI code onto Rovie, what carries over unchanged, and the handful of things that don't.
+description: The three-line diff that moves working OpenAI code onto Rovie Route, what carries over unchanged, and the handful of things that don't.
 sidebar:
   order: 4
 ---
@@ -21,7 +21,7 @@ Rovie.
   client = OpenAI(
 -     base_url="https://api.openai.com/v1",
 -     api_key=os.environ["OPENAI_API_KEY"],
-+     base_url="https://api.getrovie.com/v1",
++     base_url="https://api.rovie.africa/v1",
 +     api_key=os.environ["ROVIE_API_KEY"],
   )
 
@@ -41,7 +41,7 @@ Rovie.
   const client = new OpenAI({
 -   baseURL: 'https://api.openai.com/v1',
 -   apiKey: process.env.OPENAI_API_KEY,
-+   baseURL: 'https://api.getrovie.com/v1',
++   baseURL: 'https://api.rovie.africa/v1',
 +   apiKey: process.env.ROVIE_API_KEY,
   });
 
@@ -62,7 +62,7 @@ Rovie.
 -     model="gpt-4o",
 +     model="openai/gpt-4o",
 -     base_url="https://api.openai.com/v1",
-+     base_url="https://api.getrovie.com/v1",
++     base_url="https://api.rovie.africa/v1",
 -     api_key=os.environ["OPENAI_API_KEY"],
 +     api_key=os.environ["ROVIE_API_KEY"],
   )
@@ -77,7 +77,7 @@ Rovie.
   const rovie = createOpenAI({
 -   baseURL: 'https://api.openai.com/v1',
 -   apiKey: process.env.OPENAI_API_KEY,
-+   baseURL: 'https://api.getrovie.com/v1',
++   baseURL: 'https://api.rovie.africa/v1',
 +   apiKey: process.env.ROVIE_API_KEY,
   });
 
@@ -100,7 +100,7 @@ called `llama-3.3-70b`. The prefix is what makes one namespace out of nine.
 
 ## What carries over unchanged
 
-Everything in the chat completions surface, because Rovie serves the same
+Everything in the chat completions surface, because Rovie Route serves the same
 request and response shapes:
 
 - Streaming — `stream: true`, SSE chunks, `data: [DONE]`. See
@@ -126,7 +126,7 @@ is the one place to look.
 
 ### 2. Some parameters depend on the model
 
-OpenAI's API is one company's models. Rovie's is everyone's, and they don't all
+OpenAI's API is one company's models. Rovie Route's is everyone's, and they don't all
 accept the same fields. `temperature` on a reasoning model that fixes it is a
 `400`, not a silent ignore.
 
@@ -148,7 +148,7 @@ with, and they are visible on the key itself. See
 
 ### 5. Endpoints beyond chat completions
 
-Rovie's documented surface is [chat completions](/api/operations/createchatcompletion/),
+Rovie Route's documented surface is [chat completions](/api/operations/createchatcompletion/),
 [the model list](/api/operations/listgatewaymodels/) and
 [a health probe](/api/operations/getreadiness/). If your code calls Assistants,
 the Responses API, files, batches or fine-tuning, those are not part of what is
@@ -166,20 +166,20 @@ openai_client = OpenAI(
 )
 
 rovie_client = OpenAI(
-    base_url="https://api.getrovie.com/v1",
+    base_url="https://api.rovie.africa/v1",
     api_key=os.environ["ROVIE_API_KEY"],
 )
 
 # Same call, same shape, two bills.
 ```
 
-Give the Rovie key a small [budget cap](/start/authentication/#narrowing-a-key)
+Give the Rovie Route key a small [budget cap](/start/authentication/#narrowing-a-key)
 while you evaluate. Then the experiment cannot cost more than the number you
 chose.
 
 ## A checklist
 
-- [ ] `base_url` points at `https://api.getrovie.com/v1`
+- [ ] `base_url` points at `https://api.rovie.africa/v1`
 - [ ] Key comes from `ROVIE_API_KEY`, out of a secret store
 - [ ] Every model name is provider-prefixed
 - [ ] Anything reading `OPENAI_API_KEY` elsewhere in the process is accounted for

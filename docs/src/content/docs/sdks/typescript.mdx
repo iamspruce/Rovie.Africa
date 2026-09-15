@@ -1,6 +1,6 @@
 ---
 title: TypeScript
-description: Using the OpenAI Node client with Rovie — setup, streaming, tools, retries and the Next.js route handler you probably want.
+description: Using the OpenAI Node client with Rovie Route — setup, streaming, tools, retries and the Next.js route handler you probably want.
 sidebar:
   order: 2
 ---
@@ -23,7 +23,7 @@ if (!process.env.ROVIE_API_KEY) {
 }
 
 export const rovie = new OpenAI({
-  baseURL: 'https://api.getrovie.com/v1',
+  baseURL: 'https://api.rovie.africa/v1',
   apiKey: process.env.ROVIE_API_KEY,
 
   // The client retries 429s and 5xx on its own. Leave it on, and do NOT wrap
@@ -82,7 +82,7 @@ for await (const chunk of stream) {
 
 ## A Next.js route handler
 
-The shape most people actually need: browser talks to you, you talk to Rovie,
+The shape most people actually need: browser talks to you, you talk to Rovie Route,
 the stream passes straight through.
 
 ```ts
@@ -127,13 +127,13 @@ export async function POST(request: Request) {
 
 <Aside type="tip" title="Or use the Vercel AI SDK">
 If you want message state, tool calls and a `useChat` hook rather than raw
-tokens, `@ai-sdk/openai` points at Rovie the same way:
+tokens, `@ai-sdk/openai` points at Rovie Route the same way:
 
 ```ts
 import { createOpenAI } from '@ai-sdk/openai';
 
 const rovie = createOpenAI({
-  baseURL: 'https://api.getrovie.com/v1',
+  baseURL: 'https://api.rovie.africa/v1',
   apiKey: process.env.ROVIE_API_KEY,
 });
 
@@ -150,7 +150,7 @@ const tools: OpenAI.Chat.ChatCompletionTool[] = [
     function: {
       name: 'get_balance',
       description:
-        "Look up a user's Rovie balance. Use whenever they ask how much credit is left.",
+        "Look up a user's Rovie Route balance. Use whenever they ask how much credit is left.",
       parameters: {
         type: 'object',
         properties: { userId: { type: 'string', description: 'e.g. usr_4f2a' } },
@@ -193,7 +193,7 @@ try {
     switch (error.status) {
       case 402:
         // Out of balance. Alert somebody; retrying will never help.
-        await notifyOps('Rovie balance exhausted');
+        await notifyOps('Rovie Route balance exhausted');
         break;
       case 404:
         // Wrong model id, or this key is scoped away from it.
@@ -229,7 +229,7 @@ interface CatalogModel {
 }
 
 export async function fetchCatalog(): Promise<CatalogModel[]> {
-  const response = await fetch('https://api.getrovie.com/models');
+  const response = await fetch('https://api.rovie.africa/models');
   if (!response.ok) throw new Error(`catalog: ${response.status}`);
   const { models } = (await response.json()) as { models: CatalogModel[] };
   return models;

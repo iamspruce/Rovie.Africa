@@ -20,7 +20,7 @@ Five minutes, four steps, one working request.
 
 2. ### Put something on the balance
 
-   Rovie spends against a balance, not a card, so there is nothing to call
+   Rovie Route spends against a balance, not a card, so there is nothing to call
    until there is credit behind it.
 
    Go to [Billing](https://rovie.africa/dashboard/billing) and top up by bank
@@ -40,7 +40,7 @@ Five minutes, four steps, one working request.
    `staging`).
 
    <Aside type="caution" title="Shown once">
-   The full key appears exactly once, at the moment you create it. Rovie stores
+   The full key appears exactly once, at the moment you create it. Rovie Route stores
    only a hash and the first few characters, so it cannot be shown again and
    support cannot recover it. Put it in your password manager or your secret
    store before closing the dialog. Lost one? [Rotate
@@ -57,7 +57,7 @@ Five minutes, four steps, one working request.
    <TabItem label="curl">
 
    ```bash
-   curl https://api.getrovie.com/v1/chat/completions \
+   curl https://api.rovie.africa/v1/chat/completions \
      -H "Authorization: Bearer $ROVIE_API_KEY" \
      -H "Content-Type: application/json" \
      -d '{
@@ -77,7 +77,7 @@ Five minutes, four steps, one working request.
    from openai import OpenAI
 
    client = OpenAI(
-       base_url="https://api.getrovie.com/v1",
+       base_url="https://api.rovie.africa/v1",
        api_key=os.environ["ROVIE_API_KEY"],
    )
 
@@ -97,7 +97,7 @@ Five minutes, four steps, one working request.
    import OpenAI from 'openai';
 
    const client = new OpenAI({
-     baseURL: 'https://api.getrovie.com/v1',
+     baseURL: 'https://api.rovie.africa/v1',
      apiKey: process.env.ROVIE_API_KEY,
    });
 
@@ -127,7 +127,7 @@ Five minutes, four steps, one working request.
 
    func main() {
        client := openai.NewClient(
-           option.WithBaseURL("https://api.getrovie.com/v1"),
+           option.WithBaseURL("https://api.rovie.africa/v1"),
            option.WithAPIKey(os.Getenv("ROVIE_API_KEY")),
        )
 
@@ -177,7 +177,7 @@ The OpenAI response shape, unmodified:
 
 Two fields are worth looking at every time:
 
-- **`model`** is what actually answered. Rovie never substitutes a different
+- **`model`** is what actually answered. Rovie Route never substitutes a different
   model, so this should always match what you asked for — but it is the honest
   record of what you are paying for.
 - **`usage`** is what the call cost, in tokens. Multiply by the model's
@@ -193,7 +193,7 @@ Two fields are worth looking at every time:
 | `402` | No balance, or past this key's budget cap. [Top up](https://rovie.africa/dashboard/billing). |
 | `404` | No such model, or this key has been narrowed to a list that excludes it. `GET /v1/models` shows what the key can reach. |
 | `429` | Over a rate limit. [Back off and retry](/guides/errors/#retrying-well). |
-| Connection refused | Check the base URL. It is `https://api.getrovie.com` — the SDKs above append `/v1` themselves, curl does not. |
+| Connection refused | Check the base URL. It is `https://api.rovie.africa` — the SDKs above append `/v1` themselves, curl does not. |
 
 The full list, with the retry strategy each one deserves, is in
 [Errors and retries](/guides/errors/).

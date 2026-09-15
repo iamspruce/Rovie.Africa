@@ -10,7 +10,7 @@
 // variant idea is actually needed. The app never loads those files because its
 // logo is inlined and can use currentColor; this one cannot.
 //
-// The mark only. The "Rovie docs" beside it is Starlight's own title text and
+// The mark only. The "Rovie Route docs" beside it is Starlight's own title text and
 // picks up the face from src/styles/rovie.css, so baking the wordmark in here
 // would draw it twice.
 //
@@ -68,7 +68,7 @@ function toSvg({ viewBox, transform, strokeWidth, paths }, ink) {
   const body = paths.map((d) => `    <path d="${d}"/>`).join('\n');
 
   return (
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" width="32" height="32" role="img" aria-label="Rovie">\n` +
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" width="32" height="32" role="img" aria-label="Rovie Route">\n` +
     `  <g transform="${transform}" fill="none" stroke="${ink}" stroke-width="${strokeWidth}" stroke-linejoin="round">\n` +
     `${body}\n` +
     `  </g>\n` +

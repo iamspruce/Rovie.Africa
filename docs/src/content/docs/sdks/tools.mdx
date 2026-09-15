@@ -1,6 +1,6 @@
 ---
 title: Editors and agents
-description: Running Cursor, Continue, OpenCode, Zed, Aider and other coding tools against Rovie's model list on your own balance.
+description: Running Cursor, Continue, OpenCode, Zed, Aider and other coding tools against Rovie Route's model list on your own balance.
 sidebar:
   order: 4
 ---
@@ -8,7 +8,7 @@ sidebar:
 import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
 
 Most coding tools let you point at a custom OpenAI-compatible endpoint. That
-means one Rovie key gives them the whole catalog — you can put Claude behind a
+means one Rovie Route key gives them the whole catalog — you can put Claude behind a
 tool that ships with GPT defaults, and pay for it from a balance you topped up
 in naira.
 
@@ -16,7 +16,7 @@ Everything below needs the same two values:
 
 | | |
 | --- | --- |
-| **Base URL** | `https://api.getrovie.com/v1` |
+| **Base URL** | `https://api.rovie.africa/v1` |
 | **API key** | `rv_...` from [your dashboard](https://rovie.africa/dashboard/keys) |
 
 <Aside type="tip" title="Use a separate key">
@@ -34,7 +34,7 @@ per-machine line in your [usage breakdown](/guides/usage/).
 
 Settings → Models → **Override OpenAI Base URL**.
 
-1. Set the base URL to `https://api.getrovie.com/v1`.
+1. Set the base URL to `https://api.rovie.africa/v1`.
 2. Paste the key into the OpenAI API key field.
 3. Add the models you want by their full ids — `anthropic/claude-sonnet-5`,
    `openai/gpt-4o` — then verify.
@@ -51,17 +51,17 @@ In `~/.continue/config.json`:
 {
   "models": [
     {
-      "title": "Claude Sonnet 5 (Rovie)",
+      "title": "Claude Sonnet 5 (Rovie Route)",
       "provider": "openai",
       "model": "anthropic/claude-sonnet-5",
-      "apiBase": "https://api.getrovie.com/v1",
+      "apiBase": "https://api.rovie.africa/v1",
       "apiKey": "rv_..."
     },
     {
-      "title": "GPT-4o mini (Rovie)",
+      "title": "GPT-4o mini (Rovie Route)",
       "provider": "openai",
       "model": "openai/gpt-4o-mini",
-      "apiBase": "https://api.getrovie.com/v1",
+      "apiBase": "https://api.rovie.africa/v1",
       "apiKey": "rv_..."
     }
   ]
@@ -80,7 +80,7 @@ In `settings.json`:
 {
   "language_models": {
     "openai": {
-      "api_url": "https://api.getrovie.com/v1",
+      "api_url": "https://api.rovie.africa/v1",
       "available_models": [
         { "name": "anthropic/claude-sonnet-5", "max_tokens": 200000 },
         { "name": "openai/gpt-4o", "max_tokens": 128000 }
@@ -98,7 +98,7 @@ Set the key through Zed's assistant panel rather than in the settings file.
 <TabItem label="Aider">
 
 ```bash
-export OPENAI_API_BASE="https://api.getrovie.com/v1"
+export OPENAI_API_BASE="https://api.rovie.africa/v1"
 export OPENAI_API_KEY="rv_..."
 
 aider --model openai/anthropic/claude-sonnet-5
@@ -106,7 +106,7 @@ aider --model openai/anthropic/claude-sonnet-5
 
 The doubled prefix is not a typo: aider routes through LiteLLM, so `openai/`
 tells it *how to talk* (the OpenAI protocol) and `anthropic/claude-sonnet-5` is
-the model id Rovie expects.
+the model id Rovie Route expects.
 
 </TabItem>
 <TabItem label="OpenCode">
@@ -129,7 +129,7 @@ offers:
 - `OPENAI_API_BASE` or `OPENAI_BASE_URL` as an environment variable
 
 Then use provider-prefixed model ids. If the tool rejects a model name with a
-slash in it, that is a limitation of the tool rather than of Rovie — some
+slash in it, that is a limitation of the tool rather than of Rovie Route — some
 validate names against a hard-coded OpenAI list.
 
 ## Watching what an agent spends

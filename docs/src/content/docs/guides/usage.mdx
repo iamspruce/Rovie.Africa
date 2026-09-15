@@ -58,7 +58,7 @@ served from its own cache, billed at the model's `cost.cache_read` rate instead
 of `cost.input` — often ten times cheaper.
 
 It is reported in **tokens, not dollars**, because the discount differs per
-provider and Rovie does not invent a figure. If you send a large stable system
+provider and Rovie Route does not invent a figure. If you send a large stable system
 prompt on every call, this number is where most of your savings live, and a
 prompt change that reorders it can silently destroy them. Watch it.
 
@@ -82,7 +82,7 @@ There is a CSV export for the window if you would rather do the analysis
 yourself.
 
 <Aside type="note" title="Prompts are not in there">
-Every one of these is an aggregate. Rovie's usage reporting never returns
+Every one of these is an aggregate. Rovie Route's usage reporting never returns
 prompts or completions — not to you through the dashboard, not to anyone. Your
 own logging is the only place your prompt text exists on your side, and that is
 deliberate. See the [data policy](https://rovie.africa/data-policy).
@@ -105,7 +105,7 @@ Give the key a name you will recognise later — `checkout-api`, not `key-2`.
 ### The `user` field
 
 `user` on the request is an opaque id for the end user a call is on behalf of.
-Rovie records it against the request, so it appears in your own usage data.
+Rovie Route records it against the request, so it appears in your own usage data.
 
 ```python
 response = client.chat.completions.create(
@@ -122,7 +122,7 @@ identifier in a field that ends up in logs is not.
 
 The finest-grained and the most work: correlate your `llm_call` records with
 your product events. This is the only way to answer "what does one invoice
-summary cost", because Rovie cannot know what an invoice summary is.
+summary cost", because Rovie Route cannot know what an invoice summary is.
 
 ## Reconciling
 
@@ -134,7 +134,7 @@ Roughly monthly, and any time a bill surprises you:
 
 Gaps have honest causes worth knowing:
 
-- **Streamed calls without `include_usage`** — you logged nothing, Rovie
+- **Streamed calls without `include_usage`** — you logged nothing, Rovie Route
   metered everything. The most common gap by far.
 - **Timeouts and cancelled streams** — you never saw a response, so you logged
   nothing, but the provider generated tokens and you were billed. These appear

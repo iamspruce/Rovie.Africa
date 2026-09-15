@@ -1,6 +1,6 @@
 ---
 title: Authentication
-description: How Rovie API keys work — the header, the one-time reveal, rotation, per-key budgets and where a key must never go.
+description: How Rovie Route API keys work — the header, the one-time reveal, rotation, per-key budgets and where a key must never go.
 sidebar:
   order: 3
 ---
@@ -23,7 +23,7 @@ issue keys is an API where one leaked key becomes unlimited keys.
 
 <Aside type="caution" title="You see it once">
 The full key is returned exactly once — at creation, and again at rotation.
-Rovie stores a hash and the leading characters, which is why the dashboard can
+Rovie Route stores a hash and the leading characters, which is why the dashboard can
 show you `rv_9f3a…` in the list but never the rest. If you lose it, rotate it;
 there is no recovery path, for you or for support.
 </Aside>
@@ -42,7 +42,7 @@ import os
 from openai import OpenAI
 
 client = OpenAI(
-    base_url="https://api.getrovie.com/v1",
+    base_url="https://api.rovie.africa/v1",
     api_key=os.environ["ROVIE_API_KEY"],  # never a literal
 )
 ```
@@ -54,7 +54,7 @@ client = OpenAI(
 import OpenAI from 'openai';
 
 const client = new OpenAI({
-  baseURL: 'https://api.getrovie.com/v1',
+  baseURL: 'https://api.rovie.africa/v1',
   apiKey: process.env.ROVIE_API_KEY, // never a literal
 });
 ```
@@ -79,7 +79,7 @@ your credit, and forwards the request. That server is also where per-user rate
 limiting belongs.
 
 <Aside type="danger" title="What a leaked key costs">
-Somebody else's traffic on your balance until you notice. Rovie caps the damage
+Somebody else's traffic on your balance until you notice. Rovie Route caps the damage
 at your balance — there is no card to overdraft and no invoice at the end of
 the month — but the balance is real money. Revoke immediately from the
 dashboard if a key is ever exposed, then rotate.

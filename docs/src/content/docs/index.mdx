@@ -1,5 +1,5 @@
 ---
-title: Rovie docs
+title: Rovie Route docs
 description: One API key for GPT, Claude, Gemini, Llama and every other frontier model — OpenAI-compatible, billed against a balance you top up in your own currency.
 template: splash
 hero:
@@ -17,7 +17,7 @@ hero:
 
 import { Card, CardGrid, LinkCard, Code } from '@astrojs/starlight/components';
 
-Rovie is a gateway. You send it the request body you would have sent OpenAI, it
+Rovie Route is a gateway. You send it the request body you would have sent OpenAI, it
 routes to whichever provider actually serves the model you named, and it draws
 the cost down from a balance you topped up in naira, shillings or cedis.
 
@@ -31,7 +31,7 @@ The integration is a base URL and a key.
   client = OpenAI(
 -     base_url="https://api.openai.com/v1",
 -     api_key=os.environ["OPENAI_API_KEY"],
-+     base_url="https://api.getrovie.com/v1",
++     base_url="https://api.rovie.africa/v1",
 +     api_key=os.environ["ROVIE_API_KEY"],
   )
 
@@ -81,7 +81,7 @@ so it cannot drift from what the gateway actually serves.
   />
   <LinkCard
     title="GET /models"
-    description="Every model Rovie serves, with prices. No key needed."
+    description="Every model Rovie Route serves, with prices. No key needed."
     href="/api/operations/listcatalog/"
   />
 </CardGrid>
@@ -91,4 +91,4 @@ so it cannot drift from what the gateway actually serves.
 There is an [`/llms.txt`](/llms.txt) index, a
 [condensed](/llms-small.txt) full-text version and a
 [complete](/llms-full.txt) one. Point Claude, ChatGPT or a coding agent at
-whichever fits its context and it can write against Rovie without guessing.
+whichever fits its context and it can write against Rovie Route without guessing.

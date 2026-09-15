@@ -1,11 +1,11 @@
 ---
-title: What Rovie is
+title: What Rovie Route is
 description: A gateway between your code and every frontier model, with the billing rebuilt around how Africa actually pays.
 sidebar:
   order: 1
 ---
 
-Rovie sits between your code and the model providers. You hold one account and
+Rovie Route sits between your code and the model providers. You hold one account and
 one API key; behind it are OpenAI, Anthropic, Google, Meta, DeepSeek, Mistral
 and the rest, reachable through a single OpenAI-compatible endpoint.
 
@@ -18,7 +18,7 @@ second key, a second SDK, a second billing relationship and a second set of
 rate limits to reason about. Switching models means a code change; comparing
 them means doing all of the above twice.
 
-Through Rovie, changing model is changing a string:
+Through Rovie Route, changing model is changing a string:
 
 ```diff
 - model="openai/gpt-4o"
@@ -37,7 +37,7 @@ Kampala, Accra or Nairobi that is not a minor friction — it is often a hard
 stop. Naira cards get declined. Dollar cards have limits measured in tens of
 dollars a month. A team that can write the code cannot buy the tokens.
 
-Rovie holds the dollar relationship so you don't have to:
+Rovie Route holds the dollar relationship so you don't have to:
 
 - **Top up in your own currency** by bank transfer or stablecoin.
 - **Get quoted in your own currency** — every model's per-million price on the
@@ -51,7 +51,7 @@ See [Balance and top-ups](/guides/billing/) for the mechanics and
 [Pricing in local currency](/guides/local-pricing/) for how the conversion
 actually works.
 
-## What Rovie does not do
+## What Rovie Route does not do
 
 Worth being direct about, because gateways vary and the differences matter:
 
@@ -62,7 +62,7 @@ Worth being direct about, because gateways vary and the differences matter:
 - **It does not silently reroute.** A request for Claude that came back
   answered by GPT would be a worse outcome than a failed request. If the
   upstream provider is down, you get a 503 and you choose what to do.
-- **It does not host models.** Rovie proxies to the providers' own APIs. The
+- **It does not host models.** Rovie Route proxies to the providers' own APIs. The
   model you call is the provider's real model, at the provider's real quality.
 - **It is not a fine-tuning platform.** Inference only, today.
 

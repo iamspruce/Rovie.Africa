@@ -1,13 +1,13 @@
 ---
 title: SDKs
-description: There is no Rovie SDK to install — every OpenAI client already works. What to point where, in each language and framework.
+description: There is no Rovie Route SDK to install — every OpenAI client already works. What to point where, in each language and framework.
 sidebar:
   order: 1
 ---
 
 import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
 
-**There is no Rovie SDK, and that is the design.**
+**There is no Rovie Route SDK, and that is the design.**
 
 The gateway speaks OpenAI's protocol, so every OpenAI client library — the
 official ones, the community ones, and every framework built on top of them —
@@ -18,13 +18,13 @@ You need two values:
 
 | | |
 | --- | --- |
-| **Base URL** | `https://api.getrovie.com/v1` |
+| **Base URL** | `https://api.rovie.africa/v1` |
 | **API key** | `rv_...`, from [your dashboard](https://rovie.africa/dashboard/keys) |
 
 <Aside type="note" title="Where /v1 goes">
 Most SDKs append paths to whatever base URL you give them, so they want
-`https://api.getrovie.com/v1`. Raw HTTP calls need the full path,
-`https://api.getrovie.com/v1/chat/completions`. If you are getting 404s from a
+`https://api.rovie.africa/v1`. Raw HTTP calls need the full path,
+`https://api.rovie.africa/v1/chat/completions`. If you are getting 404s from a
 client library, this is the first thing to check.
 </Aside>
 
@@ -41,7 +41,7 @@ pip install openai
 from openai import OpenAI
 
 client = OpenAI(
-    base_url="https://api.getrovie.com/v1",
+    base_url="https://api.rovie.africa/v1",
     api_key=os.environ["ROVIE_API_KEY"],
 )
 ```
@@ -59,7 +59,7 @@ npm install openai
 import OpenAI from 'openai';
 
 const client = new OpenAI({
-  baseURL: 'https://api.getrovie.com/v1',
+  baseURL: 'https://api.rovie.africa/v1',
   apiKey: process.env.ROVIE_API_KEY,
 });
 ```
@@ -75,7 +75,7 @@ go get github.com/openai/openai-go/v2
 
 ```go
 client := openai.NewClient(
-    option.WithBaseURL("https://api.getrovie.com/v1"),
+    option.WithBaseURL("https://api.rovie.africa/v1"),
     option.WithAPIKey(os.Getenv("ROVIE_API_KEY")),
 )
 ```
@@ -85,7 +85,7 @@ client := openai.NewClient(
 
 ```java
 OpenAIClient client = OpenAIOkHttpClient.builder()
-    .baseUrl("https://api.getrovie.com/v1")
+    .baseUrl("https://api.rovie.africa/v1")
     .apiKey(System.getenv("ROVIE_API_KEY"))
     .build();
 ```
@@ -119,7 +119,7 @@ rather not add one, the [reference](/api/) carries a working curl, JavaScript
 and Go snippet on every operation.
 
 ```bash
-curl https://api.getrovie.com/v1/chat/completions \
+curl https://api.rovie.africa/v1/chat/completions \
   -H "Authorization: Bearer $ROVIE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"model": "openai/gpt-4o-mini", "messages": [{"role": "user", "content": "Hi"}]}'
@@ -128,7 +128,7 @@ curl https://api.getrovie.com/v1/chat/completions \
 ## Editors and coding agents
 
 Cursor, Continue, OpenCode, Zed, Aider and the rest all accept a custom
-OpenAI-compatible endpoint, which means they can run against Rovie's whole
+OpenAI-compatible endpoint, which means they can run against Rovie Route's whole
 model list on your balance. Setup for each is on
 [Editors and agents](/sdks/tools/).
 

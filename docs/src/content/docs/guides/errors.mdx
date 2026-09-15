@@ -31,7 +31,7 @@ Branch on `code`. `message` is written for a human and its wording can change.
 | `402` | Out of balance, or past this key's budget cap | **No** — top up |
 | `404` | No such model, or the key is scoped away from it | **No** |
 | `429` | Over a rate limit | **Yes**, with backoff |
-| `500` | Rovie failed | **Yes**, a couple of times |
+| `500` | Rovie Route failed | **Yes**, a couple of times |
 | `503` | Upstream provider unavailable | **Yes**, or switch model |
 | Timeout | No response in time | **Yes**, carefully — see below |
 
@@ -68,7 +68,7 @@ Two causes, and the second is easy to miss:
 
 ### `503` — the provider is down
 
-Rovie does not silently reroute to a different model. A request for Claude that
+Rovie Route does not silently reroute to a different model. A request for Claude that
 came back answered by GPT would be worse than a failure — different quality,
 different price, and no way for you to know it happened.
 
@@ -174,7 +174,7 @@ So:
 ## What is not charged
 
 Nothing is charged for a request that never reached a provider: `400`, `401`,
-`402`, `404`, `429` and Rovie's own `500`s are free.
+`402`, `404`, `429` and Rovie Route's own `500`s are free.
 
 You *are* charged when a provider generated tokens, even if you never used
 them — a timeout you abandoned, a stream you cancelled mid-flight, a `503`
