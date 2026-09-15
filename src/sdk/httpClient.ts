@@ -95,7 +95,9 @@ export function buildHeaders({ apiKey, internalKey, json = true }: BuildHeadersO
   return headers;
 }
 
-const DEFAULT_TIMEOUT_MS = 8000;
+// 15 seconds allows scale-to-zero microservices (Fly.io + Neon compute)
+// enough headroom to boot cold instances without tripping client aborts.
+const DEFAULT_TIMEOUT_MS = 15000;
 
 export async function request(
   url: string,

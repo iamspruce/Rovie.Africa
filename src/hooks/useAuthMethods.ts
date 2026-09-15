@@ -17,16 +17,38 @@ export function useAuthMethods() {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
+    let active = true;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const controller = new AbortController();
 
-    rovie.portal
-      .getAuthMethods(controller.signal)
-      .then((methods) => setData(methods))
-      .catch((err: unknown) => {
-        if (!isAbortError(err)) setError(err as Error);
-      });
+    async function load(attempt = 1) {
+      try {
+        const methods = await rovie.portal.getAuthMethods(controller.signal);
+        if (active) {
+          setData(methods);
+          setError(null);
+        }
+      } catch (err: unknown) {
+        if (!active || isAbortError(err)) return;
+        // Backend cold-starts (scale-to-zero) can take several seconds to boot.
+        // Automatically retry twice before displaying an error banner.
+        if (attempt < 3) {
+          timer = setTimeout(() => {
+            if (active) void load(attempt + 1);
+          }, 1500);
+        } else {
+          setError(err as Error);
+        }
+      }
+    }
 
-    return () => controller.abort();
+    void load();
+
+    return () => {
+      active = false;
+      if (timer) clearTimeout(timer);
+      controller.abort();
+    };
   }, []);
 
   return { data, error };

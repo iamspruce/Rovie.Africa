@@ -7,7 +7,12 @@ export interface Config {
 }
 
 const isProd = import.meta.env.PROD;
-const isRouteApp = import.meta.env.VITE_APP_TARGET === 'route';
+const isRouteApp =
+  import.meta.env.VITE_APP_TARGET === 'route' ||
+  (typeof window !== 'undefined' &&
+    (window.location.hostname === 'route.rovie.africa' ||
+      window.location.hostname.includes('route') ||
+      window.location.port === '5174'));
 
 // Per-service Fly.io URLs (scale-to-zero, ~300ms cold start)
 const PROD_ACCOUNT_URL  = 'https://rovie-account-service.fly.dev';
