@@ -1,4 +1,4 @@
-import { useId, type InputHTMLAttributes, type ReactNode } from 'react';
+import { useId, useState, type InputHTMLAttributes, type ReactNode } from 'react';
 import { rovie } from '../../sdk';
 import type { AuthMethods, SocialProvider } from '../../sdk';
 import styles from './AuthForm.module.scss';
@@ -121,15 +121,23 @@ export function SocialButton({
   provider,
   onClick,
   disabled,
+  loading,
 }: {
   provider: SocialProvider;
   onClick: () => void;
   disabled?: boolean;
+  loading?: boolean;
 }) {
   return (
-    <button type="button" className={styles.social} onClick={onClick} disabled={disabled}>
+    <button
+      type="button"
+      className={styles.social}
+      onClick={onClick}
+      disabled={disabled || loading}
+      aria-busy={loading}
+    >
       {MARKS[provider]}
-      {LABELS[provider]}
+      {loading ? `Redirecting…` : LABELS[provider]}
     </button>
   );
 }
@@ -154,7 +162,23 @@ export function SocialAuth({
   disabled?: boolean;
 }) {
   const available = PROVIDER_ORDER.filter((provider) => methods?.[provider]);
+  const [pending, setPending] = useState<SocialProvider | null>(null);
+
   if (available.length === 0) return null;
+
+  async function handleSocialClick(provider: SocialProvider) {
+    if (pending) return; // already in-flight
+    setPending(provider);
+    try {
+      // Better Auth v1 social sign-in is a POST that returns the provider
+      // authorization URL. Navigate only once we have that URL.
+      const url = await rovie.portal.initiateSocialSignIn(provider, callbackURL);
+      window.location.href = url;
+    } catch {
+      // Navigation failed — reset so the user can try again.
+      setPending(null);
+    }
+  }
 
   return (
     <>
@@ -163,12 +187,9 @@ export function SocialAuth({
           <SocialButton
             key={provider}
             provider={provider}
-            disabled={disabled}
-            // A full-page navigation, not a route change: the browser has to
-            // leave for the provider and come back with a session cookie.
-            onClick={() => {
-              window.location.href = rovie.portal.socialSignInUrl(provider, callbackURL);
-            }}
+            disabled={disabled || pending !== null}
+            loading={pending === provider}
+            onClick={() => { void handleSocialClick(provider); }}
           />
         ))}
       </div>

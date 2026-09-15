@@ -202,15 +202,28 @@ export function changePassword(input: {
 }
 
 /**
- * OAuth is a full-page redirect, not a fetch: the browser has to visit Google
- * or GitHub itself. Returning the URL rather than navigating keeps this
- * module free of side effects.
+ * Initiates OAuth sign-in with the given social provider.
+ *
+ * Better Auth v1's /auth/sign-in/social is a POST endpoint — it is NOT a
+ * navigable GET URL. This function posts the request and returns the
+ * authorization URL that the browser must be sent to. The caller is responsible
+ * for the navigation (window.location.href = ...).
+ *
+ * @returns The provider's authorization URL to redirect the browser to.
+ * @throws  If the API call fails or the response contains no redirect URL.
  */
-export function socialSignInUrl(provider: SocialProvider, callbackURL: string): string {
-  const url = new URL(`${config.portalApiUrl.replace(/\/+$/, '')}/auth/sign-in/social`);
-  url.searchParams.set('provider', provider);
-  url.searchParams.set('callbackURL', callbackURL);
-  return url.toString();
+export async function initiateSocialSignIn(
+  provider: SocialProvider,
+  callbackURL: string,
+): Promise<string> {
+  const result = await portalCall<{ url?: string; redirect?: boolean }>(
+    '/auth/sign-in/social',
+    { method: 'POST', body: { provider, callbackURL } },
+  );
+  if (!result.url) {
+    throw new Error(`Social sign-in for ${provider} did not return a redirect URL.`);
+  }
+  return result.url;
 }
 
 // -------------------------------------------------------------- api keys

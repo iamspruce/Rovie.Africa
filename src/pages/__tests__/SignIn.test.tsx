@@ -20,8 +20,11 @@ vi.mock('../../sdk', () => ({
       sendMagicLink: (...args: unknown[]) => sendMagicLink(...args),
       requestPasswordReset: (...args: unknown[]) => requestPasswordReset(...args),
       signOut: vi.fn(),
-      socialSignInUrl: (provider: string, callback: string) =>
-        `http://localhost:4002/auth/sign-in/social?provider=${provider}&callbackURL=${encodeURIComponent(callback)}`,
+      // Better Auth v1: social sign-in is a POST that returns a redirect URL.
+      initiateSocialSignIn: (provider: string, callback: string) =>
+        Promise.resolve(
+          `http://localhost:4002/auth/sign-in/social?provider=${provider}&callbackURL=${encodeURIComponent(callback)}`
+        ),
     },
     geo: { detectVisitorCountry: (...args: unknown[]) => detectVisitorCountry(...args) },
   },
@@ -266,10 +269,12 @@ describe('SignIn page', () => {
       renderSignIn('/signin?next=/dashboard/keys');
       await user.click(await screen.findByRole('button', { name: /Continue with GitHub/ }));
 
-      expect(assigned).toEqual([
+      // initiateSocialSignIn is async — wait for the URL assignment.
+      await waitFor(() => expect(assigned).toHaveLength(1));
+      expect(assigned[0]).toBe(
         'http://localhost:4002/auth/sign-in/social?provider=github&callbackURL=' +
           encodeURIComponent('http://localhost:5173/dashboard/keys'),
-      ]);
+      );
     } finally {
       Object.defineProperty(window, 'location', original);
     }

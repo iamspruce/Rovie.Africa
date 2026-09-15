@@ -17,8 +17,9 @@ vi.mock('../../sdk', () => ({
       signUpWithEmail: (...args: unknown[]) => signUpWithEmail(...args),
       sendMagicLink: (...args: unknown[]) => sendMagicLink(...args),
       signOut: vi.fn(),
-      socialSignInUrl: (provider: string) =>
-        `http://localhost:4002/auth/sign-in/social?provider=${provider}`,
+      // Better Auth v1: social sign-in is a POST that returns a redirect URL.
+      initiateSocialSignIn: (provider: string) =>
+        Promise.resolve(`http://localhost:4002/auth/sign-in/social?provider=${provider}`),
     },
     geo: { detectVisitorCountry: (...args: unknown[]) => detectVisitorCountry(...args) },
   },
